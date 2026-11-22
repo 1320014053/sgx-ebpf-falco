@@ -2,11 +2,12 @@ param(
     [switch]$Install,
     [string]$QemuDirectory = 'C:\Program Files\qemu',
     [string]$Python = 'python',
-    [int]$SshPort = 2222
+    [int]$SshPort = 2222,
+    [string]$DataRoot = (Split-Path $PSScriptRoot -Parent)
 )
 $ErrorActionPreference = 'Stop'
-$workspace = Split-Path $PSScriptRoot -Parent
-$runtime = Join-Path $PSScriptRoot 'runtime'
+$workspace = (Resolve-Path -LiteralPath $DataRoot).ProviderPath
+$runtime = Join-Path $workspace 'vm/runtime'
 $disk = Join-Path $workspace 'sgx-ebpf-sim.qcow2'
 $iso = Join-Path $workspace 'ubuntu-22.04.5-live-server-amd64.iso'
 $qemu = Join-Path $QemuDirectory 'qemu-system-x86_64.exe'

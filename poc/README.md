@@ -6,10 +6,10 @@ Falco 原版规则与扩展使用独立的离线回放和 Modern eBPF 实时直�
 
 ## 构建与运行
 
-Windows 上安装及启动客体见 `../vm/README.md`。把 `poc/` 上传到客体后执行：
+从客体中的仓库根目录执行。Windows 主机可先按[虚拟机说明](../vm/README.md)启动客体并传入完整提交。
 
 ```bash
-cd ~/poc
+cd poc
 sudo bash scripts/setup-ubuntu.sh
 bash scripts/check-environment.sh > ../environment.log
 bash scripts/build.sh

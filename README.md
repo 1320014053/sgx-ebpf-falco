@@ -13,6 +13,8 @@
 
 ## 先运行 GETPID 测试
 
+Windows 主机从本仓库根目录按[虚拟机说明](vm/README.md)启动已有客体，将待测 Git 提交传入一个新目录。以下 Linux 命令从客体内该提交的仓库根目录开始。已安装依赖和 Intel SGX SDK 的客体可以直接执行构建和冒烟测试。
+
 在启用 eBPF 和 BTF 的 Ubuntu 22.04 x86-64 客体中，从仓库根目录执行。安装脚本准备 Intel SGX SDK 2.25 和编译依赖。
 
 ```bash
