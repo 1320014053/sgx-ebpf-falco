@@ -1,0 +1,4163 @@
+{
+  "environment": {
+    "date": "2026-11-21",
+    "os": "Ubuntu 22.04 x86_64",
+    "kernel": "5.15.0-198-generic",
+    "vm": "QEMU TCG, 4 vCPUs, 6144 MiB, isolated snapshot",
+    "falco": "0.45.2",
+    "falco_libs": "0.26.1",
+    "enclave": "Open Enclave SGX Simulation",
+    "configured_heap_bytes": 536870912,
+    "raven_commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+    "raven_archive_sha256": "f53bbce4f31287a3528a5060aa52e056ca1ec10945121b7f64058be6aab0bd69"
+  },
+  "measurement": {
+    "units": "bytes except event counts and wall_seconds",
+    "growth": "Resident process RSS for native or current OE allocated heap for SGX. After each 10,000 events, before EOF refresh. Deltas are paired in each process before taking the median of three runs.",
+    "process_peak_rss": "GNU time %M from process start to exit, converted from KiB",
+    "enclave_peak": "OE allocator high-water footprint, including allocator slack; sampled through final output flush. This covers the whole trusted heap.",
+    "alert_bytes": "UTF-8 bytes of one whole Falco JSON output line excluding its line ending",
+    "payload_bytes": "UTF-8 bytes of the unescaped rz.result field",
+    "upstream_comparison": "Full detection objects in order. Normalize random detection ID and absolute rule installation prefix. Fixed evidence IDs and their order are compared unmodified.",
+    "process_peak_artifact": "release; profiles supply intermediate RSS and enclave allocator data"
+  },
+  "main": {
+    "events_per_workload": 100000,
+    "profile_repeats": 3,
+    "inputs": {
+      "repeat": {
+        "bytes": 20877827,
+        "sha256": "6e8f58885f03523eac294c72a90cf55ff02d5e2de2fa66323cc8516a5da37561"
+      },
+      "churn": {
+        "bytes": 18477885,
+        "sha256": "8aecf27667b66b593f62ada50b86dbc15ef4d6789084f6dc4ba1ad190aec29ba"
+      }
+    },
+    "binaries_sha256": {
+      "release": {
+        "lib/libraven_zeek.so": "acd9b4f643be9cc125285849be635b63fe8226591d82ad72bf4ea9a9e80cdbe0",
+        "bin/falco-sgx": "b463d98891cdd828fb31d2dc680ee51f14a3415af409f7b5fefb2367125f3edb",
+        "falco-enclave.signed": "79244744b30b1dc9e1749a1f0a03043f563baf88051ce9ebde906587cbf450a8"
+      },
+      "profile": {
+        "lib/libraven_zeek.so": "64d03c6d2a464b6e370e4810b19885560ed45ebef8164a491efb76d9b67f06e2",
+        "bin/falco-sgx": "590f4fffe36b4fcc1cedacc690521959c8f31c0a346dfc0c3c297b9267f1ad18",
+        "falco-enclave.signed": "5aeb54bb476b9a1654f1a33369c19c2bea0b5a7df5deed199d664abdf9e0e00f"
+      },
+      "falco": "702900ebeee85e03823f817af99a19fcc0389bfc8f9cacab251bcaac0981d02e"
+    },
+    "machine": "5.15.0-198-generic",
+    "runs": [
+      {
+        "workload": "repeat",
+        "mode": "native",
+        "artifact": "release",
+        "run": "repeat-native-release-0",
+        "wall_seconds": 55.007,
+        "process_peak_rss": 186134528,
+        "checkpoints": [],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "repeat",
+        "mode": "sgx",
+        "artifact": "release",
+        "run": "repeat-sgx-release-0",
+        "wall_seconds": 42.842,
+        "process_peak_rss": 908468224,
+        "checkpoints": [],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "churn",
+        "mode": "native",
+        "artifact": "release",
+        "run": "churn-native-release-0",
+        "wall_seconds": 62.253,
+        "process_peak_rss": 286498816,
+        "checkpoints": [],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      },
+      {
+        "workload": "churn",
+        "mode": "sgx",
+        "artifact": "release",
+        "run": "churn-sgx-release-0",
+        "wall_seconds": 46.334,
+        "process_peak_rss": 908398592,
+        "checkpoints": [],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      },
+      {
+        "workload": "repeat",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "repeat-sgx-profile-1",
+        "wall_seconds": 46.584,
+        "process_peak_rss": 908455936,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 23425888,
+            "enclave_peak": 24223744,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 25563376,
+            "enclave_peak": 26918912,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 20002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 2,
+            "enclave_used": 27612080,
+            "enclave_peak": 30130176,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 30002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 3,
+            "enclave_used": 30037552,
+            "enclave_peak": 33193984,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 40002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 4,
+            "enclave_used": 33626880,
+            "enclave_peak": 38191104,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 50002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 5,
+            "enclave_used": 37332080,
+            "enclave_peak": 42561536,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 60002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 6,
+            "enclave_used": 41676976,
+            "enclave_peak": 47550464,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 70002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 7,
+            "enclave_used": 47707760,
+            "enclave_peak": 55779328,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 80002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 8,
+            "enclave_used": 53330144,
+            "enclave_peak": 62070784,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 90002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 9,
+            "enclave_used": 59591152,
+            "enclave_peak": 68980736,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 66493680,
+            "enclave_peak": 76509184,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 95285296,
+            "enclave_peak": 103333888,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 39235152,
+            "enclave_peak": 163835904,
+            "enclave_capacity": 536870912,
+            "rss": 817115136,
+            "anonymous_rss": 50929664,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "repeat",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "repeat-native-profile-1",
+        "wall_seconds": 54.287,
+        "process_peak_rss": 186429440,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 74424320,
+            "anonymous_rss": 38576128,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 76664832,
+            "anonymous_rss": 40685568,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 20002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 2,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 79237120,
+            "anonymous_rss": 43257856,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 30002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 3,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 82198528,
+            "anonymous_rss": 46219264,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 40002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 4,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 85131264,
+            "anonymous_rss": 49152000,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 50002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 5,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 89227264,
+            "anonymous_rss": 53248000,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 60002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 6,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 92946432,
+            "anonymous_rss": 56967168,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 70002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 7,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 97280000,
+            "anonymous_rss": 61300736,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 80002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 8,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 100909056,
+            "anonymous_rss": 64929792,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 90002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 9,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 107761664,
+            "anonymous_rss": 71782400,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 113823744,
+            "anonymous_rss": 77844480,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 144150528,
+            "anonymous_rss": 108171264,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "churn",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "churn-sgx-profile-1",
+        "wall_seconds": 47.812,
+        "process_peak_rss": 908410880,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 21026064,
+            "enclave_peak": 23658496,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 60954880,
+            "enclave_peak": 61345792,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 10003,
+            "edges": 20002,
+            "edge_ids": 25000,
+            "tree_pids": 5000,
+            "ledger_pids": 2048,
+            "detections": 2,
+            "enclave_used": 85053104,
+            "enclave_peak": 85733376,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 15003,
+            "edges": 30003,
+            "edge_ids": 37500,
+            "tree_pids": 7500,
+            "ledger_pids": 2048,
+            "detections": 3,
+            "enclave_used": 108783200,
+            "enclave_peak": 109457408,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 20003,
+            "edges": 40004,
+            "edge_ids": 50000,
+            "tree_pids": 10000,
+            "ledger_pids": 2048,
+            "detections": 4,
+            "enclave_used": 133314608,
+            "enclave_peak": 134561792,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 25003,
+            "edges": 50005,
+            "edge_ids": 62500,
+            "tree_pids": 12500,
+            "ledger_pids": 2048,
+            "detections": 5,
+            "enclave_used": 157076912,
+            "enclave_peak": 158285824,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 30003,
+            "edges": 60006,
+            "edge_ids": 75000,
+            "tree_pids": 15000,
+            "ledger_pids": 2048,
+            "detections": 6,
+            "enclave_used": 180845328,
+            "enclave_peak": 182075392,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 35003,
+            "edges": 70007,
+            "edge_ids": 87500,
+            "tree_pids": 17500,
+            "ledger_pids": 2048,
+            "detections": 7,
+            "enclave_used": 206186432,
+            "enclave_peak": 208158720,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 40003,
+            "edges": 80008,
+            "edge_ids": 100000,
+            "tree_pids": 20000,
+            "ledger_pids": 2048,
+            "detections": 8,
+            "enclave_used": 229908048,
+            "enclave_peak": 231882752,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 45003,
+            "edges": 90009,
+            "edge_ids": 112500,
+            "tree_pids": 22500,
+            "ledger_pids": 2048,
+            "detections": 9,
+            "enclave_used": 253654912,
+            "enclave_peak": 255672320,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 277382432,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 277382816,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 21130288,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812277760,
+            "anonymous_rss": 46129152,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      },
+      {
+        "workload": "churn",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "churn-native-profile-1",
+        "wall_seconds": 63.19,
+        "process_peak_rss": 286375936,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 71827456,
+            "anonymous_rss": 36089856,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 105660416,
+            "anonymous_rss": 69791744,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 10003,
+            "edges": 20002,
+            "edge_ids": 25000,
+            "tree_pids": 5000,
+            "ledger_pids": 2048,
+            "detections": 2,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 125804544,
+            "anonymous_rss": 89935872,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 15003,
+            "edges": 30003,
+            "edge_ids": 37500,
+            "tree_pids": 7500,
+            "ledger_pids": 2048,
+            "detections": 3,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 145813504,
+            "anonymous_rss": 109944832,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 20003,
+            "edges": 40004,
+            "edge_ids": 50000,
+            "tree_pids": 10000,
+            "ledger_pids": 2048,
+            "detections": 4,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 166100992,
+            "anonymous_rss": 130232320,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 25003,
+            "edges": 50005,
+            "edge_ids": 62500,
+            "tree_pids": 12500,
+            "ledger_pids": 2048,
+            "detections": 5,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 186097664,
+            "anonymous_rss": 150228992,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 30003,
+            "edges": 60006,
+            "edge_ids": 75000,
+            "tree_pids": 15000,
+            "ledger_pids": 2048,
+            "detections": 6,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 206118912,
+            "anonymous_rss": 170250240,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 35003,
+            "edges": 70007,
+            "edge_ids": 87500,
+            "tree_pids": 17500,
+            "ledger_pids": 2048,
+            "detections": 7,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 227147776,
+            "anonymous_rss": 191279104,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 40003,
+            "edges": 80008,
+            "edge_ids": 100000,
+            "tree_pids": 20000,
+            "ledger_pids": 2048,
+            "detections": 8,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 247078912,
+            "anonymous_rss": 211210240,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 45003,
+            "edges": 90009,
+            "edge_ids": 112500,
+            "tree_pids": 22500,
+            "ledger_pids": 2048,
+            "detections": 9,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 267014144,
+            "anonymous_rss": 231145472,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 286941184,
+            "anonymous_rss": 251072512,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 286941184,
+            "anonymous_rss": 251072512,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      },
+      {
+        "workload": "repeat",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "repeat-native-profile-2",
+        "wall_seconds": 54.437,
+        "process_peak_rss": 185307136,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 74739712,
+            "anonymous_rss": 38662144,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 77189120,
+            "anonymous_rss": 40980480,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 20002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 2,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 79241216,
+            "anonymous_rss": 43032576,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 30002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 3,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 81293312,
+            "anonymous_rss": 45084672,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 40002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 4,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 84893696,
+            "anonymous_rss": 48685056,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 50002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 5,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 88485888,
+            "anonymous_rss": 52277248,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 60002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 6,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 93143040,
+            "anonymous_rss": 56934400,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 70002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 7,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 99090432,
+            "anonymous_rss": 62881792,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 80002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 8,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 102371328,
+            "anonymous_rss": 66162688,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 90002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 9,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 106463232,
+            "anonymous_rss": 70254592,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 116273152,
+            "anonymous_rss": 80064512,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 142524416,
+            "anonymous_rss": 106315776,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "repeat",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "repeat-sgx-profile-2",
+        "wall_seconds": 44.601,
+        "process_peak_rss": 908378112,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 23427680,
+            "enclave_peak": 26058752,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 25560448,
+            "enclave_peak": 26914816,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 20002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 2,
+            "enclave_used": 27613072,
+            "enclave_peak": 30130176,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 30002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 3,
+            "enclave_used": 30038048,
+            "enclave_peak": 33193984,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 40002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 4,
+            "enclave_used": 33628064,
+            "enclave_peak": 38191104,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 50002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 5,
+            "enclave_used": 37331856,
+            "enclave_peak": 42561536,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 60002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 6,
+            "enclave_used": 41677504,
+            "enclave_peak": 47550464,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 70002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 7,
+            "enclave_used": 47708016,
+            "enclave_peak": 55779328,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 80002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 8,
+            "enclave_used": 53330560,
+            "enclave_peak": 62070784,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 90002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 9,
+            "enclave_used": 59592640,
+            "enclave_peak": 68980736,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 66495488,
+            "enclave_peak": 76509184,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 95285472,
+            "enclave_peak": 103333888,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 39236928,
+            "enclave_peak": 163835904,
+            "enclave_capacity": 536870912,
+            "rss": 817016832,
+            "anonymous_rss": 50933760,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "churn",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "churn-native-profile-2",
+        "wall_seconds": 63.85,
+        "process_peak_rss": 285753344,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 71774208,
+            "anonymous_rss": 36126720,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 105603072,
+            "anonymous_rss": 69824512,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 10003,
+            "edges": 20002,
+            "edge_ids": 25000,
+            "tree_pids": 5000,
+            "ledger_pids": 2048,
+            "detections": 2,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 125747200,
+            "anonymous_rss": 89968640,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 15003,
+            "edges": 30003,
+            "edge_ids": 37500,
+            "tree_pids": 7500,
+            "ledger_pids": 2048,
+            "detections": 3,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 145764352,
+            "anonymous_rss": 109985792,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 20003,
+            "edges": 40004,
+            "edge_ids": 50000,
+            "tree_pids": 10000,
+            "ledger_pids": 2048,
+            "detections": 4,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 166043648,
+            "anonymous_rss": 130265088,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 25003,
+            "edges": 50005,
+            "edge_ids": 62500,
+            "tree_pids": 12500,
+            "ledger_pids": 2048,
+            "detections": 5,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 186044416,
+            "anonymous_rss": 150265856,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 30003,
+            "edges": 60006,
+            "edge_ids": 75000,
+            "tree_pids": 15000,
+            "ledger_pids": 2048,
+            "detections": 6,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 206061568,
+            "anonymous_rss": 170283008,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 35003,
+            "edges": 70007,
+            "edge_ids": 87500,
+            "tree_pids": 17500,
+            "ledger_pids": 2048,
+            "detections": 7,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 227090432,
+            "anonymous_rss": 191311872,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 40003,
+            "edges": 80008,
+            "edge_ids": 100000,
+            "tree_pids": 20000,
+            "ledger_pids": 2048,
+            "detections": 8,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 246022144,
+            "anonymous_rss": 210243584,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 45003,
+            "edges": 90009,
+            "edge_ids": 112500,
+            "tree_pids": 22500,
+            "ledger_pids": 2048,
+            "detections": 9,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 266956800,
+            "anonymous_rss": 231178240,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 286883840,
+            "anonymous_rss": 251105280,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 286883840,
+            "anonymous_rss": 251105280,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      },
+      {
+        "workload": "churn",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "churn-sgx-profile-2",
+        "wall_seconds": 51.786,
+        "process_peak_rss": 908447744,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 21025616,
+            "enclave_peak": 23658496,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 60957760,
+            "enclave_peak": 61411328,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 10003,
+            "edges": 20002,
+            "edge_ids": 25000,
+            "tree_pids": 5000,
+            "ledger_pids": 2048,
+            "detections": 2,
+            "enclave_used": 85056464,
+            "enclave_peak": 85733376,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 15003,
+            "edges": 30003,
+            "edge_ids": 37500,
+            "tree_pids": 7500,
+            "ledger_pids": 2048,
+            "detections": 3,
+            "enclave_used": 108786832,
+            "enclave_peak": 109457408,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 20003,
+            "edges": 40004,
+            "edge_ids": 50000,
+            "tree_pids": 10000,
+            "ledger_pids": 2048,
+            "detections": 4,
+            "enclave_used": 133319792,
+            "enclave_peak": 134561792,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 25003,
+            "edges": 50005,
+            "edge_ids": 62500,
+            "tree_pids": 12500,
+            "ledger_pids": 2048,
+            "detections": 5,
+            "enclave_used": 157082608,
+            "enclave_peak": 158285824,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 30003,
+            "edges": 60006,
+            "edge_ids": 75000,
+            "tree_pids": 15000,
+            "ledger_pids": 2048,
+            "detections": 6,
+            "enclave_used": 180851856,
+            "enclave_peak": 182075392,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 35003,
+            "edges": 70007,
+            "edge_ids": 87500,
+            "tree_pids": 17500,
+            "ledger_pids": 2048,
+            "detections": 7,
+            "enclave_used": 206193248,
+            "enclave_peak": 208224256,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 40003,
+            "edges": 80008,
+            "edge_ids": 100000,
+            "tree_pids": 20000,
+            "ledger_pids": 2048,
+            "detections": 8,
+            "enclave_used": 229915264,
+            "enclave_peak": 231948288,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 45003,
+            "edges": 90009,
+            "edge_ids": 112500,
+            "tree_pids": 22500,
+            "ledger_pids": 2048,
+            "detections": 9,
+            "enclave_used": 253661376,
+            "enclave_peak": 255672320,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 277388896,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 277389216,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 21129920,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812290048,
+            "anonymous_rss": 46125056,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      },
+      {
+        "workload": "repeat",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "repeat-sgx-profile-3",
+        "wall_seconds": 47.385,
+        "process_peak_rss": 908439552,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 23426512,
+            "enclave_peak": 24223744,
+            "enclave_capacity": 536870912,
+            "rss": 817057792,
+            "anonymous_rss": 50933760,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 25564336,
+            "enclave_peak": 26918912,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 20002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 2,
+            "enclave_used": 27613200,
+            "enclave_peak": 30130176,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 30002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 3,
+            "enclave_used": 30038288,
+            "enclave_peak": 33193984,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 40002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 4,
+            "enclave_used": 33627344,
+            "enclave_peak": 38191104,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 50002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 5,
+            "enclave_used": 37332112,
+            "enclave_peak": 42561536,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 60002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 6,
+            "enclave_used": 41677136,
+            "enclave_peak": 47550464,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 70002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 7,
+            "enclave_used": 47708368,
+            "enclave_peak": 55779328,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 80002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 8,
+            "enclave_used": 53331472,
+            "enclave_peak": 62070784,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 90002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 9,
+            "enclave_used": 59591760,
+            "enclave_peak": 68980736,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 66493504,
+            "enclave_peak": 76509184,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 95285184,
+            "enclave_peak": 103333888,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 39235904,
+            "enclave_peak": 163835904,
+            "enclave_capacity": 536870912,
+            "rss": 817123328,
+            "anonymous_rss": 50933760,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "repeat",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "repeat-native-profile-3",
+        "wall_seconds": 52.735,
+        "process_peak_rss": 185909248,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 74473472,
+            "anonymous_rss": 38703104,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 76918784,
+            "anonymous_rss": 41017344,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 20002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 2,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 79437824,
+            "anonymous_rss": 43536384,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 30002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 3,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 82055168,
+            "anonymous_rss": 46153728,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 40002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 4,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 86007808,
+            "anonymous_rss": 50106368,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 50002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 5,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 88887296,
+            "anonymous_rss": 52985856,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 60002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 6,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 92884992,
+            "anonymous_rss": 56983552,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 70002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 7,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 97140736,
+            "anonymous_rss": 61239296,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 80002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 8,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 100749312,
+            "anonymous_rss": 64847872,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 90002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 9,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 107610112,
+            "anonymous_rss": 71708672,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 112091136,
+            "anonymous_rss": 76189696,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 100002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 143040512,
+            "anonymous_rss": 107139072,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 1291073,
+        "max_alert_bytes": 4474496,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 1291070,
+            "alert_bytes": 4474487
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 1291072,
+            "alert_bytes": 4474493
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 1291073,
+            "alert_bytes": 4474496
+          }
+        ],
+        "ordered_alert_sha256": "38cac0861b3cb605419b5b3323402e11cf4e3da7243e40d64c4a630d6ec14f5c"
+      },
+      {
+        "workload": "churn",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "churn-sgx-profile-3",
+        "wall_seconds": 49.611,
+        "process_peak_rss": 908468224,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 21025760,
+            "enclave_peak": 21823488,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 60959568,
+            "enclave_peak": 61411328,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 10003,
+            "edges": 20002,
+            "edge_ids": 25000,
+            "tree_pids": 5000,
+            "ledger_pids": 2048,
+            "detections": 2,
+            "enclave_used": 85058576,
+            "enclave_peak": 85733376,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 15003,
+            "edges": 30003,
+            "edge_ids": 37500,
+            "tree_pids": 7500,
+            "ledger_pids": 2048,
+            "detections": 3,
+            "enclave_used": 108788608,
+            "enclave_peak": 109457408,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 20003,
+            "edges": 40004,
+            "edge_ids": 50000,
+            "tree_pids": 10000,
+            "ledger_pids": 2048,
+            "detections": 4,
+            "enclave_used": 133322352,
+            "enclave_peak": 134561792,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 25003,
+            "edges": 50005,
+            "edge_ids": 62500,
+            "tree_pids": 12500,
+            "ledger_pids": 2048,
+            "detections": 5,
+            "enclave_used": 157085232,
+            "enclave_peak": 158285824,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 30003,
+            "edges": 60006,
+            "edge_ids": 75000,
+            "tree_pids": 15000,
+            "ledger_pids": 2048,
+            "detections": 6,
+            "enclave_used": 180855456,
+            "enclave_peak": 182075392,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 35003,
+            "edges": 70007,
+            "edge_ids": 87500,
+            "tree_pids": 17500,
+            "ledger_pids": 2048,
+            "detections": 7,
+            "enclave_used": 206196336,
+            "enclave_peak": 208224256,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 40003,
+            "edges": 80008,
+            "edge_ids": 100000,
+            "tree_pids": 20000,
+            "ledger_pids": 2048,
+            "detections": 8,
+            "enclave_used": 229917936,
+            "enclave_peak": 231948288,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 45003,
+            "edges": 90009,
+            "edge_ids": 112500,
+            "tree_pids": 22500,
+            "ledger_pids": 2048,
+            "detections": 9,
+            "enclave_used": 253663456,
+            "enclave_peak": 255672320,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 277391824,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 277392144,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 21130192,
+            "enclave_peak": 279396352,
+            "enclave_capacity": 536870912,
+            "rss": 812351488,
+            "anonymous_rss": 46129152,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      },
+      {
+        "workload": "churn",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "churn-native-profile-3",
+        "wall_seconds": 62.252,
+        "process_peak_rss": 286064640,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 71905280,
+            "anonymous_rss": 36208640,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 105738240,
+            "anonymous_rss": 69910528,
+            "phase": "events"
+          },
+          {
+            "events": 20000,
+            "nodes": 10003,
+            "edges": 20002,
+            "edge_ids": 25000,
+            "tree_pids": 5000,
+            "ledger_pids": 2048,
+            "detections": 2,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 125878272,
+            "anonymous_rss": 90050560,
+            "phase": "events"
+          },
+          {
+            "events": 30000,
+            "nodes": 15003,
+            "edges": 30003,
+            "edge_ids": 37500,
+            "tree_pids": 7500,
+            "ledger_pids": 2048,
+            "detections": 3,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 145883136,
+            "anonymous_rss": 110055424,
+            "phase": "events"
+          },
+          {
+            "events": 40000,
+            "nodes": 20003,
+            "edges": 40004,
+            "edge_ids": 50000,
+            "tree_pids": 10000,
+            "ledger_pids": 2048,
+            "detections": 4,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 166178816,
+            "anonymous_rss": 130351104,
+            "phase": "events"
+          },
+          {
+            "events": 50000,
+            "nodes": 25003,
+            "edges": 50005,
+            "edge_ids": 62500,
+            "tree_pids": 12500,
+            "ledger_pids": 2048,
+            "detections": 5,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 186175488,
+            "anonymous_rss": 150347776,
+            "phase": "events"
+          },
+          {
+            "events": 60000,
+            "nodes": 30003,
+            "edges": 60006,
+            "edge_ids": 75000,
+            "tree_pids": 15000,
+            "ledger_pids": 2048,
+            "detections": 6,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 206196736,
+            "anonymous_rss": 170369024,
+            "phase": "events"
+          },
+          {
+            "events": 70000,
+            "nodes": 35003,
+            "edges": 70007,
+            "edge_ids": 87500,
+            "tree_pids": 17500,
+            "ledger_pids": 2048,
+            "detections": 7,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 227229696,
+            "anonymous_rss": 191401984,
+            "phase": "events"
+          },
+          {
+            "events": 80000,
+            "nodes": 40003,
+            "edges": 80008,
+            "edge_ids": 100000,
+            "tree_pids": 20000,
+            "ledger_pids": 2048,
+            "detections": 8,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 247160832,
+            "anonymous_rss": 211333120,
+            "phase": "events"
+          },
+          {
+            "events": 90000,
+            "nodes": 45003,
+            "edges": 90009,
+            "edge_ids": 112500,
+            "tree_pids": 22500,
+            "ledger_pids": 2048,
+            "detections": 9,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 267091968,
+            "anonymous_rss": 231264256,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 287019008,
+            "anonymous_rss": 251191296,
+            "phase": "events"
+          },
+          {
+            "events": 100000,
+            "nodes": 50003,
+            "edges": 100010,
+            "edge_ids": 125000,
+            "tree_pids": 25000,
+            "ledger_pids": 2048,
+            "detections": 10,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 287019008,
+            "anonymous_rss": 251191296,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 10,
+        "max_payload_bytes": 2305,
+        "max_alert_bytes": 8210,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          },
+          {
+            "event": 19999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 29999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 39999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 49999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 59999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 69999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 79999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 89999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          },
+          {
+            "event": 99999,
+            "payload_bytes": 2305,
+            "alert_bytes": 8210
+          }
+        ],
+        "ordered_alert_sha256": "329b47b07686a1969e4bc2958d68432e274c847adaaa6164a25e3f6420cb4ca9"
+      }
+    ],
+    "upstream": {
+      "repeat": {
+        "matching_complete_records": {
+          "native": 10,
+          "sgx": 10
+        }
+      },
+      "churn": {
+        "matching_complete_records": {
+          "native": 10,
+          "sgx": 10
+        }
+      }
+    }
+  },
+  "pilot": {
+    "events_per_workload": 10000,
+    "profile_repeats": 1,
+    "inputs": {
+      "repeat": {
+        "bytes": 2077735,
+        "sha256": "1d35d6804ae8b3665bb6d344f3063744fa801412bdd9e8d3df4333c710f81003"
+      },
+      "churn": {
+        "bytes": 1837793,
+        "sha256": "658fbf16f60afad381f4cdcdde98f631076362ac566af46299ceaa4602ab98b8"
+      }
+    },
+    "binaries_sha256": {
+      "release": {
+        "lib/libraven_zeek.so": "acd9b4f643be9cc125285849be635b63fe8226591d82ad72bf4ea9a9e80cdbe0",
+        "bin/falco-sgx": "b463d98891cdd828fb31d2dc680ee51f14a3415af409f7b5fefb2367125f3edb",
+        "falco-enclave.signed": "79244744b30b1dc9e1749a1f0a03043f563baf88051ce9ebde906587cbf450a8"
+      },
+      "profile": {
+        "lib/libraven_zeek.so": "64d03c6d2a464b6e370e4810b19885560ed45ebef8164a491efb76d9b67f06e2",
+        "bin/falco-sgx": "590f4fffe36b4fcc1cedacc690521959c8f31c0a346dfc0c3c297b9267f1ad18",
+        "falco-enclave.signed": "5aeb54bb476b9a1654f1a33369c19c2bea0b5a7df5deed199d664abdf9e0e00f"
+      },
+      "falco": "702900ebeee85e03823f817af99a19fcc0389bfc8f9cacab251bcaac0981d02e"
+    },
+    "machine": "5.15.0-198-generic",
+    "runs": [
+      {
+        "workload": "repeat",
+        "mode": "native",
+        "artifact": "release",
+        "run": "repeat-native-release-0",
+        "wall_seconds": 4.53,
+        "process_peak_rss": 58785792,
+        "checkpoints": [],
+        "alerts": 1,
+        "max_payload_bytes": 121069,
+        "max_alert_bytes": 424484,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 121069,
+            "alert_bytes": 424484
+          }
+        ],
+        "ordered_alert_sha256": "1c195a781d86e95c2e0f3a48a659254556b03f3ba3fa3cf84acb68fd25164b2f"
+      },
+      {
+        "workload": "repeat",
+        "mode": "sgx",
+        "artifact": "release",
+        "run": "repeat-sgx-release-0",
+        "wall_seconds": 12.972,
+        "process_peak_rss": 908443648,
+        "checkpoints": [],
+        "alerts": 1,
+        "max_payload_bytes": 121069,
+        "max_alert_bytes": 424484,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 121069,
+            "alert_bytes": 424484
+          }
+        ],
+        "ordered_alert_sha256": "1c195a781d86e95c2e0f3a48a659254556b03f3ba3fa3cf84acb68fd25164b2f"
+      },
+      {
+        "workload": "churn",
+        "mode": "native",
+        "artifact": "release",
+        "run": "churn-native-release-0",
+        "wall_seconds": 5.385,
+        "process_peak_rss": 88178688,
+        "checkpoints": [],
+        "alerts": 1,
+        "max_payload_bytes": 2302,
+        "max_alert_bytes": 8201,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          }
+        ],
+        "ordered_alert_sha256": "a50e95113e39d2debdef43d0f18281fdf5a739696e90b700b3cfa5b255aaeef1"
+      },
+      {
+        "workload": "churn",
+        "mode": "sgx",
+        "artifact": "release",
+        "run": "churn-sgx-release-0",
+        "wall_seconds": 15.577,
+        "process_peak_rss": 908374016,
+        "checkpoints": [],
+        "alerts": 1,
+        "max_payload_bytes": 2302,
+        "max_alert_bytes": 8201,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          }
+        ],
+        "ordered_alert_sha256": "a50e95113e39d2debdef43d0f18281fdf5a739696e90b700b3cfa5b255aaeef1"
+      },
+      {
+        "workload": "repeat",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "repeat-sgx-profile-1",
+        "wall_seconds": 14.709,
+        "process_peak_rss": 908455936,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 4625856,
+            "enclave_peak": 5423104,
+            "enclave_capacity": 536870912,
+            "rss": 773500928,
+            "anonymous_rss": 7335936,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 6763136,
+            "enclave_peak": 8118272,
+            "enclave_capacity": 536870912,
+            "rss": 773500928,
+            "anonymous_rss": 7335936,
+            "phase": "events"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 6763408,
+            "enclave_peak": 8118272,
+            "enclave_capacity": 536870912,
+            "rss": 773500928,
+            "anonymous_rss": 7335936,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 6001600,
+            "enclave_peak": 8437760,
+            "enclave_capacity": 536870912,
+            "rss": 773500928,
+            "anonymous_rss": 7335936,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 1,
+        "max_payload_bytes": 121069,
+        "max_alert_bytes": 424484,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 121069,
+            "alert_bytes": 424484
+          }
+        ],
+        "ordered_alert_sha256": "1c195a781d86e95c2e0f3a48a659254556b03f3ba3fa3cf84acb68fd25164b2f"
+      },
+      {
+        "workload": "repeat",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "repeat-native-profile-1",
+        "wall_seconds": 4.522,
+        "process_peak_rss": 57561088,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 55431168,
+            "anonymous_rss": 19771392,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 57942016,
+            "anonymous_rss": 22085632,
+            "phase": "events"
+          },
+          {
+            "events": 10000,
+            "nodes": 5,
+            "edges": 5,
+            "edge_ids": 10002,
+            "tree_pids": 1,
+            "ledger_pids": 1,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 57942016,
+            "anonymous_rss": 22085632,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 1,
+        "max_payload_bytes": 121069,
+        "max_alert_bytes": 424484,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 121069,
+            "alert_bytes": 424484
+          }
+        ],
+        "ordered_alert_sha256": "1c195a781d86e95c2e0f3a48a659254556b03f3ba3fa3cf84acb68fd25164b2f"
+      },
+      {
+        "workload": "churn",
+        "mode": "sgx",
+        "artifact": "profile",
+        "run": "churn-sgx-profile-1",
+        "wall_seconds": 15.827,
+        "process_peak_rss": 908455936,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 4384048,
+            "enclave_peak": 5181440,
+            "enclave_capacity": 536870912,
+            "rss": 771301376,
+            "anonymous_rss": 5115904,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 44317648,
+            "enclave_peak": 44769280,
+            "enclave_capacity": 536870912,
+            "rss": 771301376,
+            "anonymous_rss": 5115904,
+            "phase": "events"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 44317712,
+            "enclave_peak": 44769280,
+            "enclave_capacity": 536870912,
+            "rss": 771301376,
+            "anonymous_rss": 5115904,
+            "phase": "settled"
+          },
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 4404576,
+            "enclave_peak": 44769280,
+            "enclave_capacity": 536870912,
+            "rss": 771301376,
+            "anonymous_rss": 5115904,
+            "phase": "flushed"
+          }
+        ],
+        "alerts": 1,
+        "max_payload_bytes": 2302,
+        "max_alert_bytes": 8201,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          }
+        ],
+        "ordered_alert_sha256": "a50e95113e39d2debdef43d0f18281fdf5a739696e90b700b3cfa5b255aaeef1"
+      },
+      {
+        "workload": "churn",
+        "mode": "native",
+        "artifact": "profile",
+        "run": "churn-native-profile-1",
+        "wall_seconds": 5.369,
+        "process_peak_rss": 88756224,
+        "checkpoints": [
+          {
+            "events": 0,
+            "nodes": 0,
+            "edges": 0,
+            "edge_ids": 0,
+            "tree_pids": 0,
+            "ledger_pids": 0,
+            "detections": 0,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 55349248,
+            "anonymous_rss": 19525632,
+            "phase": "start"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 89178112,
+            "anonymous_rss": 53223424,
+            "phase": "events"
+          },
+          {
+            "events": 10000,
+            "nodes": 5003,
+            "edges": 10001,
+            "edge_ids": 12500,
+            "tree_pids": 2500,
+            "ledger_pids": 2048,
+            "detections": 1,
+            "enclave_used": 0,
+            "enclave_peak": 0,
+            "enclave_capacity": 0,
+            "rss": 89178112,
+            "anonymous_rss": 53223424,
+            "phase": "settled"
+          }
+        ],
+        "alerts": 1,
+        "max_payload_bytes": 2302,
+        "max_alert_bytes": 8201,
+        "per_alert": [
+          {
+            "event": 9999,
+            "payload_bytes": 2302,
+            "alert_bytes": 8201
+          }
+        ],
+        "ordered_alert_sha256": "a50e95113e39d2debdef43d0f18281fdf5a739696e90b700b3cfa5b255aaeef1"
+      }
+    ],
+    "upstream": {
+      "repeat": {
+        "matching_complete_records": {
+          "native": 1,
+          "sgx": 1
+        }
+      },
+      "churn": {
+        "matching_complete_records": {
+          "native": 1,
+          "sgx": 1
+        }
+      }
+    }
+  },
+  "live": {
+    "repeat": {
+      "checkpoints": [
+        {
+          "phase": "live_start",
+          "events": 0,
+          "enclave_used": 3885104,
+          "enclave_peak": 5308416,
+          "enclave_capacity": 536870912,
+          "rss": 925614080,
+          "anonymous_rss": 18104320
+        },
+        {
+          "phase": "live_events",
+          "events": 10000,
+          "enclave_used": 5755760,
+          "enclave_peak": 5840896,
+          "enclave_capacity": 536870912,
+          "rss": 925630464,
+          "anonymous_rss": 18112512
+        },
+        {
+          "phase": "live_events",
+          "events": 20000,
+          "enclave_used": 8714512,
+          "enclave_peak": 10039296,
+          "enclave_capacity": 536870912,
+          "rss": 926068736,
+          "anonymous_rss": 18550784
+        },
+        {
+          "phase": "live_flushed",
+          "events": 20076,
+          "enclave_used": 10036992,
+          "enclave_peak": 16584704,
+          "enclave_capacity": 536870912,
+          "rss": 926957568,
+          "anonymous_rss": 19439616
+        }
+      ],
+      "process_peak_rss": 926892032,
+      "raven_zeek_alerts": 3,
+      "max_alert_bytes": 886906,
+      "workload_alerts": [
+        {
+          "event": "ring-12840",
+          "pid": 5096,
+          "path": "/root/rzmem-ujkf6tr0/repeat",
+          "accessed": 1,
+          "modified": 10001,
+          "alert_bytes": 436861,
+          "payload_bytes": 125185
+        },
+        {
+          "event": "ring-22889",
+          "pid": 5096,
+          "path": "/root/rzmem-ujkf6tr0/repeat",
+          "accessed": 2,
+          "modified": 20001,
+          "alert_bytes": 886906,
+          "payload_bytes": 255198
+        }
+      ],
+      "capture": {
+        "live": {
+          "accepted": 23457,
+          "alerts": 3,
+          "busy_observations": 17801,
+          "consumer": 1855168,
+          "consumer_write_bytes": 12520,
+          "control_read_bytes": 9771312,
+          "discarded": 0,
+          "event_types": {
+            "access": 1,
+            "bpf": 293,
+            "brk": 19,
+            "clone3": 2,
+            "close": 89,
+            "connect": 1,
+            "dup": 3,
+            "execve": 1,
+            "fcntl": 4,
+            "futex": 13,
+            "getdents64": 24,
+            "getegid": 1,
+            "geteuid": 1,
+            "getgid": 1,
+            "getuid": 1,
+            "ioctl": 62,
+            "lseek": 121,
+            "mkdir": 1,
+            "mmap": 52,
+            "mprotect": 14,
+            "munmap": 5,
+            "nanosleep": 2,
+            "newfstatat": 413,
+            "openat": 174,
+            "page_fault": 1394,
+            "pread": 4,
+            "prlimit": 1,
+            "procexit": 1,
+            "pwrite": 20000,
+            "read": 122,
+            "rmdir": 1,
+            "switch": 373,
+            "syscall": 260,
+            "unlinkat": 1,
+            "write": 2
+          },
+          "events": 23372,
+          "format_rejected": 0,
+          "header_read_bytes": 165032,
+          "index_read_bytes": 19542632,
+          "initial_consumer": 72,
+          "max_event_bytes": 1069,
+          "min_event_bytes": 32,
+          "mode": "live",
+          "packet_records": 0,
+          "payload_copy_bytes": 1512546,
+          "producer": 1855168,
+          "raven_events": 20076,
+          "records": 23457,
+          "snapshot_bytes": 106148,
+          "trace_bytes": 0,
+          "wrapped": 0
+        },
+        "modern_ebpf": {
+          "mode": "modern_ebpf",
+          "map_id": 20,
+          "ring_bytes": 33554432,
+          "packet_submitted": 0,
+          "packet_drops": 0,
+          "driver_api": 193514046488577,
+          "driver_schema": 70368828063746,
+          "driver_events": 23457,
+          "driver_drops": 0,
+          "driver_buffer_drops": 0,
+          "driver_size_drops": 0,
+          "driver_preemptions": 0,
+          "consumer": 1855168,
+          "producer": 1855168,
+          "capture_ms": 919,
+          "drain_ms": 3816,
+          "progress_samples": 5,
+          "data_ecalls": 1,
+          "output_ocalls": 7,
+          "trace_ocalls": 0
+        }
+      }
+    },
+    "churn": {
+      "checkpoints": [
+        {
+          "phase": "live_start",
+          "events": 0,
+          "enclave_used": 3893104,
+          "enclave_peak": 5308416,
+          "enclave_capacity": 536870912,
+          "rss": 925614080,
+          "anonymous_rss": 18124800
+        },
+        {
+          "phase": "live_events",
+          "events": 10000,
+          "enclave_used": 31891056,
+          "enclave_peak": 32051200,
+          "enclave_capacity": 536870912,
+          "rss": 925630464,
+          "anonymous_rss": 18132992
+        },
+        {
+          "phase": "live_events",
+          "events": 20000,
+          "enclave_used": 43389984,
+          "enclave_peak": 43458560,
+          "enclave_capacity": 536870912,
+          "rss": 925634560,
+          "anonymous_rss": 18137088
+        },
+        {
+          "phase": "live_flushed",
+          "events": 20535,
+          "enclave_used": 42777376,
+          "enclave_peak": 44113920,
+          "enclave_capacity": 536870912,
+          "rss": 925638656,
+          "anonymous_rss": 18141184
+        }
+      ],
+      "process_peak_rss": 925573120,
+      "raven_zeek_alerts": 3,
+      "max_alert_bytes": 8350,
+      "workload_alerts": [
+        {
+          "event": "ring-575517",
+          "pid": 7647,
+          "path": "/root/rzmem-19aa49hq/file-2500",
+          "accessed": 1,
+          "modified": 2,
+          "alert_bytes": 8281,
+          "payload_bytes": 2335
+        },
+        {
+          "event": "ring-1149264",
+          "pid": 10157,
+          "path": "/root/rzmem-19aa49hq/file-5000",
+          "accessed": 1,
+          "modified": 2,
+          "alert_bytes": 8350,
+          "payload_bytes": 2358
+        }
+      ],
+      "capture": {
+        "live": {
+          "accepted": 1157002,
+          "alerts": 3,
+          "busy_observations": 2633657,
+          "consumer": 78704560,
+          "consumer_write_bytes": 6610048,
+          "control_read_bytes": 523262736,
+          "discarded": 0,
+          "event_types": {
+            "access": 21,
+            "bpf": 293,
+            "brk": 79,
+            "clone": 10040,
+            "clone3": 2,
+            "close": 5565,
+            "connect": 80,
+            "dup": 3,
+            "epoll_wait": 211,
+            "execve": 21,
+            "fcntl": 740,
+            "futex": 500,
+            "getdents64": 396,
+            "getegid": 26,
+            "geteuid": 26,
+            "getgid": 26,
+            "getsockopt": 50,
+            "getuid": 26,
+            "ioctl": 228,
+            "lseek": 141,
+            "mkdir": 1,
+            "mmap": 232,
+            "mprotect": 94,
+            "munmap": 25,
+            "nanosleep": 130,
+            "newfstatat": 1067,
+            "openat": 10896,
+            "page_fault": 1040216,
+            "poll": 246,
+            "pread": 84,
+            "prlimit": 21,
+            "procexit": 5023,
+            "read": 400,
+            "recvfrom": 360,
+            "recvmsg": 186,
+            "rmdir": 1,
+            "sendmmsg": 80,
+            "sendmsg": 225,
+            "sendto": 1,
+            "setsockopt": 90,
+            "signaldeliver": 37,
+            "socket": 85,
+            "switch": 46138,
+            "syscall": 22395,
+            "tgkill": 17,
+            "unlinkat": 5000,
+            "write": 5158
+          },
+          "events": 1151197,
+          "format_rejected": 0,
+          "header_read_bytes": 15162636,
+          "index_read_bytes": 1046525480,
+          "initial_consumer": 72,
+          "max_event_bytes": 1067,
+          "min_event_bytes": 32,
+          "mode": "live",
+          "packet_records": 320,
+          "payload_copy_bytes": 64708571,
+          "producer": 78704560,
+          "raven_events": 20535,
+          "records": 1157002,
+          "snapshot_bytes": 107180,
+          "trace_bytes": 0,
+          "wrapped": 2
+        },
+        "modern_ebpf": {
+          "mode": "modern_ebpf",
+          "map_id": 43,
+          "ring_bytes": 33554432,
+          "packet_submitted": 320,
+          "packet_drops": 0,
+          "driver_api": 193514046488577,
+          "driver_schema": 70368828063746,
+          "driver_events": 1156682,
+          "driver_drops": 0,
+          "driver_buffer_drops": 0,
+          "driver_size_drops": 0,
+          "driver_preemptions": 0,
+          "consumer": 78704560,
+          "producer": 78704560,
+          "capture_ms": 41993,
+          "drain_ms": 226,
+          "progress_samples": 411,
+          "data_ecalls": 1,
+          "output_ocalls": 6,
+          "trace_ocalls": 0
+        }
+      }
+    },
+    "binaries_sha256": {
+      "falco-live": "eebcb9038acc53275d6cab36fc4b26c709df3503e18ddd5c84c42c1e2b196b30",
+      "falco-enclave.signed": "8ff8e32f991f9b34ef437f73ef2cc331265e3ab95f6dd027b3f851e64019279c"
+    }
+  },
+  "evidence": {
+    "file": "memory-benchmark-evidence.tar.xz",
+    "bytes": 555124,
+    "sha256": "311bb4d674d3c2ba31ef177fd9359ed500c638fe5a06b6dc8ec8568972f2b71c",
+    "members": {
+      "main/repeat.jsonl": {
+        "bytes": 20877827,
+        "sha256": "6e8f58885f03523eac294c72a90cf55ff02d5e2de2fa66323cc8516a5da37561"
+      },
+      "main/churn.jsonl": {
+        "bytes": 18477885,
+        "sha256": "8aecf27667b66b593f62ada50b86dbc15ef4d6789084f6dc4ba1ad190aec29ba"
+      },
+      "main/empty.pcap": {
+        "bytes": 24,
+        "sha256": "acc530668c8bc60b2d229281130b1899bfc81d70fdada5c34b3236c628f739c8"
+      },
+      "main/repeat-native-release-0/output.jsonl": {
+        "bytes": 44745057,
+        "sha256": "0fc3ec65d93507a5618618c04d631b529f7e0dd20767668f953b3f9d1e11a5e7"
+      },
+      "main/repeat-sgx-release-0/output.jsonl": {
+        "bytes": 44747849,
+        "sha256": "b514f9f50956d73c5a9d529d3dff0c78cd36f538d29e3973e47cca3e5dbe2488"
+      },
+      "main/repeat-upstream.jsonl": {
+        "bytes": 13912959,
+        "sha256": "13e94add5f664636fc232ff031a8ac0cb8c5eb73f28d83706cdd4c5fd2d5f4bf"
+      },
+      "main/churn-native-release-0/output.jsonl": {
+        "bytes": 82221,
+        "sha256": "64a1b195da6e543d208a97421c46c9b1cbe2eb6e2d84f62f78d166ae59f81780"
+      },
+      "main/churn-sgx-release-0/output.jsonl": {
+        "bytes": 85013,
+        "sha256": "dd6d080ffa3ce47300b92dfd68ec26571f6649c3a79e19e4dca3f70281b14b27"
+      },
+      "main/churn-upstream.jsonl": {
+        "bytes": 25317,
+        "sha256": "58a63633acc79293d0209cb1b9249b5677a83086bbb30abf7e1c889b33e47d99"
+      },
+      "live/repeat/alerts.jsonl": {
+        "bytes": 1330980,
+        "sha256": "b7f192c66bc736dc97671adff8c5f25135f0e83e295cf37fd8f66e49aed5774c"
+      },
+      "live/repeat/process.log": {
+        "bytes": 2872,
+        "sha256": "90f13af1110bc98c99e536de7efda4f5284399cb77224997a03ae2a6db3eb53b"
+      },
+      "live/churn/alerts.jsonl": {
+        "bytes": 23856,
+        "sha256": "a4602c2b6f27ce2161c1473a5f79c800b455d2fba394c7ae402ae207e57f48ec"
+      },
+      "live/churn/process.log": {
+        "bytes": 3114,
+        "sha256": "c1dbb49855fec551b9e3b3e3a6b8fec1a8660c33ce58049627f8a1581e8dcb66"
+      }
+    }
+  }
+}

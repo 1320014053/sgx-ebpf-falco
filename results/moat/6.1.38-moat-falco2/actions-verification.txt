@@ -1,0 +1,12 @@
+GitHub Actions run https://github.com/1320014053/moat-kernel-build/actions/runs/44609488889
+Recipe commit 2a9c64e891d39edefe37db36ad35734a5bc84e65
+Artifact ID 14573461439
+SHA-256 836f0dd3268be600f0b15392927184ea6e38229182ccf1dbdd60ee9d0c6ff481  artifact.zip
+039186db0c2a034b3d8fd5d9cf5a34e3e4712d5a79089cf6759b149e4c720db5  linux-headers-6.1.38-moat-falco2_6.1.38-4_amd64.deb
+ccbf5ff475554975e8bd76540fd7fed967fae9583dc4b9e47fcb992fb5379ba4  linux-image-6.1.38-moat-falco2_6.1.38-4_amd64.deb
+705c99563d87ccc9caaf4025bae72bfe8d2fa414963a522ab6d654b03e19d1ce  config-6.1.38-moat-falco2
+a58c9b15d772c7e4db812749ade64c2f08030fe843eebc9dfdbc6e92fed57fd1  BUILD-INFO.txt
+SHA-256 abd68034660d6b0e01a258f7b3685820e4303af37ffb0455198edebf4a7f940c  vmlinuz-6.1.38-moat-falco2
+QEMU kernel bytes 20169120
+Both project patches match the build manifest. The packaged kernel config matches the standalone config.
+Config difference from published 6.1.38-moat: [('CONFIG_LOCALVERSION="-moat"', 'CONFIG_LOCALVERSION="-moat-falco2"')]

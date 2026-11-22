@@ -1,0 +1,9 @@
+{
+  "pass": true,
+  "matched_alerts": 2,
+  "loaded_rules": 25,
+  "enabled_rules": 25,
+  "alerts_by_rule": {
+    "Run shell untrusted": 2
+  }
+}

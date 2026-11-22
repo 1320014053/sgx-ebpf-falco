@@ -1,0 +1,168 @@
+{
+  "kernel": "5.15.0-198-generic",
+  "enclave_mode": "SGX Simulation",
+  "ring-only": {
+    "before_workload_exit": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan",
+      "server_spawns_shell"
+    ],
+    "syscall_records": 7953,
+    "raven_events": 258,
+    "packets": 92,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 208,
+    "drained_position": 610088,
+    "stopped_by": "SIGTERM",
+    "input_files": []
+  },
+  "recorded": {
+    "before_workload_exit": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan",
+      "server_spawns_shell"
+    ],
+    "syscall_records": 7890,
+    "raven_events": 191,
+    "packets": 92,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 231,
+    "drained_position": 568800,
+    "stopped_by": "workload exit",
+    "input_files": [
+      "events.jsonl",
+      "packets.pcap",
+      "reference.scap"
+    ],
+    "recorded_replay": [
+      "enclave",
+      "native"
+    ]
+  },
+  "environment": {
+    "machine": "x86_64",
+    "os": "Ubuntu 22.04.5 LTS",
+    "falco": "Falco version: 0.45.2\nLibs version:  0.26.1\nPlugin API:    3.12.0\nEngine:        0.65.0\nDriver:\n  API version:    11.0.0\n  Schema version: 4.3.0\n  Default driver: 11.0.1+driver"
+  },
+  "individual_recordings": {
+    "events.jsonl": {
+      "created": [
+        "events.jsonl"
+      ],
+      "bytes": 32725
+    },
+    "packets.pcap": {
+      "created": [
+        "packets.pcap"
+      ],
+      "bytes": 448
+    }
+  },
+  "build_sha256": {
+    "falco-live": "81fbd1a648b288fa5cee42b1713d4c3d26f42a62b4ff0c65e5069812a96ac8ff",
+    "falco-enclave.signed": "e4d3d2c5ac4b7b1a5e666201c46fb207a56d0d7f5bd03014f5d45d568fc00f85",
+    "libraven_zeek.so": "701e1b381750a48d494606b543b4ee88328d908d009c73f068a26c3bcf303506"
+  },
+  "source_sha256": {
+    "Falco.edl": "ef08c9ec45ab27b767225cdd9cfc695bcfbc9011797495cf19b095e60c7e0b61",
+    "host.cpp": "b3b021fcc517f903299c6267615deba23950a82a52a45b93066dee34a20fb04d",
+    "host.hpp": "0b8316d71c0e6bdb603468c30f2f770f7dea4b7ae5b4b3208b06adcc6651faab",
+    "live/CMakeLists.txt": "52225cb13f7faf005e70d5109702f6a0e5deedad87af5f1f5637ac111ef85107",
+    "live/check-detectors.py": "66727bddff72f265b08307f3bb4e7b9e877ad0d85b34953698101397ff6cd251",
+    "live/live_host.cpp": "c86d34aa365c0f3e3d67969562d4ccc7244b375212bcf357ef2066cf0ee462a6",
+    "live/packet_record.h": "685a984f9783959a2c124bad64a74c214c05344c94d81337d08385122fbcfbf7",
+    "live/packet_tap.bpf.c": "24b869f90d05e8e384efebde0889b0fdbe0b92a06917f3bf1ab4452733abb97b",
+    "live/ring.hpp": "e601acf8c1c229dd35397ae05ab0a950168815a52296ba12e66079b12b62cded",
+    "plugin/check.py": "f49d3b8bbb978639bec4ddd58b8dab4b0fc583997193200a98cd7f2d7df5f686",
+    "plugin/detectors.hpp": "19aeda359c9c7c6108dc02e13cdf42226da6eaf2571cb370b2e8d06dce30c3bd",
+    "plugin/graph.cpp": "d0e5b5ac84d53d75bb7b5afa1581e8c9358b752d698b479b443126c12399cb3c",
+    "plugin/graph.hpp": "11357e0da8f6c93ea42b21347b4de3dea80f70430e1348a0010f1f70c6780c38",
+    "plugin/live.yaml": "b97679b1520ff1f1322c3bcc11f2516c62f6c1a9284facc1f512793ab46d9311",
+    "plugin/plugin.cpp": "183851cfd0dedd14a2ccfd4a2c71062694f267b4fb0f62da47df516f2985830c",
+    "plugin/raven.cpp": "c067a15e05a07b8baa75026ade8f5e8e97230e2ea4c4f3cb1003fa2e5c49f5bb",
+    "plugin/replay.yaml": "ff0085690f730ee1d841530b9589acaf5592a02e3ffac2e3f44389021bccd1a9",
+    "plugin/rules.yaml": "6099ff8ee3a34a294e2e415ce3c0f4c3a2af5d3e4db31c69a2ae0ff22b8e0cc3",
+    "plugin/zeek.cpp": "ebcaeb093cc82eded1be0982b00d05ecf0f30c5d0426cfa858ed95935895436a",
+    "replay_host.cpp": "c320a77863a83a39cb535d1197a01724f921c4e5be0cc307fab98d20b4e74b76",
+    "trusted/CMakeLists.txt": "c52e16d4bee83830bcfd3b6c5f850ef8c7e88691a1b94338cd391366838b24c9",
+    "trusted/enclave.cpp": "76814e7ed252d06ebdfe3087a1967c93e88ac133ab1411cf648734417a8f9e7d",
+    "trusted/raven_syscalls.cpp": "d73cd66124dd5c57ff73a597313223a2f8f997dc49e2c853b0b8341ad6a5f486",
+    "trusted/raven_syscalls.hpp": "543f7f68639f3b8a61fa7b5e12a4f548357b13c03b8f5886a64562a449611a9e"
+  },
+  "offline_regression": {
+    "raven_commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+    "zeek_version": "6.0.9",
+    "valid_cases": [
+      "empty",
+      "tetragon-mixed",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "idle",
+      "tetragon",
+      "states",
+      "epochs",
+      "ipv6-vlan",
+      "reverse-eof",
+      "fragments",
+      "pcapng"
+    ],
+    "malformed_cases": {
+      "bad-json": {
+        "rejected_by": [
+          "native",
+          "sgx"
+        ],
+        "diagnostic": "RAVEN line 1"
+      },
+      "bad-pcap": {
+        "rejected_by": [
+          "native",
+          "sgx"
+        ],
+        "diagnostic": "truncated PCAP packet header"
+      }
+    },
+    "archived_case_counts_equal": true
+  },
+  "syscall_regression": {
+    "native_replay": {
+      "pass": true,
+      "matched_alerts": 1,
+      "loaded_rules": 25,
+      "enabled_rules": 25,
+      "alerts_by_rule": {
+        "Run shell untrusted": 1
+      }
+    },
+    "enclave_replay": {
+      "pass": true,
+      "matched_alerts": 1,
+      "loaded_rules": 25,
+      "enabled_rules": 25,
+      "alerts_by_rule": {
+        "Run shell untrusted": 1
+      }
+    },
+    "real_ring_accepted": 26969,
+    "driver_drops": 0,
+    "ring_test": {
+      "records": 223,
+      "accepted": 220,
+      "discarded": 1,
+      "format_rejected": 2,
+      "wrapped": 1
+    },
+    "private_copy_verified": true
+  }
+}

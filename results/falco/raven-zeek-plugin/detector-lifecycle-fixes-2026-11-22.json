@@ -1,0 +1,497 @@
+{
+  "date": "2026-11-22",
+  "scope": "项目锁定的 RAVEN full 与 Zeek 6.0.9 policy/misc/scan，普通 Falco 和签名 Open Enclave SGX Simulation。",
+  "fixes": [
+    {
+      "issue": "RAVEN 现场宽限期边界",
+      "change": "事件进入账本和规则链后，按已登记事件的最高时间复核。空闲时钟继续推进历史回收。关闭时先处理已缓冲的现场事件，再做最终复核。",
+      "proof": "同一组现场输入修复后只发布 active，良性对照仍从 active 更新为 context_filtered。"
+    },
+    {
+      "issue": "Zeek 积压定时器改变告警",
+      "change": "TCP 会话、连接尝试、清理、策略窗口和默认策略的周期任务按定时器顺序共享每轮 300 个额度。连接被移除时取消关联定时器，结束回放时结清待处理的连接尝试。",
+      "proof": "378 包中途完成握手的用例在上游及三个项目入口均为零条 Notice。未收到回复的积压用例与原版在同一时间报一次。45 种连接数量下的完整通知与顺序相符。"
+    },
+    {
+      "issue": "RAVEN 规范化 JSONL 显式 null",
+      "change": "用非空 exe 补齐显式为 null 的 exe_name，跳过 event_type 为 null 的占位记录。",
+      "proof": "两份原复现输入在两端都正常结束并报一次。无路径的空名称及数值名称在两端继续报错，与原版退出状态一致。"
+    }
+  ],
+  "scope_of_tests": {
+    "build": "Ubuntu 22.04.5 QEMU 快照增量构建，Falco 0.45.2，Open Enclave SGX Simulation。",
+    "run": "把同批构建产物复制到 Ubuntu 24.04 WSL 后执行离线、流式及签名 falco_live 入口。现场样本为构造的系统调用和 IP 包环形缓冲记录。硬件 SGX 与端到端内核现场采集未覆盖。",
+    "comparison": "按退出码和有序检测内容比较。沿用项目对随机 RAVEN ID 和安装目录的归一化。核验现场状态更新使用同一告警 ID，并核验 ring 读尽及零拒收。",
+    "timer_profile": "核对了固定默认扫描策略的启动调度。26 个表到期定时器、心跳、脚本回调与连接定时器共享同一额度。原版记录在证据包 upstream/first-packet-timers.txt。"
+  },
+  "checks": {
+    "lifecycle_files_matching_upstream": 19,
+    "additional_file_regressions": 3,
+    "lifecycle_file_cases_total": 22,
+    "stream_cases_matching_upstream": 6,
+    "signed_live_cases": {
+      "boundary-benign": {
+        "upstream": [
+          [
+            "server_spawns_shell",
+            "active"
+          ],
+          [
+            "server_spawns_shell",
+            "context_filtered"
+          ]
+        ],
+        "signed_live": [
+          [
+            "server_spawns_shell",
+            "active"
+          ],
+          [
+            "server_spawns_shell",
+            "context_filtered"
+          ]
+        ],
+        "input_sha256": "433e85437c05bf2b93c47270810f75ac8331053d56b1195fe57bf51fd398263a",
+        "metrics": {
+          "accepted": 6,
+          "alerts": 3,
+          "busy_observations": 0,
+          "consumer": 1072,
+          "consumer_write_bytes": 8,
+          "control_read_bytes": 8,
+          "discarded": 0,
+          "event_types": {
+            "connect": 2,
+            "execve": 3,
+            "socket": 1
+          },
+          "events": 7,
+          "format_rejected": 0,
+          "header_read_bytes": 24,
+          "index_read_bytes": 24,
+          "initial_consumer": 0,
+          "max_event_bytes": 287,
+          "min_event_bytes": 45,
+          "mode": "live",
+          "packet_records": 0,
+          "payload_copy_bytes": 1000,
+          "producer": 1072,
+          "raven_events": 4,
+          "records": 6,
+          "snapshot_bytes": 2804,
+          "trace_bytes": 0,
+          "wrapped": 0
+        }
+      },
+      "boundary-review": {
+        "upstream": [
+          [
+            "server_spawns_shell",
+            "active"
+          ]
+        ],
+        "signed_live": [
+          [
+            "server_spawns_shell",
+            "active"
+          ]
+        ],
+        "input_sha256": "35405c742d08045cac583c420f5d6689e00687bd64f248c3aa4bb5e234aa6779",
+        "metrics": {
+          "accepted": 6,
+          "alerts": 2,
+          "busy_observations": 0,
+          "consumer": 1080,
+          "consumer_write_bytes": 8,
+          "control_read_bytes": 8,
+          "discarded": 0,
+          "event_types": {
+            "connect": 2,
+            "execve": 3,
+            "socket": 1
+          },
+          "events": 6,
+          "format_rejected": 0,
+          "header_read_bytes": 24,
+          "index_read_bytes": 24,
+          "initial_consumer": 0,
+          "max_event_bytes": 287,
+          "min_event_bytes": 45,
+          "mode": "live",
+          "packet_records": 0,
+          "payload_copy_bytes": 1008,
+          "producer": 1080,
+          "raven_events": 4,
+          "records": 6,
+          "snapshot_bytes": 2804,
+          "trace_bytes": 0,
+          "wrapped": 0
+        }
+      },
+      "early-review": {
+        "upstream": [
+          [
+            "server_spawns_shell",
+            "active"
+          ]
+        ],
+        "signed_live": [
+          [
+            "server_spawns_shell",
+            "active"
+          ]
+        ],
+        "input_sha256": "d4f70bdf105db979e17c67b410c852a374908b09bffe770ba251d42524252232",
+        "metrics": {
+          "accepted": 6,
+          "alerts": 2,
+          "busy_observations": 0,
+          "consumer": 1080,
+          "consumer_write_bytes": 8,
+          "control_read_bytes": 8,
+          "discarded": 0,
+          "event_types": {
+            "connect": 2,
+            "execve": 3,
+            "socket": 1
+          },
+          "events": 6,
+          "format_rejected": 0,
+          "header_read_bytes": 24,
+          "index_read_bytes": 24,
+          "initial_consumer": 0,
+          "max_event_bytes": 287,
+          "min_event_bytes": 45,
+          "mode": "live",
+          "packet_records": 0,
+          "payload_copy_bytes": 1008,
+          "producer": 1080,
+          "raven_events": 4,
+          "records": 6,
+          "snapshot_bytes": 2804,
+          "trace_bytes": 0,
+          "wrapped": 0
+        }
+      },
+      "timer-queue-30": {
+        "upstream": [
+          [
+            "Scan::Port_Scan",
+            1700000008.0
+          ]
+        ],
+        "signed_live": [
+          [
+            "Scan::Port_Scan",
+            1700000008.0
+          ]
+        ],
+        "input_sha256": "0e36353e45afd37c565e3dae38e9e2cb82d1b7e9de63a4e3ffdbd4033267be59",
+        "metrics": {
+          "accepted": 48,
+          "alerts": 1,
+          "busy_observations": 0,
+          "consumer": 3456,
+          "consumer_write_bytes": 8,
+          "control_read_bytes": 8,
+          "discarded": 0,
+          "event_types": {},
+          "events": 1,
+          "format_rejected": 0,
+          "header_read_bytes": 192,
+          "index_read_bytes": 24,
+          "initial_consumer": 0,
+          "max_event_bytes": 64,
+          "min_event_bytes": 64,
+          "mode": "live",
+          "packet_records": 48,
+          "payload_copy_bytes": 3072,
+          "producer": 3456,
+          "raven_events": 0,
+          "records": 48,
+          "snapshot_bytes": 2804,
+          "trace_bytes": 0,
+          "wrapped": 0
+        }
+      },
+      "timer-queue-360": {
+        "upstream": [
+          [
+            "Scan::Port_Scan",
+            1700000009.0
+          ]
+        ],
+        "signed_live": [
+          [
+            "Scan::Port_Scan",
+            1700000009.0
+          ]
+        ],
+        "input_sha256": "efb4c1a748d4f13d1a14ee6dd707ed49b4bcccedcdec24e947b65158e7ae0618",
+        "metrics": {
+          "accepted": 378,
+          "alerts": 1,
+          "busy_observations": 0,
+          "consumer": 27216,
+          "consumer_write_bytes": 16,
+          "control_read_bytes": 12,
+          "discarded": 0,
+          "event_types": {},
+          "events": 1,
+          "format_rejected": 0,
+          "header_read_bytes": 1512,
+          "index_read_bytes": 32,
+          "initial_consumer": 0,
+          "max_event_bytes": 64,
+          "min_event_bytes": 64,
+          "mode": "live",
+          "packet_records": 378,
+          "payload_copy_bytes": 24192,
+          "producer": 27216,
+          "raven_events": 0,
+          "records": 378,
+          "snapshot_bytes": 2804,
+          "trace_bytes": 0,
+          "wrapped": 0
+        }
+      },
+      "timer-queue-reply-30": {
+        "upstream": [
+          [
+            "Scan::Port_Scan",
+            1700000008.0
+          ]
+        ],
+        "signed_live": [
+          [
+            "Scan::Port_Scan",
+            1700000008.0
+          ]
+        ],
+        "input_sha256": "3ba90a26db02c73ed3ef9db527824ae588dfd7eb172de76ced384cfc84bc054d",
+        "metrics": {
+          "accepted": 48,
+          "alerts": 1,
+          "busy_observations": 0,
+          "consumer": 3456,
+          "consumer_write_bytes": 8,
+          "control_read_bytes": 8,
+          "discarded": 0,
+          "event_types": {},
+          "events": 1,
+          "format_rejected": 0,
+          "header_read_bytes": 192,
+          "index_read_bytes": 24,
+          "initial_consumer": 0,
+          "max_event_bytes": 64,
+          "min_event_bytes": 64,
+          "mode": "live",
+          "packet_records": 48,
+          "payload_copy_bytes": 3072,
+          "producer": 3456,
+          "raven_events": 0,
+          "records": 48,
+          "snapshot_bytes": 2804,
+          "trace_bytes": 0,
+          "wrapped": 0
+        }
+      },
+      "timer-queue-reply-360": {
+        "upstream": [],
+        "signed_live": [],
+        "input_sha256": "aabff656070186352bd6210ab7ed16aae52a6ef5ddf4e47011c9cfc33d705c57",
+        "metrics": {
+          "accepted": 378,
+          "alerts": 0,
+          "busy_observations": 0,
+          "consumer": 27216,
+          "consumer_write_bytes": 16,
+          "control_read_bytes": 12,
+          "discarded": 0,
+          "event_types": {},
+          "events": 0,
+          "format_rejected": 0,
+          "header_read_bytes": 1512,
+          "index_read_bytes": 32,
+          "initial_consumer": 0,
+          "max_event_bytes": 64,
+          "min_event_bytes": 64,
+          "mode": "live",
+          "packet_records": 378,
+          "payload_copy_bytes": 24192,
+          "producer": 27216,
+          "raven_events": 0,
+          "records": 378,
+          "snapshot_bytes": 2804,
+          "trace_bytes": 0,
+          "wrapped": 0
+        }
+      }
+    },
+    "timer_load_sizes_matching_upstream_both": 45,
+    "timer_load_original_notice_times": {
+      "30": [
+        1700000008.0
+      ],
+      "125": [
+        1700000008.0
+      ],
+      "135": [
+        1700000008.0
+      ],
+      "140": [
+        1700000008.0
+      ],
+      "145": [
+        1700000008.0
+      ],
+      "148": [
+        1700000008.0
+      ],
+      "149": [
+        1700000008.0
+      ],
+      "150": [
+        1700000008.0
+      ],
+      "151": [
+        1700000008.0
+      ],
+      "155": [
+        1700000008.0
+      ],
+      "165": [
+        1700000008.0
+      ],
+      "180": [
+        1700000008.0
+      ],
+      "183": [
+        1700000008.0
+      ],
+      "187": [
+        1700000008.0
+      ],
+      "190": [
+        1700000008.0
+      ],
+      "193": [
+        1700000008.001
+      ],
+      "195": [
+        1700000008.0
+      ],
+      "197": [
+        1700000008.001
+      ],
+      "199": [
+        1700000008.001
+      ],
+      "200": [
+        1700000008.001
+      ],
+      "201": [
+        1700000008.001
+      ],
+      "204": [
+        1700000008.001
+      ],
+      "205": [
+        1700000008.001
+      ],
+      "206": [
+        1700000008.001
+      ],
+      "208": [],
+      "210": [],
+      "212": [
+        1700000008.001
+      ],
+      "215": [],
+      "217": [],
+      "225": [],
+      "250": [],
+      "275": [],
+      "280": [],
+      "285": [],
+      "290": [],
+      "295": [],
+      "298": [],
+      "299": [],
+      "300": [],
+      "301": [],
+      "305": [],
+      "310": [],
+      "320": [],
+      "360": [],
+      "600": []
+    },
+    "historical_behavior_matches": {
+      "native": 44,
+      "sgx": 44
+    },
+    "historical_behavior_cases": 45,
+    "historical_exception": {
+      "name": "duplicate-after-601s",
+      "upstream": 1,
+      "native": 2,
+      "sgx": 2
+    },
+    "structure_regression_cases": 23,
+    "standard_regression_cases": 38,
+    "earlier_parity_regression_cases": 27,
+    "retention_idle_and_late_event_assertions": "passed",
+    "verified_lifecycle_cli_cases": 22,
+    "asan_ubsan_pcap_cases": 58,
+    "original_frag_timeout": "0 secs",
+    "unchanged_raven_retention": {
+      "seconds": 600,
+      "high_mib": 128,
+      "low_mib": 96
+    }
+  },
+  "references": {
+    "RAVEN": {
+      "commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+      "tier": "full",
+      "reference_adapter": "poc/falco/upstream/raven-replay.py",
+      "source_tar_sha256": "f53bbce4f31287a3528a5060aa52e056ca1ec10945121b7f64058be6aab0bd69"
+    },
+    "Zeek": {
+      "version": "6.0.9",
+      "commit": "7a7864f89297e0fc3f3779ec2f8dc5100d8449c0",
+      "policy": "policy/misc/scan",
+      "image": "zeek/zeek@sha256:a25a3c38497c5492dd4391c09595f0842b46a608fad4180df18549c754797f23",
+      "linux_amd64_binary_sha256": "27c910b1be9f5cf0666d5f3510db48195dd92611aa47c8b11bdfc153999e68b0",
+      "source_tar_sha256": "77b921c05bf8edc476c3dc9c1190f99580537fad493fae4ebfe4bc1ee64f1d19"
+    }
+  },
+  "source_sha256": {
+    "poc/falco/plugin/raven.cpp": "04ea54e0b2c3c4e4b89b42450fe200f495390ca5e3629d2b53c540bc7f997b5e",
+    "poc/falco/plugin/zeek.cpp": "817d5f46047d6e7839d4e6b0e9b520cad60414999bc5c98ae061600486e481f0",
+    "poc/falco/trusted/enclave.cpp": "9f453c10025855a0b5f38f02eb349174657c13ca8129d7de49636bbeceae893e",
+    "poc/falco/plugin/check.py": "7515e998e259250d9a0e68a3df209ac9ed817c2adbe5264446990f70ba34b591",
+    "poc/falco/bench/retention-idle.cpp": "232b332b1fda711ab61763cc4a75e56c4dbd06ab6664c1670a9e58acb5335ac6"
+  },
+  "binaries_sha256": {
+    "build-ert/lib/libraven_zeek.so": "4257d6a2ba33e625f560d309bf7c8e8bc565f96adc1c92c7ab31cbdd3b0e5779",
+    "build-ert/falco-enclave.signed": "7c8ea8a6ae76411d06795014d535bb8d6ef864d3d2e6e825f4adfbb1b70a0148",
+    "build-ert/bin/falco-sgx": "618f3451138c7c18bc7bf36a761e43839b86170747ec06d9a95dc10ddf338a5c",
+    "deps/package/usr/bin/falco": "702900ebeee85e03823f817af99a19fcc0389bfc8f9cacab251bcaac0981d02e",
+    "snapshot-feed": "4f3b064481af40f0bb1ee4f5581f6f9861bf8cf4dfc503bdab50c29f627d2247"
+  },
+  "prior_review": {
+    "file": "detector-lifecycle-review-2026-11-22.json",
+    "sha256": "e2dfe42c852d68a034624c4cb2963658d142d86da3640d68420acdd440573d4c",
+    "evidence": {
+      "file": "detector-lifecycle-review-2026-11-22-evidence.zip",
+      "members": 285,
+      "sha256": "11a6674b69b069c619b6596fd1636415eb98b39e461d327799fe72298e07fbd5"
+    }
+  },
+  "evidence": {
+    "file": "detector-lifecycle-fixes-2026-11-22-evidence.zip",
+    "sha256": "50234f5d2fd03616841106d153bd9ab0a5e24dac2597ccbd64c467811bb479c9",
+    "entries": 608
+  }
+}

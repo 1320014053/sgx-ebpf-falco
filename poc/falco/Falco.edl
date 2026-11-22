@@ -1,0 +1,23 @@
+enclave {
+    from "openenclave/edl/syscall.edl" import *;
+    from "platform.edl" import *;
+    from "openenclave/edl/ertlibc.edl" import *;
+    trusted {
+        public int falco_config([in, string] const char* config, [in, string] const char* hostname, uint8_t live);
+        public int falco_rules([in, string] const char* path, [in, string] const char* yaml);
+        public int falco_replay([in, size=bytes] uint8_t* scap, size_t bytes, [in, string] const char* dns_hosts);
+        public int falco_plugin_replay([in, size=events_size] uint8_t* events, size_t events_size,
+                                         [in, size=packets_size] uint8_t* packets, size_t packets_size,
+                                         uint8_t have_pcap, uint8_t tetragon, uint8_t host_capture);
+        public int falco_plugin_stream([in, size=bytes] uint8_t* lines, size_t bytes, uint8_t finish);
+        public int falco_live([in, size=bytes] uint8_t* snapshot, size_t bytes,
+                              uint64_t consumer, uint64_t producer, uint64_t control,
+                              size_t page, size_t capacity, uint8_t record, uint8_t record_inputs);
+    };
+    untrusted {
+        int falco_emit([in, size=bytes] const char* data, size_t bytes, int diagnostics);
+        int falco_trace_append([in, size=bytes] const uint8_t* data, size_t bytes);
+        int falco_record_input([in, size=bytes] const uint8_t* data, size_t bytes,
+                               uint64_t timestamp_ns, uint32_t wire_bytes);
+    };
+};

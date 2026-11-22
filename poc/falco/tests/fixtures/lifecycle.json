@@ -1,0 +1,107 @@
+{
+  "new_file_cases": {
+    "basename-derived": {
+      "engine": "RAVEN",
+      "input_sha256": "0e5cea62900f27ac2b857c9ccd5d10f2cbd1f0399173a7e1c81defd43514cbe4",
+      "upstream_records": 1
+    },
+    "basename-null": {
+      "engine": "RAVEN",
+      "input_sha256": "c85f989ddcf9d4b00535968fbe19b9f56143389fb00adf991aeaeac9bb42010d",
+      "upstream_records": 1
+    },
+    "context-before-grace": {
+      "engine": "RAVEN",
+      "input_sha256": "530146b28e4cf9c7cc41135f602c42c867c0fd85b6657f31123d275dd30efd86",
+      "upstream_records": 2
+    },
+    "context-benign-at-grace": {
+      "engine": "RAVEN",
+      "input_sha256": "f5a4beec656f2188a95b79f53a66ef3918c136cca6a0bb8eb0d0c374368d7b5b",
+      "upstream_records": 1
+    },
+    "context-sensitive-at-grace": {
+      "engine": "RAVEN",
+      "input_sha256": "8796514b8435efd283a6f806a7bc3d2218a5d0a5168e020c85d4577a30071b12",
+      "upstream_records": 2
+    },
+    "duration-10500000": {
+      "engine": "Zeek",
+      "input_sha256": "401a415feefce95bf2ca50b881ae18e589641f16e79d251e62df5f965b2eb26e",
+      "upstream_records": 1
+    },
+    "duration-1500000": {
+      "engine": "Zeek",
+      "input_sha256": "af4521b872f590f844f2162589705910a1b0147eac060401851c020be6470d07",
+      "upstream_records": 1
+    },
+    "duration-500000": {
+      "engine": "Zeek",
+      "input_sha256": "87e46fd9d15dbbc5918f95027d5185172228d708fb26b361acef1023616560b6",
+      "upstream_records": 1
+    },
+    "epoch-290": {
+      "engine": "Zeek",
+      "input_sha256": "f7e5c600ea966657943c8f1f958439898c5ec7b58ef883a9bb68552980498bb6",
+      "upstream_records": 1
+    },
+    "epoch-294": {
+      "engine": "Zeek",
+      "input_sha256": "34b68e866590e523f6f5c96a013b713471c329a00abf62de03f39b1fcac850bb",
+      "upstream_records": 0
+    },
+    "epoch-295": {
+      "engine": "Zeek",
+      "input_sha256": "07da472dd52d1f689e3eb3eb4ffda050be984208502d56eb35780e1fcf0c470f",
+      "upstream_records": 1
+    },
+    "epoch-296": {
+      "engine": "Zeek",
+      "input_sha256": "09b332bc4af79f17333968959cb74d522065a5b5a7691c265bb342c14d70e173",
+      "upstream_records": 1
+    },
+    "epoch-299": {
+      "engine": "Zeek",
+      "input_sha256": "c7bb15531bfcfdf5e17ddb0b15a9cec0695a05124ad3bd1f62234bafdbe82b57",
+      "upstream_records": 1
+    },
+    "ignore-null-event": {
+      "engine": "RAVEN",
+      "input_sha256": "b99fd2bbf7b6292937171dafd594e832065d0e95ba8c2e88558445f880a8e5f6",
+      "upstream_records": 1
+    },
+    "refused-control": {
+      "engine": "Zeek",
+      "input_sha256": "801585ceab23b7b62a65e51775ccbc067af7fe1982918c916c0db8ce433026b7",
+      "upstream_records": 1
+    },
+    "timer-queue-30": {
+      "engine": "Zeek",
+      "input_sha256": "1c648c541b817214759d0142774ac9bae4736e349c61087f55f1158151a8f6ac",
+      "upstream_records": 1
+    },
+    "timer-queue-360": {
+      "engine": "Zeek",
+      "input_sha256": "8b37a1e148ac836f013179eec2e1ea6badddb4157e69adcf8ddd52761caba3d2",
+      "upstream_records": 1
+    },
+    "timer-queue-reply-30": {
+      "engine": "Zeek",
+      "input_sha256": "28005be30794ea47e1a6e97519c1db529d52cc51b1de5919d4e193a1b463aa32",
+      "upstream_records": 1
+    },
+    "timer-queue-reply-360": {
+      "engine": "Zeek",
+      "input_sha256": "659a5e94533f1db4d352d392f84f757305dff648ca929428a7a00a9dd6305bb3",
+      "upstream_records": 0
+    }
+  },
+  "source_archive": {
+    "file": "detector-lifecycle-review-2026-11-22-evidence.zip",
+    "sha256": "11a6674b69b069c619b6596fd1636415eb98b39e461d327799fe72298e07fbd5"
+  },
+  "evidence": {
+    "file": "regression.zip",
+    "sha256": "ce8580f354272d83e2905c775cbab5a75961d257c3be70e194b19cdd7a043984"
+  }
+}

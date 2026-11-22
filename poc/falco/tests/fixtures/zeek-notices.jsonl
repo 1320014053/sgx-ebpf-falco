@@ -1,0 +1,2 @@
+{"ts":1700000001.002601,"proto":"tcp","note":"Scan::Address_Scan","msg":"192.0.2.10 scanned at least 25 unique hosts on port 443/tcp in 0m0s","sub":"local","src":"192.0.2.10","p":443,"actions":["Notice::ACTION_LOG"],"email_dest":[],"suppress_for":3600.0}
+{"ts":1700000002.004101,"note":"Scan::Port_Scan","msg":"192.0.2.20 scanned at least 15 unique ports of host 203.0.113.5 in 0m0s","sub":"local","src":"192.0.2.20","dst":"203.0.113.5","actions":["Notice::ACTION_LOG"],"email_dest":[],"suppress_for":3600.0}

@@ -1,0 +1,209 @@
+{
+  "date": "2026-11-22",
+  "environments": {
+    "detector": "Ubuntu 24.04 WSL2, x86-64, C++17, nlohmann/json 3.11.3",
+    "integration": "Ubuntu 22.04 x86-64, QEMU TCG, Linux 5.15.0-198-generic, SGX Simulation"
+  },
+  "fixture_sha256": "ce8580f354272d83e2905c775cbab5a75961d257c3be70e194b19cdd7a043984",
+  "detector_sources_sha256": {
+    "poc/falco/plugin/raven.cpp": "04ea54e0b2c3c4e4b89b42450fe200f495390ca5e3629d2b53c540bc7f997b5e",
+    "poc/falco/plugin/zeek.cpp": "817d5f46047d6e7839d4e6b0e9b520cad60414999bc5c98ae061600486e481f0",
+    "poc/falco/plugin/graph.cpp": "150944af01ed86ac428836b90924f0242af8b42274d5c7b8ffb7a471b23efd57",
+    "poc/falco/plugin/graph.hpp": "22a8705856c54d379b8016293c784a46fd7ee1eaf44f858a9ad6dbf7d5527e39",
+    "poc/falco/plugin/detectors.hpp": "1e9ac3d8955a6ffad4608363d149197bc43d6ab6424e92639459d758e7c58684",
+    "poc/falco/plugin/plugin.cpp": "99edc2579f0da2997b1d0f55b401b15e075d5abc8ffe9314f5de663e1d9cfbcd"
+  },
+  "qemu_binaries_sha256": {
+    "falco-enclave.signed": "7c8ea8a6ae76411d06795014d535bb8d6ef864d3d2e6e825f4adfbb1b70a0148",
+    "replay-ring": "c981e11da69f2d2f317e987c9148032efac6a320a1dcf4dbda36dd0c199e04f5",
+    "libraven_zeek.so": "4257d6a2ba33e625f560d309bf7c8e8bc565f96adc1c92c7ab31cbdd3b0e5779"
+  },
+  "getpid": {
+    "parser": "PASS: SIM parser, wrap, BUSY, DISCARD, malformed input, descriptor bounds, replay, tail batch, stop/drain",
+    "smoke_runs": [
+      {
+        "mode": "host",
+        "ok": true,
+        "attempted": 10003,
+        "submitted": 10003,
+        "reserve_failed": 0,
+        "processed": 10003,
+        "matched": 10003,
+        "format_rejected": 0,
+        "data_ecalls": 0
+      },
+      {
+        "mode": "ecall",
+        "ok": true,
+        "attempted": 10003,
+        "submitted": 10003,
+        "reserve_failed": 0,
+        "processed": 10003,
+        "matched": 10003,
+        "format_rejected": 0,
+        "data_ecalls": 10003
+      },
+      {
+        "mode": "batch",
+        "ok": true,
+        "attempted": 10003,
+        "submitted": 10003,
+        "reserve_failed": 0,
+        "processed": 10003,
+        "matched": 10003,
+        "format_rejected": 0,
+        "data_ecalls": 6676
+      },
+      {
+        "mode": "step",
+        "ok": true,
+        "attempted": 10003,
+        "submitted": 10003,
+        "reserve_failed": 0,
+        "processed": 10003,
+        "matched": 10003,
+        "format_rejected": 0,
+        "data_ecalls": 2177281
+      },
+      {
+        "mode": "direct",
+        "ok": true,
+        "attempted": 10003,
+        "submitted": 10003,
+        "reserve_failed": 0,
+        "processed": 10003,
+        "matched": 10003,
+        "format_rejected": 0,
+        "data_ecalls": 1
+      },
+      {
+        "mode": "direct",
+        "ok": true,
+        "attempted": 20000,
+        "submitted": 3971,
+        "reserve_failed": 16029,
+        "processed": 3971,
+        "matched": 3971,
+        "format_rejected": 0,
+        "data_ecalls": 1
+      }
+    ]
+  },
+  "falco_offline": {
+    "pass": true,
+    "matched_alerts": 2,
+    "loaded_rules": 25,
+    "enabled_rules": 25,
+    "alerts_by_rule": {
+      "Run shell untrusted": 2
+    }
+  },
+  "current_fixture_core_replay": {
+    "matched_project_expectations": 95,
+    "cases": 95,
+    "suites": {
+      "behavior": 45,
+      "parity-audit": 8,
+      "structure": 23,
+      "lifecycle": 19
+    }
+  },
+  "historical_detector": {
+    "matched_upstream": 79,
+    "cases": 91,
+    "previously_observed_differences": [
+      "zeek/bsd-loop",
+      "zeek/ethernet-snap",
+      "raven/nullable-dst-ip",
+      "raven/nullable-file-path",
+      "raven/nullable-user",
+      "stream/stream-history-4000",
+      "zeek/tcp-half-close-reset-only",
+      "ip/tcp-half-close-reset-only",
+      "zeek/tcp-half-close-reset-peer-fin",
+      "ip/tcp-half-close-reset-peer-fin",
+      "zeek/udp-background-360",
+      "ip/udp-background-360"
+    ],
+    "exit": 1
+  },
+  "historical_signed_ring": {
+    "passes": [
+      "ring/boundary-benign",
+      "ring/boundary-review",
+      "ring/early-review",
+      "ring/timer-queue-30",
+      "ring/timer-queue-360",
+      "ring/timer-queue-reply-30",
+      "ring/timer-queue-reply-360",
+      "ring/uid-translation"
+    ],
+    "exit": 0
+  },
+  "zeek_state": {
+    "session_observations": [
+      [
+        49001,
+        1,
+        1
+      ],
+      [
+        49002,
+        1,
+        0
+      ]
+    ],
+    "suppression_observations": [
+      [
+        930,
+        2
+      ],
+      [
+        3603,
+        2
+      ],
+      [
+        3690,
+        1
+      ],
+      [
+        4320,
+        0
+      ],
+      [
+        4590,
+        1
+      ],
+      [
+        8190,
+        0
+      ]
+    ]
+  },
+  "regenerated_100k_inputs": {
+    "repeat": {
+      "events": 100000,
+      "sha256": "6e8f58885f03523eac294c72a90cf55ff02d5e2de2fa66323cc8516a5da37561",
+      "order": "14858273988666337996"
+    },
+    "churn": {
+      "events": 100000,
+      "sha256": "8aecf27667b66b593f62ada50b86dbc15ef4d6789084f6dc4ba1ad190aec29ba",
+      "order": "14858273988666337996"
+    }
+  },
+  "structure_native_and_signed_replay": {
+    "matched": 23,
+    "valid_inputs": 17,
+    "expected_rejections": [
+      "second-interface-after-delivery-16384",
+      "two-interfaces-snaplen-16384",
+      "two-sections-mixed-endian",
+      "positive-large-is-distinct",
+      "same-order-sections-different-snaplen",
+      "order-change-after-notices"
+    ],
+    "comparison_file_sha256": "39e6d28892068cbb7740440aba3cad15c8a99be136289f48f8d1666ea8c9bcc4",
+    "exit": 0
+  }
+}

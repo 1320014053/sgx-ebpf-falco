@@ -1,0 +1,154 @@
+diff --git a/cmake/modules/libsinsp.cmake b/cmake/modules/libsinsp.cmake
+index 44c632e..f539f4e 100644
+--- a/cmake/modules/libsinsp.cmake
++++ b/cmake/modules/libsinsp.cmake
+@@ -29,7 +29,7 @@ if(NOT HAVE_LIBSINSP)
+ 
+ 	include(ExternalProject)
+ 	include(libscap)
+-	if(NOT EMSCRIPTEN)
++	if(NOT EMSCRIPTEN AND NOT FALCO_SGX)
+ 		include(tbb)
+ 	endif()
+ 	include(jsoncpp)
+@@ -42,7 +42,7 @@ if(NOT HAVE_LIBSINSP)
+ 
+ 	set(LIBSINSP_INCLUDE_DIRS)
+ 
+-	if(NOT USE_BUNDLED_TBB AND NOT EMSCRIPTEN)
++	if(NOT USE_BUNDLED_TBB AND NOT EMSCRIPTEN AND NOT FALCO_SGX)
+ 		list(APPEND LIBSINSP_INCLUDE_DIRS ${TBB_INCLUDE_DIR})
+ 	endif()
+ 
+diff --git a/userspace/libsinsp/CMakeLists.txt b/userspace/libsinsp/CMakeLists.txt
+index 6ef2763..21050a6 100644
+--- a/userspace/libsinsp/CMakeLists.txt
++++ b/userspace/libsinsp/CMakeLists.txt
+@@ -32,7 +32,9 @@ include(ExternalProject)
+ include(BuildPkgConfigDependencies)
+ include(jsoncpp)
+ include(zlib)
+-include(tbb)
++if(NOT FALCO_SGX)
++	include(tbb)
++endif()
+ 
+ # The compile-time version macros only carry major.minor.patch, so drop anything the git-derived
+ # version appends to them.
+@@ -152,7 +154,7 @@ target_link_libraries(
+ set(SINSP_PKGCONFIG_REQUIRES jsoncpp)
+ set(SINSP_PKGCONFIG_REQUIRES_PRIVATE re2)
+ 
+-if(NOT EMSCRIPTEN)
++if(NOT EMSCRIPTEN AND NOT FALCO_SGX)
+ 	target_link_libraries(sinsp PRIVATE "${TBB_LIB}")
+ 	list(APPEND SINSP_PKGCONFIG_REQUIRES_PRIVATE tbb)
+ endif()
+@@ -173,11 +175,11 @@ if(ENABLE_THREAD_POOL AND USE_BUNDLED_BS_THREADPOOL)
+ 	add_dependencies(sinsp bs_threadpool)
+ endif()
+ 
+-if(NOT EMSCRIPTEN)
++if(NOT EMSCRIPTEN AND NOT FALCO_SGX)
+ 	add_dependencies(sinsp tbb)
+ endif()
+ 
+-if(NOT WIN32)
++if(NOT WIN32 AND NOT FALCO_SGX)
+ 	if(NOT APPLE)
+ 		if(NOT EMSCRIPTEN)
+ 			if(NOT MUSL_OPTIMIZED_BUILD)
+diff --git a/userspace/libsinsp/dns_manager.cpp b/userspace/libsinsp/dns_manager.cpp
+index fad6110..48c8c8a 100644
+--- a/userspace/libsinsp/dns_manager.cpp
++++ b/userspace/libsinsp/dns_manager.cpp
+@@ -22,7 +22,7 @@ void sinsp_dns_resolver::refresh(uint64_t erase_timeout,
+                                  uint64_t base_refresh_timeout,
+                                  uint64_t max_refresh_timeout,
+                                  std::future<void> f_exit) {
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+ 	sinsp_dns_manager &manager = sinsp_dns_manager::get();
+ 	while(true) {
+ 		if(!manager.m_cache.empty()) {
+@@ -70,7 +70,7 @@ void sinsp_dns_resolver::refresh(uint64_t erase_timeout,
+ #endif
+ }
+ 
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+ inline sinsp_dns_manager::dns_info sinsp_dns_manager::resolve(const std::string &name,
+                                                               uint64_t ts) {
+ 	dns_info dinfo;
+@@ -100,7 +100,7 @@ inline sinsp_dns_manager::dns_info sinsp_dns_manager::resolve(const std::string
+ #endif
+ 
+ bool sinsp_dns_manager::match(const char *name, int af, const void *addr, uint64_t ts) {
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+ 	if(!m_resolver) {
+ 		m_resolver = std::make_unique<std::thread>(sinsp_dns_resolver::refresh,
+ 		                                           m_erase_timeout,
+@@ -139,7 +139,7 @@ bool sinsp_dns_manager::match(const char *name, int af, const void *addr, uint64
+ std::string sinsp_dns_manager::name_of(int af, const void *addr, uint64_t ts) {
+ 	std::string ret;
+ 
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+ 	if(!m_cache.empty()) {
+ 		m_erase_mutex.lock();
+ 		for(auto &it : m_cache) {
+@@ -168,7 +168,7 @@ std::string sinsp_dns_manager::name_of(int af, const void *addr, uint64_t ts) {
+ }
+ 
+ void sinsp_dns_manager::cleanup() {
+-#if !defined(__EMSCRIPTEN__)
++#if !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+ 	if(m_resolver) {
+ 		m_exit_signal.set_value();
+ 		m_resolver->join();
+diff --git a/userspace/libsinsp/dns_manager.h b/userspace/libsinsp/dns_manager.h
+index 68ad5da..97d8981 100644
+--- a/userspace/libsinsp/dns_manager.h
++++ b/userspace/libsinsp/dns_manager.h
+@@ -29,7 +29,9 @@ limitations under the License.
+ #include <future>
+ #include <mutex>
+ #include <memory>
++#ifndef FALCO_SGX
+ #include "tbb/concurrent_unordered_map.h"
++#endif
+ #include <libsinsp/sinsp.h>
+ 
+ struct sinsp_dns_resolver {
+@@ -56,7 +58,7 @@ public:
+ 	void set_max_refresh_timeout(uint64_t ns) { m_max_refresh_timeout = ns; };
+ 
+ 	size_t size() const {
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+ 		return m_cache.size();
+ #else
+ 		return 0;
+@@ -74,7 +76,7 @@ private:
+ 	sinsp_dns_manager(sinsp_dns_manager const &) = delete;
+ 	void operator=(sinsp_dns_manager const &) = delete;
+ 
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+ 	struct dns_info {
+ 		bool operator==(const dns_info &other) const {
+ 			return m_v4_addrs == other.m_v4_addrs && m_v6_addrs == other.m_v6_addrs;
+diff --git a/userspace/libsinsp/parsers.cpp b/userspace/libsinsp/parsers.cpp
+index c346241..68f90a9 100644
+--- a/userspace/libsinsp/parsers.cpp
++++ b/userspace/libsinsp/parsers.cpp
+@@ -2627,7 +2627,7 @@ void sinsp_parser::parse_accept_exit(sinsp_evt &evt, sinsp_parser_verdict &verdi
+ 	const auto family = *packed::generic_sockaddr::family(packed_data);
+ 
+ 	// Populate the fd info class.
+-	std::shared_ptr fdi = m_fdinfo_factory.create();
++	std::shared_ptr<sinsp_fdinfo> fdi = m_fdinfo_factory.create();
+ 	if(family == PPM_AF_INET) {
+ 		const auto *const sip = packed::in_socktuple::sip(packed_data);
+ 		const auto *const sport = packed::in_socktuple::sport(packed_data);

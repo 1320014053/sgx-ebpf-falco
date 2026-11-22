@@ -1,0 +1,162 @@
+{
+  "empty": {
+    "official": 2,
+    "active": 0,
+    "context_filtered": 0,
+    "notices": []
+  },
+  "tetragon-mixed": {
+    "official": 2,
+    "active": 3,
+    "context_filtered": 0,
+    "notices": []
+  },
+  "bad-json": {
+    "rejected_by": [
+      "native",
+      "sgx"
+    ],
+    "diagnostic": "RAVEN line 1"
+  },
+  "bad-pcap": {
+    "rejected_by": [
+      "native",
+      "sgx"
+    ],
+    "diagnostic": "truncated PCAP packet header"
+  },
+  "A": {
+    "official": 2,
+    "active": 1,
+    "context_filtered": 0,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "B": {
+    "official": 2,
+    "active": 1,
+    "context_filtered": 0,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "C": {
+    "official": 2,
+    "active": 1,
+    "context_filtered": 0,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "D": {
+    "official": 2,
+    "active": 3,
+    "context_filtered": 0,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "E": {
+    "official": 2,
+    "active": 1,
+    "context_filtered": 0,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "F": {
+    "official": 2,
+    "active": 3,
+    "context_filtered": 0,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "G": {
+    "official": 2,
+    "active": 0,
+    "context_filtered": 1,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "idle": {
+    "official": 2,
+    "active": 0,
+    "context_filtered": 0,
+    "notices": []
+  },
+  "tetragon": {
+    "official": 2,
+    "active": 1,
+    "context_filtered": 0,
+    "notices": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "states": {
+    "official": 2,
+    "active": 6,
+    "context_filtered": 1,
+    "notices": [
+      "Scan::Port_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "epochs": {
+    "official": 2,
+    "active": 6,
+    "context_filtered": 1,
+    "notices": [
+      "Scan::Port_Scan",
+      "Scan::Port_Scan"
+    ]
+  },
+  "ipv6-vlan": {
+    "official": 2,
+    "active": 6,
+    "context_filtered": 1,
+    "notices": [
+      "Scan::Port_Scan"
+    ]
+  },
+  "reverse-eof": {
+    "official": 2,
+    "active": 6,
+    "context_filtered": 1,
+    "notices": [
+      "Scan::Port_Scan"
+    ]
+  },
+  "fragments": {
+    "official": 2,
+    "active": 6,
+    "context_filtered": 1,
+    "notices": [
+      "Scan::Port_Scan"
+    ]
+  },
+  "pcapng": {
+    "official": 2,
+    "active": 6,
+    "context_filtered": 1,
+    "notices": [
+      "Scan::Port_Scan"
+    ]
+  },
+  "live": {
+    "official": 1,
+    "plugin_events": 5,
+    "ring_records": 13440,
+    "driver_drops": 0
+  }
+}

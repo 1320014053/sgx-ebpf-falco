@@ -1,0 +1,23 @@
+--- a/trusted/enclave.cpp
++++ b/trusted/enclave.cpp
+@@ -497,10 +497,12 @@
+                     archive(line.data(), line.size(), evt.get_ts(), 0);
+                 }
+                 raven->event(row);
++                if (raven_events % 10000 == 0) rz_bench::sample("live_events", raven_events);
+             };
+         } else if (record_inputs) {
+             throw std::runtime_error("recording detector inputs requires raven_zeek in load_plugins");
+         }
++        if (raven) rz_bench::sample("live_start");
+         auto deliver = [&] {
+             if (!pending.empty()) detector->inspect_plugin(true);
+             if (raven) detector->flush();
+@@ -630,6 +632,7 @@
+         inspector.close();
+         if (detector->plugin_inspector) detector->plugin_inspector->close();
+         detector->flush();
++        if (raven) rz_bench::sample("live_flushed", raven_events);
+         flush_trace();
+         nlohmann::json event_types = nlohmann::json::object();
+         for (size_t i = 0; i < types.size(); ++i) {

@@ -1,0 +1,279 @@
+{
+  "date": "2026-11-22",
+  "scope": "RAVEN 和 Zeek 离线回放的五项修复",
+  "references": {
+    "RAVEN": {
+      "commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+      "tier": "full",
+      "reference_adapter": "poc/falco/upstream/raven-replay.py",
+      "source_tar_sha256": "f53bbce4f31287a3528a5060aa52e056ca1ec10945121b7f64058be6aab0bd69"
+    },
+    "Zeek": {
+      "version": "6.0.9",
+      "commit": "7a7864f89297e0fc3f3779ec2f8dc5100d8449c0",
+      "policy": "policy/misc/scan",
+      "image": "zeek/zeek@sha256:a25a3c38497c5492dd4391c09595f0842b46a608fad4180df18549c754797f23",
+      "linux_amd64_binary_sha256": "27c910b1be9f5cf0666d5f3510db48195dd92611aa47c8b11bdfc153999e68b0",
+      "source_tar_sha256": "77b921c05bf8edc476c3dc9c1190f99580537fad493fae4ebfe4bc1ee64f1d19"
+    }
+  },
+  "runtimes": {
+    "ordinary": "Falco 0.45.2 x86_64 shared source plugin",
+    "enclave": "signed Open Enclave SGX Simulation",
+    "build": "Ubuntu 22.04 QEMU",
+    "full_regression": "Ubuntu 24.04 WSL 2",
+    "targeted_repeat": "Ubuntu 22.04 QEMU"
+  },
+  "source_sha256": {
+    "capture.hpp": "6f0b9a82591aa835f0ecbec8d354f872aaa792e8252825c84ef42a5147908a98",
+    "Falco.edl": "c5a1d67ad988135859c9c64acdff45659f05438ec30e50fdbf8770c23209706b",
+    "host.cpp": "21cc2236a09553c5a5da323369e48ed8625f5e0482a82a10ce8af6db1c0cceff",
+    "plugin/detectors.hpp": "047ca0659bd78cd51752e570903af4aecf438ecd51ee62f28bc3d2a015e83989",
+    "plugin/plugin.cpp": "9a4316e049d121940412a17465d8cd83c71bf58642e2da7fdeb863de41c3ee1e",
+    "plugin/raven.cpp": "67aa7025537bb80346a03f628e6f8a580cc178eca1fbf6ba2a3ed87918ea7d6c",
+    "plugin/zeek.cpp": "c357d152be0f901721dfbbd2d9450435e3a15382f5eefe8254bdd7ebf324bac9",
+    "trusted/enclave.cpp": "213c8bde3a80f439a15ea4b5fd9a021d0fcf1e16dedbe6508234f56ac1b003b2",
+    "plugin/check.py": "bfc5eb4aece7e21ce292b1e3a19b09b24943ab9913023720660cb1fc5d411f11"
+  },
+  "binary_sha256": {
+    "falco": "702900ebeee85e03823f817af99a19fcc0389bfc8f9cacab251bcaac0981d02e",
+    "libraven_zeek.so": "c5008936ec9699b913dc227e1a3e426867f11aebab8f416bcbd8f27ac41fab11",
+    "falco-sgx": "618f3451138c7c18bc7bf36a761e43839b86170747ec06d9a95dc10ddf338a5c",
+    "falco-enclave.signed": "c05407c09626cb4b893f38be6536b07b339f3c2deb8fd59f14b9ca97f8c910eb"
+  },
+  "suites": {
+    "targeted": {
+      "cases": 27,
+      "passed_in_each_mode": 27,
+      "also_passed_in_each_mode_in_qemu": 27,
+      "original_eight": {
+        "match_upstream": 7,
+        "match_project_contract": 8
+      }
+    },
+    "regression": {
+      "cases": 34,
+      "passed_in_each_mode": 34
+    },
+    "archived": {
+      "cases": 45,
+      "passed_project_expectations_in_each_mode": 45,
+      "match_upstream_in_each_mode": 44,
+      "difference": "duplicate-after-601s"
+    }
+  },
+  "comparison": "固定原版从输入重新生成期望。按顺序逐字段比较告警，规范化 RAVEN 自动生成的 ID 和规则文件路径。两种 Falco 入口还比较规则、输出元数据及退出状态。每个专项用例另在 QEMU 重跑，27 组四条执行路径的检测结果经同样规范化后逐字段相等。",
+  "connection_state": {
+    "20s": {
+      "ssh": true,
+      "http": true
+    },
+    "420s": {
+      "ssh": true,
+      "http": false
+    },
+    "evidence": [
+      "state/state-upstream.txt",
+      "state/state-current.txt"
+    ],
+    "idle_policy": "已建立连接的服务端口 21、22、23、513 使用 3600 秒，HTTP 使用默认 300 秒。黑盒回放还验证了 SSH 空闲超时和新流量延后回收。"
+  },
+  "history_contract": {
+    "maintenance-older-context": "内网连接早于服务启动 620 秒，项目输出 1 条 active。固定原版输出 1 条 context_filtered。",
+    "duplicate-after-601s": "项目输出 2 条告警，固定原版输出 1 条。"
+  },
+  "targeted_cases": {
+    "access-link-healthchecks": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 2,
+      "ordered_result_sha256": "d33f3eef500b57565bc329130e460af115fada393f125c71402769ca37b89d85"
+    },
+    "classic-2.3": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 2,
+      "ordered_result_sha256": "d33f3eef500b57565bc329130e460af115fada393f125c71402769ca37b89d85"
+    },
+    "idle-service-sessions": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 0,
+      "ordered_result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "maintenance-older-context": {
+      "exit": 0,
+      "raven": 1,
+      "zeek": 0,
+      "ordered_result_sha256": "a8c253b90365d6777da42ebd8cd1f401a7d1ba146c8684db93038fd209da5a3c"
+    },
+    "maintenance-recent-context": {
+      "exit": 0,
+      "raven": 1,
+      "zeek": 0,
+      "ordered_result_sha256": "cc50d272bd92c07c9476a38ee240f0e9283633f56f1ab62d57a772d134c67361"
+    },
+    "tetragon-port-plain": {
+      "exit": 0,
+      "raven": 3,
+      "zeek": 0,
+      "ordered_result_sha256": "c132d60d849ab6225fd8142208e595018e72ea5360c1c0c062112032b388a295"
+    },
+    "tetragon-port-separated": {
+      "exit": 0,
+      "raven": 3,
+      "zeek": 0,
+      "ordered_result_sha256": "c132d60d849ab6225fd8142208e595018e72ea5360c1c0c062112032b388a295"
+    },
+    "tetragon-port-trailing-text": {
+      "exit": 1,
+      "raven": 0,
+      "zeek": 0,
+      "ordered_result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "checked_diagnostic": [
+        "RAVEN input:",
+        "invalid Tetragon port"
+      ]
+    },
+    "combined-2.3": {
+      "exit": 0,
+      "raven": 3,
+      "zeek": 2,
+      "ordered_result_sha256": "6ef7ac36cc04483d4bdac1e76078fcdb125ece8806022b4376a056698b7e5a2f"
+    },
+    "combined-2.3-scenario-B": {
+      "exit": 0,
+      "raven": 1,
+      "zeek": 2,
+      "ordered_result_sha256": "a313f9b28789ed3d44960b17f7a54208bcb304a7b3ad733e0eb80bf42ce8020b"
+    },
+    "bad-raven-good-zeek": {
+      "exit": 1,
+      "raven": 0,
+      "zeek": 2,
+      "ordered_result_sha256": "d33f3eef500b57565bc329130e460af115fada393f125c71402769ca37b89d85",
+      "checked_diagnostic": "RAVEN input: RAVEN line 1"
+    },
+    "good-raven-bad-zeek": {
+      "exit": 1,
+      "raven": 3,
+      "zeek": 0,
+      "ordered_result_sha256": "c132d60d849ab6225fd8142208e595018e72ea5360c1c0c062112032b388a295",
+      "checked_diagnostic": "Zeek input: truncated PCAP packet header"
+    },
+    "both-invalid": {
+      "exit": 1,
+      "raven": 0,
+      "zeek": 0,
+      "ordered_result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "checked_diagnostic": [
+        "RAVEN input: RAVEN line 1",
+        "Zeek input: truncated PCAP packet header"
+      ]
+    },
+    "both-invalid-long-diagnostic": {
+      "exit": 1,
+      "raven": 0,
+      "zeek": 0,
+      "ordered_result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "checked_diagnostic": [
+        "invalid Tetragon port",
+        "Zeek input: truncated PCAP packet header"
+      ]
+    },
+    "missing-raven": {
+      "exit": 1,
+      "raven": 0,
+      "zeek": 2,
+      "ordered_result_sha256": "d33f3eef500b57565bc329130e460af115fada393f125c71402769ca37b89d85",
+      "checked_diagnostic": "RAVEN input: cannot open capture"
+    },
+    "missing-zeek": {
+      "exit": 1,
+      "raven": 3,
+      "zeek": 0,
+      "ordered_result_sha256": "c132d60d849ab6225fd8142208e595018e72ea5360c1c0c062112032b388a295",
+      "checked_diagnostic": "Zeek input: cannot open capture"
+    },
+    "zero-byte-pcap": {
+      "exit": 1,
+      "raven": 3,
+      "zeek": 0,
+      "ordered_result_sha256": "c132d60d849ab6225fd8142208e595018e72ea5360c1c0c062112032b388a295",
+      "checked_diagnostic": "Zeek input: truncated PCAP header"
+    },
+    "listen-plain": {
+      "exit": 0,
+      "raven": 3,
+      "zeek": 0,
+      "ordered_result_sha256": "c7f6a61ecfd789a60a1e2c27aa6fa15237298abbecdc0f9e5030da951ade78a0"
+    },
+    "listen-separated": {
+      "exit": 0,
+      "raven": 3,
+      "zeek": 0,
+      "ordered_result_sha256": "c7f6a61ecfd789a60a1e2c27aa6fa15237298abbecdc0f9e5030da951ade78a0"
+    },
+    "listen-trailing-text": {
+      "exit": 1,
+      "raven": 0,
+      "zeek": 0,
+      "ordered_result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "checked_diagnostic": [
+        "RAVEN input:",
+        "invalid Tetragon port"
+      ]
+    },
+    "2.3-modern": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 2,
+      "ordered_result_sha256": "d33f3eef500b57565bc329130e460af115fada393f125c71402769ca37b89d85"
+    },
+    "2.3-swapped": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 2,
+      "ordered_result_sha256": "d33f3eef500b57565bc329130e460af115fada393f125c71402769ca37b89d85"
+    },
+    "2.3-mixed-be": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 2,
+      "ordered_result_sha256": "d33f3eef500b57565bc329130e460af115fada393f125c71402769ca37b89d85"
+    },
+    "pppoe-vlan-ipv6": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 1,
+      "ordered_result_sha256": "a96bea326f539c5828e565e0776084d4dd354bfee59464a96b305df75e857873"
+    },
+    "pppoe-non-ip": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 0,
+      "ordered_result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "pppoe-short": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 0,
+      "ordered_result_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interactive-idle": {
+      "exit": 0,
+      "raven": 0,
+      "zeek": 5,
+      "ordered_result_sha256": "a29cee77b666f4ae43734a9cd45625abcab7245e0f22ea9daf5f65b704a6f0fe"
+    }
+  },
+  "input_archives_sha256": {
+    "behavior-review-evidence.zip": "b0fad1ac7efe96030632e436403ddfabd59d366c0b5c9d4aed3b49a1fa959b09",
+    "parity-audit-2026-11-21-evidence.zip": "acd8daf09f56d545da04699003e186e87bab41dcc5c98ffc997645fcebe9fd14"
+  },
+  "evidence": {
+    "file": "parity-fixes-2026-11-22-evidence.zip",
+    "sha256": "5ebda615eadeb79de81599b2bde899614d4bab99df2444046e331c59d373ee22",
+    "bytes": 1009921
+  }
+}

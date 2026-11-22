@@ -1,0 +1,389 @@
+{
+  "references": {
+    "RAVEN": {
+      "commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+      "tier": "full",
+      "reference_adapter": "poc/falco/upstream/raven-replay.py",
+      "source_tar_sha256": "f53bbce4f31287a3528a5060aa52e056ca1ec10945121b7f64058be6aab0bd69"
+    },
+    "Zeek": {
+      "version": "6.0.9",
+      "commit": "7a7864f89297e0fc3f3779ec2f8dc5100d8449c0",
+      "policy": "policy/misc/scan",
+      "image": "zeek/zeek@sha256:a25a3c38497c5492dd4391c09595f0842b46a608fad4180df18549c754797f23",
+      "linux_amd64_binary_sha256": "27c910b1be9f5cf0666d5f3510db48195dd92611aa47c8b11bdfc153999e68b0",
+      "source_tar_sha256": "77b921c05bf8edc476c3dc9c1190f99580537fad493fae4ebfe4bc1ee64f1d19"
+    }
+  },
+  "cases": [
+    {
+      "case": "archived-live-events",
+      "engine": "RAVEN",
+      "input_file": "inputs/archived-live-events.jsonl",
+      "input_sha256": "49df098406d0362c564d7bfb1c3a05fda05ef190db26c5ba86cf881b0abe37a5",
+      "upstream_output_file": "upstream/archived-live-events.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "boundaries",
+      "engine": "RAVEN",
+      "input_file": "inputs/boundaries.jsonl",
+      "input_sha256": "5c81bb0d1c231d8ebb3efbc02ead9c09487e7aa7af930b43bc68ab9da153b7da",
+      "upstream_output_file": "upstream/boundaries.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "duplicate-after-10s",
+      "engine": "RAVEN",
+      "input_file": "inputs/duplicate-after-10s.jsonl",
+      "input_sha256": "28b9c040b6733267de08aca0b6ef08a5619b2353481aa0aa91ac5323ca17e426",
+      "upstream_output_file": "upstream/duplicate-after-10s.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "duplicate-after-601s",
+      "engine": "RAVEN",
+      "input_file": "inputs/duplicate-after-601s.jsonl",
+      "input_sha256": "aafba526972b34bb18a673675c6961c280188cd72f407efc908faff86a90731c",
+      "upstream_output_file": "upstream/duplicate-after-601s.jsonl",
+      "upstream_exit": 0,
+      "current_output_file": "current/duplicate-after-601s.jsonl"
+    },
+    {
+      "case": "late-maintenance",
+      "engine": "RAVEN",
+      "input_file": "inputs/late-maintenance.jsonl",
+      "input_sha256": "d15a3ba16429623274c7721e16e7b72ee307f72a84c002be94a163319548877e",
+      "upstream_output_file": "upstream/late-maintenance.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "numeric-new-user",
+      "engine": "RAVEN",
+      "input_file": "inputs/numeric-new-user.jsonl",
+      "input_sha256": "af8513f29a8a3b7d8e10f1079daf9d461f74a780556507d780353adc346bc982",
+      "upstream_output_file": "upstream/numeric-new-user.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ordered-maintenance",
+      "engine": "RAVEN",
+      "input_file": "inputs/ordered-maintenance.jsonl",
+      "input_sha256": "7a0425519072e4fac5371a9e8cec18e3b7a9d9c6eb9dcd7270e035bf8df2d8e7",
+      "upstream_output_file": "upstream/ordered-maintenance.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-A",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-A.jsonl",
+      "input_sha256": "d222ed17edac15f8d6385288bb900a9e478cd527d221206cb13b181fbe1bb3eb",
+      "upstream_output_file": "upstream/scenario-A.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-B",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-B.jsonl",
+      "input_sha256": "8e9c1c526862397dd858fb1ac4dcf2856c78a45ce92c779ae35723469133f40c",
+      "upstream_output_file": "upstream/scenario-B.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-C",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-C.jsonl",
+      "input_sha256": "540dd1945f18c61a67cb4f93e2b12bff12c3bd5db21099be1d9132a1c6349a95",
+      "upstream_output_file": "upstream/scenario-C.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-D",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-D.jsonl",
+      "input_sha256": "926622a9408d6c5759f2481fe21fe40b165d543ac184a5f76a9fd879eca0aad9",
+      "upstream_output_file": "upstream/scenario-D.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-E",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-E.jsonl",
+      "input_sha256": "a0ddc693b74207a825859050631aa31cda930c31c11f7a5feb370f17dc388dad",
+      "upstream_output_file": "upstream/scenario-E.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-F",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-F.jsonl",
+      "input_sha256": "4e38bcf63c22af6901237056c111d5f3f786ecd7dde4ad549ad6354eca35b045",
+      "upstream_output_file": "upstream/scenario-F.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-G",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-G.jsonl",
+      "input_sha256": "119e9f27e55061a857d92d823899454895fc3fa0899f7eaa6a307a5dbab4611b",
+      "upstream_output_file": "upstream/scenario-G.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "scenario-idle",
+      "engine": "RAVEN",
+      "input_file": "inputs/scenario-idle.jsonl",
+      "input_sha256": "388cd7711891f3a20c3ee9c835cced9cc699d6a3f01a2b6aca0269ae676ed5b9",
+      "upstream_output_file": "upstream/scenario-idle.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "special-purpose-ipv4",
+      "engine": "RAVEN",
+      "input_file": "inputs/special-purpose-ipv4.jsonl",
+      "input_sha256": "5b00e474fa32c826b816d941589bbeccd8db36c5ced2b90e0346a9cceedf38ee",
+      "upstream_output_file": "upstream/special-purpose-ipv4.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "tetragon-invalid-numeric-id",
+      "engine": "RAVEN",
+      "input_file": "inputs/tetragon-invalid-numeric-id.jsonl",
+      "input_sha256": "8948a3572a007408e2ad21b8125b681e22c73cea847a83d1393549278c9e4031",
+      "upstream_output_file": "upstream/tetragon-invalid-numeric-id.jsonl",
+      "upstream_exit": 1
+    },
+    {
+      "case": "tetragon-mixed",
+      "engine": "RAVEN",
+      "input_file": "inputs/tetragon-mixed.jsonl",
+      "input_sha256": "8d932bceb7f92de107adafe5f28175e3da83a20869ea044531e1c250c0ac0e12",
+      "upstream_output_file": "upstream/tetragon-mixed.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "tetragon-rfc3339",
+      "engine": "RAVEN",
+      "input_file": "inputs/tetragon-rfc3339.jsonl",
+      "input_sha256": "3f2b4bf0c827de65e7168348315032f347c57beffc161655d69993978c89ee7e",
+      "upstream_output_file": "upstream/tetragon-rfc3339.jsonl",
+      "upstream_exit": 1
+    },
+    {
+      "case": "utc-second-boundary",
+      "engine": "RAVEN",
+      "input_file": "inputs/utc-second-boundary.jsonl",
+      "input_sha256": "6de5a91ac382d787a1370dc2674c7f6e8068ec2998d330233d43a7838394fd0f",
+      "upstream_output_file": "upstream/utc-second-boundary.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "archived-live-packets",
+      "engine": "Zeek",
+      "input_file": "inputs/archived-live-packets.pcap",
+      "input_sha256": "2ac968fdee755b8b84a37d3e6177f7a609e7529ffaeb517ee4a2d89dccaeb629",
+      "upstream_output_file": "upstream/archived-live-packets.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "cooked2-healthchecks",
+      "engine": "Zeek",
+      "input_file": "inputs/cooked2-healthchecks.pcap",
+      "input_sha256": "2d7013a1d2e6348fb7640297afed39fcc544f707963164bf89d38f79a03b1287",
+      "upstream_output_file": "upstream/cooked2-healthchecks.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "cooked2-vlan-healthchecks",
+      "engine": "Zeek",
+      "input_file": "inputs/cooked2-vlan-healthchecks.pcap",
+      "input_sha256": "11f21a3ca1b1299b0ae66e6db1d5321c41786e874f26c4fd6f5aea8c74b35a3c",
+      "upstream_output_file": "upstream/cooked2-vlan-healthchecks.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "epochs",
+      "engine": "Zeek",
+      "input_file": "inputs/epochs.pcap",
+      "input_sha256": "9abec8b7015fcd4c0f1de499783adb972dd91fe14cb21148024d4e323e6bbbd5",
+      "upstream_output_file": "upstream/epochs.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ethernet-epoch-eof",
+      "engine": "Zeek",
+      "input_file": "inputs/ethernet-epoch-eof.pcap",
+      "input_sha256": "bb5fa19c0f67724412566c4066ec9771e5e23ad2292cab969f2e9f58787fd226",
+      "upstream_output_file": "upstream/ethernet-epoch-eof.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ethernet-epoch-same-period",
+      "engine": "Zeek",
+      "input_file": "inputs/ethernet-epoch-same-period.pcap",
+      "input_sha256": "db7c9d2aeb56ca2a680598f50255d2f64cf814528a8fe5c5b2121da05e875525",
+      "upstream_output_file": "upstream/ethernet-epoch-same-period.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ethernet-fractional-duration",
+      "engine": "Zeek",
+      "input_file": "inputs/ethernet-fractional-duration.pcap",
+      "input_sha256": "f410ebe970cb1b2a203faf7b7fc006213143d547b14cf355efac36d5bb8feda9",
+      "upstream_output_file": "upstream/ethernet-fractional-duration.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ethernet-mpls-healthchecks",
+      "engine": "Zeek",
+      "input_file": "inputs/ethernet-mpls-healthchecks.pcap",
+      "input_sha256": "bef3d9960bb54db5d6317079cd799e7d702b5a08b4a9de4dc0c8cfffcded9031",
+      "upstream_output_file": "upstream/ethernet-mpls-healthchecks.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "fragments",
+      "engine": "Zeek",
+      "input_file": "inputs/fragments.pcap",
+      "input_sha256": "ccd42de4b44f62cb27361bb23fc861083e535cec40e3c0770e62fe19d335bfbe",
+      "upstream_output_file": "upstream/fragments.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "healthchecks",
+      "engine": "Zeek",
+      "input_file": "inputs/healthchecks.pcap",
+      "input_sha256": "6c759fe144ce3aa8e117f831a18dd54e91fcc914cf48010a3fe3ec7b5c36e7c5",
+      "upstream_output_file": "upstream/healthchecks.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ipv6-vlan",
+      "engine": "Zeek",
+      "input_file": "inputs/ipv6-vlan.pcap",
+      "input_sha256": "166f119d3e43d5b7d990805d2c8a77bd7c774927a24a672c0ef74254d9b41dd2",
+      "upstream_output_file": "upstream/ipv6-vlan.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "nanosecond-healthchecks",
+      "engine": "Zeek",
+      "input_file": "inputs/nanosecond-healthchecks.pcap",
+      "input_sha256": "127b0598dcbd8510d7b0a7ec6fe45514e79cdfe7308d5ab2f1481806b331bb43",
+      "upstream_output_file": "upstream/nanosecond-healthchecks.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "pcapng",
+      "engine": "Zeek",
+      "input_file": "inputs/pcapng.pcap",
+      "input_sha256": "8a9a8494976235959d36765d98eced25900640918aecc1c99a233b4b607093fa",
+      "upstream_output_file": "upstream/pcapng.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "pcapng-equal-linktypes",
+      "engine": "Zeek",
+      "input_file": "inputs/pcapng-equal-linktypes.pcap",
+      "input_sha256": "1d80aa5d96803a497dd9ccce1f51137d3e7a8446e45272d8ce8f4202bd491d78",
+      "upstream_output_file": "upstream/pcapng-equal-linktypes.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "pcapng-mixed-linktypes",
+      "engine": "Zeek",
+      "input_file": "inputs/pcapng-mixed-linktypes.pcap",
+      "input_sha256": "f0c913fa7d8f1e58657bc95e80e19bb04f9a79cef4dac670527b5bf76f73f07f",
+      "upstream_output_file": "upstream/pcapng-mixed-linktypes.jsonl",
+      "upstream_exit": 1
+    },
+    {
+      "case": "pcapng-submicrosecond",
+      "engine": "Zeek",
+      "input_file": "inputs/pcapng-submicrosecond.pcap",
+      "input_sha256": "8503d491ee05b4ede024ab51291512f58c4ba9a9926a165b3646f3fd0977467c",
+      "upstream_output_file": "upstream/pcapng-submicrosecond.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ppp-serial-handshakes",
+      "engine": "Zeek",
+      "input_file": "inputs/ppp-serial-handshakes.pcap",
+      "input_sha256": "70a7b8d1f0d3a1c9230eaa2c6fb41a82bf9851d36583712385f4ba803836f5ae",
+      "upstream_output_file": "upstream/ppp-serial-handshakes.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ppp-serial-healthchecks",
+      "engine": "Zeek",
+      "input_file": "inputs/ppp-serial-healthchecks.pcap",
+      "input_sha256": "8b512581764967f82c305b113530b05b6fb4f7a305f692067e4198d9976a7a54",
+      "upstream_output_file": "upstream/ppp-serial-healthchecks.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ppp-serial-ipv6",
+      "engine": "Zeek",
+      "input_file": "inputs/ppp-serial-ipv6.pcap",
+      "input_sha256": "af2e2f7f46564cb7b291556215524f0e68ca7afde10b47683cc1e2538e47cdb0",
+      "upstream_output_file": "upstream/ppp-serial-ipv6.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "ppp-serial-mpls",
+      "engine": "Zeek",
+      "input_file": "inputs/ppp-serial-mpls.pcap",
+      "input_sha256": "30a319784a2194ccc171b754018195413de7243b30374e7e64762b2fb6c50f2f",
+      "upstream_output_file": "upstream/ppp-serial-mpls.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "reordered-successful-handshakes",
+      "engine": "Zeek",
+      "input_file": "inputs/reordered-successful-handshakes.pcap",
+      "input_sha256": "0db49e0943ba11c8cc35a3c58b087d638ccba06b8a995d3cfa0a42057e9edf29",
+      "upstream_output_file": "upstream/reordered-successful-handshakes.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "reverse-eof",
+      "engine": "Zeek",
+      "input_file": "inputs/reverse-eof.pcap",
+      "input_sha256": "9b4d9df16d5193470022eb85b307ba323e756e5e49e7ff0cd6613348518720fe",
+      "upstream_output_file": "upstream/reverse-eof.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "states",
+      "engine": "Zeek",
+      "input_file": "inputs/states.pcap",
+      "input_sha256": "b5e857de1114dadb4bb6a11612ae2425ac9f76444b09851ef3e748b7109ef5da",
+      "upstream_output_file": "upstream/states.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "successful-handshakes",
+      "engine": "Zeek",
+      "input_file": "inputs/successful-handshakes.pcap",
+      "input_sha256": "18a6a122d764b75c8779e766a8cd399d5b89139d0f9acfbaa8b762a8671069a3",
+      "upstream_output_file": "upstream/successful-handshakes.jsonl",
+      "upstream_exit": 0
+    },
+    {
+      "case": "suppression-expiry",
+      "engine": "Zeek",
+      "input_file": "inputs/suppression-expiry.pcap",
+      "input_sha256": "fe08537a9cff28690c4923da2233b718e9662a9c2234ad7e07b7958e23900f77",
+      "upstream_output_file": "upstream/suppression-expiry.jsonl",
+      "upstream_exit": 0
+    }
+  ],
+  "source_archive": {
+    "file": "behavior-review-evidence.zip",
+    "sha256": "b0fad1ac7efe96030632e436403ddfabd59d366c0b5c9d4aed3b49a1fa959b09"
+  },
+  "evidence_archive": {
+    "file": "regression.zip",
+    "sha256": "ce8580f354272d83e2905c775cbab5a75961d257c3be70e194b19cdd7a043984"
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "date": "2026-11-22",
+  "references": {
+    "RAVEN": {
+      "commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+      "tier": "full",
+      "reference_adapter": "poc/falco/upstream/raven-replay.py",
+      "source_tar_sha256": "f53bbce4f31287a3528a5060aa52e056ca1ec10945121b7f64058be6aab0bd69"
+    },
+    "Zeek": {
+      "version": "6.0.9",
+      "commit": "7a7864f89297e0fc3f3779ec2f8dc5100d8449c0",
+      "policy": "policy/misc/scan",
+      "image": "zeek/zeek@sha256:a25a3c38497c5492dd4391c09595f0842b46a608fad4180df18549c754797f23",
+      "linux_amd64_binary_sha256": "27c910b1be9f5cf0666d5f3510db48195dd92611aa47c8b11bdfc153999e68b0",
+      "source_tar_sha256": "77b921c05bf8edc476c3dc9c1190f99580537fad493fae4ebfe4bc1ee64f1d19"
+    }
+  },
+  "environment": {
+    "build_and_live_ring": "Ubuntu 22.04 QEMU, signed Open Enclave SGX Simulation",
+    "offline_replay": "Ubuntu 24.04 WSL 2; native Falco 0.45.2 and the same signed enclave",
+    "uid_entry": "production falco_live with archived process snapshot and three setuid exit records",
+    "raven_targeted": "pinned RAVEN full, Python 3.10.12, PyYAML 6.0.2, psutil 5.9.8, UTC",
+    "zeek": "Zeek 6.0.9 with policy/misc/scan, executable verified against the pinned image"
+  },
+  "source_sha256": {
+    "trusted/raven_syscalls.cpp": "50efc408e3123f7d830faf454a60e5eefb7b82beef6cfbc84b8fe10f7e6e46af",
+    "trusted/raven_syscalls.hpp": "5dbfa9d25cd66b8bc8019d85684915cfbfb9c3f648df44f6616b05c7f3f6df22",
+    "trusted/enclave.cpp": "3dd6127fb36e252b4ae7e84e189adfa934dcab55a56569e9ff8f581e368a4d3e",
+    "plugin/raven.cpp": "c6c38ebfdd66f3647510510a102d9533c358a50d5499e3cf2eef3750049dd0de",
+    "plugin/zeek.cpp": "9868df16e2fc5c8625264788ef0d525e1709c8f97ee8c4d2492d6326a3325357",
+    "plugin/plugin.cpp": "99edc2579f0da2997b1d0f55b401b15e075d5abc8ffe9314f5de663e1d9cfbcd",
+    "plugin/detectors.hpp": "1e9ac3d8955a6ffad4608363d149197bc43d6ab6424e92639459d758e7c58684",
+    "plugin/check.py": "685af26097c17406d28c2e7be817ad7da9ec2f798ceacfcfa0257ba64f012e66"
+  },
+  "binaries_sha256": {
+    "falco": "702900ebeee85e03823f817af99a19fcc0389bfc8f9cacab251bcaac0981d02e",
+    "libraven_zeek.so": "39b62f3f033f572da666e8aabfdeb446d61884a16643e71904a2b933ea097b5d",
+    "falco-sgx": "618f3451138c7c18bc7bf36a761e43839b86170747ec06d9a95dc10ddf338a5c",
+    "falco-enclave.signed": "30840301ad33fc74c9f6df122ccf2aa773a7b7cc69383c57f6ef10fe3c09a95a"
+  },
+  "before_archive": {
+    "file": "runtime-parity-review-2026-11-22.zip",
+    "sha256": "b26577d5bf41343d3fb9655f979cced80ead36a719188cb1a51f9b7301ad0007"
+  },
+  "fixes": {
+    "live_uid": {
+      "before_root_pids": [
+        102
+      ],
+      "after_root_pids": [
+        101,
+        102
+      ],
+      "transitions": [
+        [
+          101,
+          0,
+          1000
+        ],
+        [
+          102,
+          0,
+          1000
+        ]
+      ],
+      "ring_counts": {
+        "records": 3,
+        "accepted": 3,
+        "format_rejected": 0,
+        "discarded": 0,
+        "raven_events": 2
+      },
+      "rule": "privilege_change_chain",
+      "ordered_full_findings_match_original_on_translated_rows": true,
+      "live_oracle": "serialize the original on_event() return before the next event",
+      "file_oracle": "serialize the original detections after settle_context(force=True)"
+    },
+    "truncated_capture": {
+      "before_classic_notices": 0,
+      "after_classic_and_pcapng": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ],
+      "native_sgx_upstream_exit": 1,
+      "clean_eof_pending_notices": 1,
+      "read_error_pending_notices": 0
+    },
+    "nullable_container_image": {
+      "before_exit": 1,
+      "after_native_sgx_upstream_exit": 0,
+      "rule": "server_spawns_shell",
+      "risk": 40,
+      "state": "active",
+      "graph_label": "maintenance-demo",
+      "image_variants": [
+        "absent",
+        "null",
+        "empty string"
+      ]
+    }
+  },
+  "regression": {
+    "targeted_file_cases_per_runtime": 15,
+    "basic_cases_per_runtime": 38,
+    "prior_audit_cases_per_runtime": 27,
+    "behavior_cases_per_runtime": 45,
+    "behavior_match_upstream": {
+      "native": 44,
+      "sgx": 44
+    },
+    "behavior_known_difference": "duplicate-after-601s",
+    "project_retention_cases": [
+      "duplicate-after-601s",
+      "maintenance-older-context"
+    ]
+  },
+  "last_packet_notice": {
+    "case": "ng-header-tail",
+    "upstream_policy_hook": "Scan::Port_Scan 1700000001.001401",
+    "default_upstream_notice_log_rows_in_this_run": 0,
+    "native_and_sgx_notices": 1,
+    "comparison": "The last complete packet raises the Notice before the fatal read. The upstream hook confirms the emission even when its buffered log is empty."
+  },
+  "independent_input_boundary": {
+    "case": "container.id is explicitly null and image is a valid string",
+    "original": {
+      "exit": 0,
+      "detections": 1
+    },
+    "native_and_sgx": {
+      "exit": 1,
+      "detections": 0
+    },
+    "scope": "The change only applies to the optional image field."
+  },
+  "comparison": "Compared ordered full detector rows and Falco metadata. The project comparator validates generated IDs, retains their references and normalizes the absolute RAVEN rule path.",
+  "evidence": {
+    "file": "runtime-parity-fixes-2026-11-22-evidence.zip",
+    "sha256": "c412fcd15df7f6b179df74a505e6b293539841ade17bc93fe15e3814809f10c4"
+  }
+}

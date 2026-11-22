@@ -1,0 +1,172 @@
+{
+  "environment": "QEMU x86_64, Ubuntu 22.04, Open Enclave SGX Simulation",
+  "versions": {
+    "falco": "0.45.2",
+    "libs": "0.26.1",
+    "engine": "0.65.0",
+    "plugin_api": "3.12.0",
+    "raven": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+    "zeek": "6.0.9"
+  },
+  "sha256": {
+    "libraven_zeek.so": "390a0a280454f0be81445197ca5841777e1efe7be091b7c5ce4734122c19e0df",
+    "falco-enclave.signed": "b82c4b877759f37e3974da6e7be40efb500ca73ba508bc1752a5a8b70acab037",
+    "raven_zeek_rules.yaml": "6099ff8ee3a34a294e2e415ce3c0f4c3a2af5d3e4db31c69a2ae0ff22b8e0cc3",
+    "events.jsonl": "8a0b85d2533fcd887207775890cfb8d2f9fcb1d339bcf6d8cfb32ccecc18030b",
+    "packets.pcap": "6c759fe144ce3aa8e117f831a18dd54e91fcc914cf48010a3fe3ec7b5c36e7c5"
+  },
+  "source_sha256": {
+    "detectors.hpp": "a7bf7e2b1478d44c0d4f2dfd77011814493ff6c17916d16648ef3a3988720a1a",
+    "graph.cpp": "d0e5b5ac84d53d75bb7b5afa1581e8c9358b752d698b479b443126c12399cb3c",
+    "graph.hpp": "11357e0da8f6c93ea42b21347b4de3dea80f70430e1348a0010f1f70c6780c38",
+    "plugin.cpp": "89039cf0c5a4e8affe8379bd02c730a27f4361e4b3f05bb4b25d34f60da3c4e8",
+    "raven.cpp": "4248e1dadf3875ccb984eb04400ba9836e4c1d1909379f423b5fb873095c9ce3",
+    "zeek.cpp": "be7c2d19b7681174e0c04e65f2782399b6e2788847ad84616c43bd5b6a76e2d5"
+  },
+  "dynamic_plugin_loaded": "2026-11-21T10:13:42+0000: Loaded plugin 'raven_zeek@1.0.0' from file /proc/self/cwd/libraven_zeek.so",
+  "shared_object_dependencies": [
+    "libstdc++.so.6",
+    "libm.so.6",
+    "libgcc_s.so.1",
+    "libc.so.6"
+  ],
+  "compiled_enclave_symbols": {
+    "rz::raven[abi:cxx11](": "0000000000606870 t rz::raven[abi:cxx11](std::basic_string_view<char, std::char_traits<char> >, bool)",
+    "rz::zeek[abi:cxx11](": "000000000062e4f0 t rz::zeek[abi:cxx11](std::basic_string_view<char, std::char_traits<char> >)",
+    "raven_zeek_api": "0000000000600750 t raven_zeek_api"
+  },
+  "combined_enabled_rules": 29,
+  "official_regression": {
+    "pass": true,
+    "matched_alerts": 2,
+    "loaded_rules": 25,
+    "enabled_rules": 25,
+    "alerts_by_rule": {
+      "Run shell untrusted": 2
+    }
+  },
+  "live_ring": {
+    "accepted": 13440,
+    "alerts": 1,
+    "busy_observations": 66741,
+    "consumer": 1086792,
+    "consumer_write_bytes": 70880,
+    "control_read_bytes": 15864848,
+    "discarded": 0,
+    "event_types": {
+      "accept4": 1,
+      "access": 44,
+      "bind": 1,
+      "bpf": 293,
+      "brk": 68,
+      "chdir": 55,
+      "clone": 10,
+      "clone3": 2,
+      "close": 348,
+      "connect": 22,
+      "dup": 2,
+      "dup2": 4,
+      "epoll_create1": 1,
+      "epoll_wait": 17,
+      "execve": 70,
+      "fcntl": 193,
+      "futex": 21,
+      "getcwd": 1,
+      "getdents64": 96,
+      "getegid": 5,
+      "geteuid": 13,
+      "getgid": 6,
+      "getpeername": 1,
+      "getsockname": 1,
+      "getsockopt": 1,
+      "getuid": 11,
+      "ioctl": 22,
+      "keyctl": 2,
+      "kill": 10,
+      "listen": 1,
+      "lseek": 16,
+      "mkdir": 63,
+      "mmap": 529,
+      "mprotect": 200,
+      "munmap": 59,
+      "nanosleep": 7,
+      "newfstatat": 529,
+      "openat": 576,
+      "page_fault": 7642,
+      "pipe2": 2,
+      "poll": 6,
+      "prctl": 6,
+      "pread": 92,
+      "prlimit": 57,
+      "procexit": 68,
+      "read": 210,
+      "recvfrom": 13,
+      "recvmsg": 4,
+      "sendmsg": 2,
+      "sendto": 8,
+      "setgid": 1,
+      "setregid": 2,
+      "setreuid": 2,
+      "setuid": 1,
+      "signaldeliver": 65,
+      "socket": 16,
+      "switch": 955,
+      "symlinkat": 2,
+      "syscall": 917,
+      "tgkill": 1,
+      "timerfd_create": 2,
+      "vfork": 35,
+      "write": 30
+    },
+    "events": 13141,
+    "format_rejected": 0,
+    "header_read_bytes": 320724,
+    "index_read_bytes": 31729704,
+    "initial_consumer": 72,
+    "max_event_bytes": 1567,
+    "min_event_bytes": 26,
+    "mode": "live",
+    "payload_copy_bytes": 923139,
+    "producer": 1086792,
+    "records": 13440,
+    "snapshot_bytes": 154824,
+    "trace_bytes": 1130276,
+    "wrapped": 1
+  },
+  "live_driver": {
+    "mode": "modern_ebpf",
+    "map_id": 93,
+    "ring_bytes": 1048576,
+    "driver_api": 193514046488577,
+    "driver_schema": 70368828063746,
+    "driver_events": 13440,
+    "driver_drops": 0,
+    "driver_buffer_drops": 0,
+    "driver_size_drops": 0,
+    "driver_preemptions": 0,
+    "consumer": 1086792,
+    "producer": 1086792,
+    "capture_ms": 632,
+    "drain_ms": 7,
+    "progress_samples": 2,
+    "data_ecalls": 1,
+    "output_ocalls": 5,
+    "trace_ocalls": 9
+  },
+  "executed_programs": {
+    "native": [
+      "/home/poc/falco-poc/deps/package/usr/bin/falco"
+    ],
+    "sgx": [
+      "/home/poc/falco-poc/build-ert/bin/falco-sgx"
+    ]
+  },
+  "process_exec_tracepoint": {
+    "native": [
+      "           falco 59016 [003]  3570.949395: sched:sched_process_exec: filename=/home/poc/falco-poc/deps/package/usr/bin/falco pid=59016 old_pid=59016"
+    ],
+    "sgx": [
+      "       falco-sgx 59014 [003]  3570.678450: sched:sched_process_exec: filename=/home/poc/falco-poc/build-ert/bin/falco-sgx pid=59014 old_pid=59014"
+    ]
+  }
+}

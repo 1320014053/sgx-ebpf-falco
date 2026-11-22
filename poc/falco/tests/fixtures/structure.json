@@ -1,0 +1,202 @@
+{
+  "cases": {
+    "tetragon-null-container-id": {
+      "format": "tetragon",
+      "input_file": "inputs/tetragon-null-container-id.jsonl",
+      "input_sha256": "a4daa8212a88b24d85b93bff7e6a81ad95ac079bba1cd40f5283880b2830d6bb",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "two-sections-same-endian": {
+      "format": "zeek",
+      "input_file": "inputs/two-sections-same-endian.pcapng",
+      "input_sha256": "726faa4709930c49f257dbc094cb99a5c3b07c98274a52c6d4f0dfd8616c3952",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "normalized-omitted-event-id": {
+      "format": "replay",
+      "input_file": "inputs/normalized-omitted-event-id.jsonl",
+      "input_sha256": "3cc19607f5af48233cbefc00445b44213d4c2719343e6eb36bdb81235a8048cf",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "second-interface-after-delivery-16384": {
+      "format": "zeek",
+      "input_file": "inputs/second-interface-after-delivery-16384.pcapng",
+      "input_sha256": "5dda8fedcb29658a264a789bbd72d8d8ca3c3ea6e257756f404c81b138b8cf12",
+      "upstream": {
+        "exit": 1
+      },
+      "diagnostic": "different snapshot lengths"
+    },
+    "two-interfaces-snaplen-16384": {
+      "format": "zeek",
+      "input_file": "inputs/two-interfaces-snaplen-16384.pcapng",
+      "input_sha256": "80c374ad33d0d4cf9a79cd81733dc3e524d9c49127960a22194caf5b786b4751",
+      "upstream": {
+        "exit": 1
+      },
+      "diagnostic": "different snapshot lengths"
+    },
+    "timer-ordered": {
+      "format": "zeek",
+      "input_file": "inputs/timer-ordered.pcap",
+      "input_sha256": "66e33b0b4e9f5a2101e8cab4af3f92bf153d2cfda4f333b46acfccb7735d6291",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "two-sections-mixed-endian": {
+      "format": "zeek",
+      "input_file": "inputs/two-sections-mixed-endian.pcapng",
+      "input_sha256": "ac91ece97d2618624d1e2354c288967b2367d2d02fdeccf1ef40b60486c34a09",
+      "upstream": {
+        "exit": 1
+      },
+      "diagnostic": "different byte orders"
+    },
+    "tetragon-omitted-container-id": {
+      "format": "tetragon",
+      "input_file": "inputs/tetragon-omitted-container-id.jsonl",
+      "input_sha256": "04cf2ad4d43904bc0c36c59990d083d75be1b052f565d57b3016b40080733eea",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "second-interface-after-delivery-65535": {
+      "format": "zeek",
+      "input_file": "inputs/second-interface-after-delivery-65535.pcapng",
+      "input_sha256": "1e8659c3f6222995127cd95a0768288c7b1919ebfb6af335068e6b41cd3bbdee",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "normalized-null-event-id": {
+      "format": "replay",
+      "input_file": "inputs/normalized-null-event-id.jsonl",
+      "input_sha256": "e20f5bfbf1d66d150c58b8ad899276a0084c24a87448268413a3a8197cf6e389",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "two-interfaces-snaplen-65535": {
+      "format": "zeek",
+      "input_file": "inputs/two-interfaces-snaplen-65535.pcapng",
+      "input_sha256": "253958cef5d35d05ebb46afa296942944585a18ff152557fd6e476fb9312b194",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "timer-out-of-order": {
+      "format": "zeek",
+      "input_file": "inputs/timer-out-of-order.pcap",
+      "input_sha256": "96124c4875e434ffc58d921f082a940917c3e661da6646f9cc0e836fe74e9917",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "normalized-empty-event-id": {
+      "format": "replay",
+      "input_file": "inputs/normalized-empty-event-id.jsonl",
+      "input_sha256": "ccb7e6ec2a527d4b83f75e09379d50f1dc6756057f0b0582df97129bdfa49c9f",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "two-generated-ids-in-envelope": {
+      "format": "replay",
+      "input_file": "inputs/two-generated-ids-in-envelope.jsonl",
+      "input_sha256": "6e912a908d2df12ca05fa70ed01ddea1b806cd087186d27be598dfb7f0e946e2",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "tetragon-empty-id": {
+      "format": "tetragon",
+      "input_file": "inputs/tetragon-empty-id.jsonl",
+      "input_sha256": "20d7d7bd42e62f6bda47a35ba9342198cb247136fbc6430ac487593fe4009cb6",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "tetragon-present-id": {
+      "format": "tetragon",
+      "input_file": "inputs/tetragon-present-id.jsonl",
+      "input_sha256": "5380211bd43e9efeec34d02a273d56c36e21c361b1f1c320c124b7f79a0f6f3d",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "zero-equivalent": {
+      "format": "zeek",
+      "input_file": "inputs/zero-equivalent.pcapng",
+      "input_sha256": "45a8291b8b91241e93aa593e572624ed21ad5742eb8c7726eabc071308cdbfc6",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "large-equivalent": {
+      "format": "zeek",
+      "input_file": "inputs/large-equivalent.pcapng",
+      "input_sha256": "dbc116905d9ee86ba97fef90af9b3bd2bb4dc92f19273a151cc290994b6d7d9c",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "positive-large-is-distinct": {
+      "format": "zeek",
+      "input_file": "inputs/positive-large-is-distinct.pcapng",
+      "input_sha256": "eaf75b5689271942775a2cdf203dad96ccb8434c8ea8c3732fd69de8025dbfa5",
+      "upstream": {
+        "exit": 1
+      },
+      "diagnostic": "different snapshot lengths"
+    },
+    "same-order-sections-different-snaplen": {
+      "format": "zeek",
+      "input_file": "inputs/same-order-sections-different-snaplen.pcapng",
+      "input_sha256": "ab18c9861a079dc0a97ec3f0b79d67f81ec40694599974f90cf9dddb3d94f510",
+      "upstream": {
+        "exit": 1
+      },
+      "diagnostic": "different snapshot lengths"
+    },
+    "big-endian-sections": {
+      "format": "zeek",
+      "input_file": "inputs/big-endian-sections.pcapng",
+      "input_sha256": "b5ab9356b5eae4ecbfde27037d14f7e98c1639fc32964944448c2b4c8a090966",
+      "upstream": {
+        "exit": 0
+      }
+    },
+    "order-change-after-notices": {
+      "format": "zeek",
+      "input_file": "inputs/order-change-after-notices.pcapng",
+      "input_sha256": "054c9fc8fc8242f1e52fe29b93b1900449d7528bb6d60da67ef47548f869524f",
+      "upstream": {
+        "exit": 1
+      },
+      "diagnostic": "different byte orders"
+    },
+    "ng-timer-out-of-order": {
+      "format": "zeek",
+      "input_file": "inputs/ng-timer-out-of-order.pcapng",
+      "input_sha256": "f7cff4adcac7a66d68fe99279c5083d31f04343fa6f18b4576a7dc4a15095785",
+      "upstream": {
+        "exit": 0
+      }
+    }
+  },
+  "source_archive": {
+    "file": "structure-parity-fixes-2026-11-22-evidence.zip",
+    "sha256": "6495a56ab08a306369987a74ec05e6fa95b2d3b440c45d5753de62531fb5af05"
+  },
+  "evidence": {
+    "file": "regression.zip",
+    "sha256": "ce8580f354272d83e2905c775cbab5a75961d257c3be70e194b19cdd7a043984"
+  }
+}

@@ -1,0 +1,24 @@
+diff --git a/userspace/libsinsp/sinsp.h b/userspace/libsinsp/sinsp.h
+--- a/userspace/libsinsp/sinsp.h
++++ b/userspace/libsinsp/sinsp.h
+@@ -175,1 +175,3 @@
+-	virtual void open_raw_block(uint8_t** buffer_ptr, uint64_t* buffer_size_ptr);
++	virtual void open_raw_block(uint8_t** buffer_ptr,
++	                            uint64_t* buffer_size_ptr,
++	                            bool live = false);
+diff --git a/userspace/libsinsp/sinsp.cpp b/userspace/libsinsp/sinsp.cpp
+--- a/userspace/libsinsp/sinsp.cpp
++++ b/userspace/libsinsp/sinsp.cpp
+@@ -781,1 +781,1 @@
+-void sinsp::open_raw_block(uint8_t** buffer_ptr, uint64_t* buffer_size_ptr) {
++void sinsp::open_raw_block(uint8_t** buffer_ptr, uint64_t* buffer_size_ptr, bool live) {
+@@ -793,1 +793,4 @@
+-	try_open_common(&oargs, &scap_raw_block_engine, platform, SINSP_MODE_CAPTURE);
++	try_open_common(&oargs,
++	                &scap_raw_block_engine,
++	                platform,
++	                live ? SINSP_MODE_NODRIVER : SINSP_MODE_CAPTURE);
+@@ -1349,1 +1352,2 @@
+-	if(res == SCAP_TIMEOUT && !m_async_events_queue.empty()) {
++	if((res == SCAP_TIMEOUT || (res == SCAP_EOF && is_nodriver())) &&
++	   !m_async_events_queue.empty()) {

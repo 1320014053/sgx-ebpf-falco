@@ -1,0 +1,36 @@
+{
+  "official_rules": 25,
+  "live_verified_rules": 25,
+  "host_rules": [
+    "Clear Log Activities",
+    "Create Hardlink Over Sensitive Files",
+    "Create Symlink Over Sensitive Files",
+    "Directory traversal monitored file read",
+    "Disallowed SSH Connection Non Standard Port",
+    "Execution from /dev/shm",
+    "Fileless execution via memfd_create",
+    "Find AWS Credentials",
+    "PTRACE anti-debug attempt",
+    "PTRACE attached to process",
+    "Read sensitive file trusted after startup",
+    "Read sensitive file untrusted",
+    "Remove Bulk Data from Disk",
+    "Run shell untrusted",
+    "Search Private Keys or Passwords",
+    "System user interactive"
+  ],
+  "containerd_rules": [
+    "Debugfs Launched in Privileged Container",
+    "Detect release_agent File Container Escapes",
+    "Drop and execute new binary in container",
+    "Linux Kernel Module Injection Detected",
+    "Netcat Remote Code Execution in Container",
+    "Packet socket created in container",
+    "Redirect STDOUT/STDIN to Network Connection in Container",
+    "Terminal shell in container"
+  ],
+  "kubernetes_rules": [
+    "Contact K8S API Server From Container"
+  ],
+  "pending_rules": []
+}

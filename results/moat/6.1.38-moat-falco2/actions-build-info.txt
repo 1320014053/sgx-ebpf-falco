@@ -1,0 +1,16 @@
+Source: https://github.com/jwnhy/MOAT-Open
+Commit: b1cfea3114ddf237c2100bc1bdc53f4030f4780b
+Linux x86 BPF JIT fix: c8831bdbfbab672c006a18006d36932a494b2fd6
+133e29adb755c59bf386adf17fbc0115886b17103fe01caccca8386bf4bdc825  patches/x86-bpf-jit-convergence.patch
+b457d2a5c43204c39f1b7021b2d565d74673218ae40ae5c96bf7ed5f38a242c3  patches/moat-ringbuf-page-backing.patch
+Supplemental build files: Linux 6.1.38 commit 61fd484b2cf6bc8022e8e5ea6f693a9991740ac2
+4c814fc656396cde51ee85c89a2ceb5d5d9d04c2a5ced6511f256f15844cb983  scripts/Makefile.lib
+2106d637e3e6de051a99e0b7e60fa2433f00adc84df8f140a32f537bd398c5ea  scripts/Makefile.modfinal
+2c4a2148a759c9ee240e115c86cb364c558d675cfc3582a0fa78122f8444c421  scripts/Makefile.modinst
+f90baca1d0e6238ecdb0ea650cb1266e94c6ca2c9989ea6838da6f15ecc0852f  scripts/Makefile.modpost
+e9ed32ac43ef54083261bc7ac754545577bc1e0c69018ae7031bfeb3d735dddb  drivers/tty/vt/defkeymap.map
+ca3dd4d10995168507e0b7b44621917c7e1e77e73e882f85afa92df86daae77a  net/wireless/certs/sforshee.hex
+ee8b91264285d6a435c80c4d1b91a0277b46b3c40bf5aafb0d846e5a8112f99c  tools/lib/bpf/libbpf.map
+Kernel: 6.1.38-moat-falco2
+gcc-12 (Ubuntu 12.4.0-2ubuntu1~24.04.1) 12.4.0
+v1.25

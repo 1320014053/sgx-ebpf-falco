@@ -1,0 +1,623 @@
+{
+  "environment": {
+    "date": "2026-11-21",
+    "kernel": "5.15.0-198-generic",
+    "python": "3.10.12",
+    "platform": "Ubuntu 22.04 x86_64, QEMU temporary snapshot",
+    "timezone": "UTC",
+    "falco": "0.45.2",
+    "raven_commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+    "raven_tier": "full",
+    "zeek": "6.0.9",
+    "zeek_commit": "7a7864f89297e0fc3f3779ec2f8dc5100d8449c0",
+    "zeek_script": "policy/misc/scan",
+    "zeek_image_digest": "sha256:a25a3c38497c5492dd4391c09595f0842b46a608fad4180df18549c754797f23",
+    "falco_libs": "0.26.1",
+    "enclave": "Open Enclave SGX Simulation"
+  },
+  "execution": "Fresh single-use QEMU snapshot. The original Zeek amd64 image layers were unpacked and its binary ran inside the image root with policy/misc/scan and LogAscii::use_json=T. RAVEN used its original collectors and full engine in UTC. Both Falco artifacts were rebuilt from the same workspace detector sources.",
+  "method": "Verify each input SHA-256 against the earlier review. For successes compare complete ordered rz.result JSON values, normalize generated event/detection IDs and the RAVEN rule installation prefix with plugin/check.py, and check the outer Falco rule metadata. Payload digests sort object keys and give integral JSON numbers a common representation. For rejection require exit status 1, zero detector records, and the same failing timestamp diagnostic. The signed enclave replays the separate unchanged official syscall fixture. Rejection emptiness refers to the raven_zeek event source.",
+  "summary": {
+    "reviewed_inputs": 10,
+    "same_input_hashes": 10,
+    "native_matches_upstream": 10,
+    "enclave_matches_upstream": 10,
+    "native_matches_enclave": 10,
+    "successes": 9,
+    "rejections": 1,
+    "prev_matches": 4,
+    "all_falco_test_cases": 34,
+    "additional_test_cases": 24
+  },
+  "cases": [
+    {
+      "case": "F",
+      "engine": "RAVEN",
+      "input_sha256": "29d67bbd4008611c777fc160ff7e7c2980335eb6642376e84ba048f9b922dcee",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 3,
+      "ordered_payload_sha256": {
+        "upstream": "2c9ea022a8dc1ce70e07a878fdc54805c3f3cd91cff7af117473eb7764f8a1e4",
+        "native_falco": "2c9ea022a8dc1ce70e07a878fdc54805c3f3cd91cff7af117473eb7764f8a1e4",
+        "signed_enclave_simulation": "2c9ea022a8dc1ce70e07a878fdc54805c3f3cd91cff7af117473eb7764f8a1e4"
+      },
+      "detections": [
+        {
+          "rule": "server_spawns_shell",
+          "risk": 40,
+          "time": "22:13:20"
+        },
+        {
+          "rule": "server_spawns_outbound",
+          "risk": 105,
+          "time": "22:13:20"
+        },
+        {
+          "rule": "staged_execution_chain",
+          "risk": 115,
+          "time": "22:13:20"
+        }
+      ],
+      "matched_before_fix": true
+    },
+    {
+      "case": "numeric-new-user",
+      "engine": "RAVEN",
+      "input_sha256": "af8513f29a8a3b7d8e10f1079daf9d461f74a780556507d780353adc346bc982",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 1,
+      "ordered_payload_sha256": {
+        "upstream": "760eb8fd44e0d49a439d89abb6bd623eb3d46dcdc7f2c3579cb9dfdcb3137d24",
+        "native_falco": "760eb8fd44e0d49a439d89abb6bd623eb3d46dcdc7f2c3579cb9dfdcb3137d24",
+        "signed_enclave_simulation": "760eb8fd44e0d49a439d89abb6bd623eb3d46dcdc7f2c3579cb9dfdcb3137d24"
+      },
+      "detections": [
+        {
+          "rule": "privilege_change_chain",
+          "risk": 80,
+          "time": "22:13:20"
+        }
+      ],
+      "privilege_target": "user:1001",
+      "matched_before_fix": false
+    },
+    {
+      "case": "utc-second-boundary",
+      "engine": "RAVEN",
+      "input_sha256": "6de5a91ac382d787a1370dc2674c7f6e8068ec2998d330233d43a7838394fd0f",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 1,
+      "ordered_payload_sha256": {
+        "upstream": "3cec0f54668e9c3dec3b9951029beb8d9b390391aedf7b8120ac76c85dc22887",
+        "native_falco": "3cec0f54668e9c3dec3b9951029beb8d9b390391aedf7b8120ac76c85dc22887",
+        "signed_enclave_simulation": "3cec0f54668e9c3dec3b9951029beb8d9b390391aedf7b8120ac76c85dc22887"
+      },
+      "detections": [
+        {
+          "rule": "privilege_change_chain",
+          "risk": 80,
+          "time": "22:13:21"
+        }
+      ],
+      "matched_before_fix": false
+    },
+    {
+      "case": "tetragon-rfc3339",
+      "engine": "RAVEN",
+      "input_sha256": "3f2b4bf0c827de65e7168348315032f347c57beffc161655d69993978c89ee7e",
+      "exit": {
+        "upstream": 1,
+        "native_falco": 1,
+        "signed_enclave_simulation": 1
+      },
+      "records": 0,
+      "ordered_payload_sha256": {
+        "upstream": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "native_falco": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "signed_enclave_simulation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "common_error": "could not convert string to float: '2025-01-01T12:00:00Z'",
+      "matched_before_fix": false
+    },
+    {
+      "case": "special-purpose-ipv4",
+      "engine": "RAVEN",
+      "input_sha256": "5b00e474fa32c826b816d941589bbeccd8db36c5ced2b90e0346a9cceedf38ee",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 0,
+      "ordered_payload_sha256": {
+        "upstream": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "native_falco": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "signed_enclave_simulation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "detections": [],
+      "matched_before_fix": true
+    },
+    {
+      "case": "healthchecks",
+      "engine": "Zeek",
+      "input_sha256": "6c759fe144ce3aa8e117f831a18dd54e91fcc914cf48010a3fe3ec7b5c36e7c5",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 2,
+      "ordered_payload_sha256": {
+        "upstream": "f7191da597c1f805f72e1d737d5c290bd674231b997465ab83e91e31db352ab3",
+        "native_falco": "f7191da597c1f805f72e1d737d5c290bd674231b997465ab83e91e31db352ab3",
+        "signed_enclave_simulation": "f7191da597c1f805f72e1d737d5c290bd674231b997465ab83e91e31db352ab3"
+      },
+      "original_zeek_connections": 90,
+      "notices": [
+        {
+          "note": "Scan::Address_Scan",
+          "ts": 1700000001.002601
+        },
+        {
+          "note": "Scan::Port_Scan",
+          "ts": 1700000002.004101
+        }
+      ],
+      "matched_before_fix": true
+    },
+    {
+      "case": "successful-handshakes",
+      "engine": "Zeek",
+      "input_sha256": "18a6a122d764b75c8779e766a8cd399d5b89139d0f9acfbaa8b762a8671069a3",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 0,
+      "ordered_payload_sha256": {
+        "upstream": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "native_falco": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "signed_enclave_simulation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "original_zeek_connections": 15,
+      "notices": [],
+      "matched_before_fix": true
+    },
+    {
+      "case": "reordered-successful-handshakes",
+      "engine": "Zeek",
+      "input_sha256": "0db49e0943ba11c8cc35a3c58b087d638ccba06b8a995d3cfa0a42057e9edf29",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 0,
+      "ordered_payload_sha256": {
+        "upstream": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "native_falco": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "signed_enclave_simulation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "original_zeek_connections": 15,
+      "notices": [],
+      "matched_before_fix": false
+    },
+    {
+      "case": "ppp-serial-handshakes",
+      "engine": "Zeek",
+      "input_sha256": "70a7b8d1f0d3a1c9230eaa2c6fb41a82bf9851d36583712385f4ba803836f5ae",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 0,
+      "ordered_payload_sha256": {
+        "upstream": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "native_falco": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "signed_enclave_simulation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "original_zeek_connections": 15,
+      "notices": [],
+      "matched_before_fix": false
+    },
+    {
+      "case": "nanosecond-healthchecks",
+      "engine": "Zeek",
+      "input_sha256": "127b0598dcbd8510d7b0a7ec6fe45514e79cdfe7308d5ab2f1481806b331bb43",
+      "exit": {
+        "upstream": 0,
+        "native_falco": 0,
+        "signed_enclave_simulation": 0
+      },
+      "records": 2,
+      "ordered_payload_sha256": {
+        "upstream": "f7191da597c1f805f72e1d737d5c290bd674231b997465ab83e91e31db352ab3",
+        "native_falco": "f7191da597c1f805f72e1d737d5c290bd674231b997465ab83e91e31db352ab3",
+        "signed_enclave_simulation": "f7191da597c1f805f72e1d737d5c290bd674231b997465ab83e91e31db352ab3"
+      },
+      "original_zeek_connections": 90,
+      "notices": [
+        {
+          "note": "Scan::Address_Scan",
+          "ts": 1700000001.002601
+        },
+        {
+          "note": "Scan::Port_Scan",
+          "ts": 1700000002.004101
+        }
+      ],
+      "matched_before_fix": false
+    }
+  ],
+  "suppression_expiry": {
+    "input_sha256": "fe08537a9cff28690c4923da2233b718e9662a9c2234ad7e07b7958e23900f77",
+    "notice_ttl_seconds": 3600,
+    "table_sweep_seconds": 10,
+    "checkpoint_columns": [
+      "capture_second_relative_to_1700000000",
+      "active_entries"
+    ],
+    "checkpoints": {
+      "upstream": [
+        [
+          930,
+          2
+        ],
+        [
+          3603,
+          2
+        ],
+        [
+          3690,
+          1
+        ],
+        [
+          4320,
+          0
+        ],
+        [
+          4590,
+          1
+        ],
+        [
+          8190,
+          0
+        ]
+      ],
+      "shared_cpp": [
+        [
+          930,
+          2
+        ],
+        [
+          3603,
+          2
+        ],
+        [
+          3690,
+          1
+        ],
+        [
+          4320,
+          0
+        ],
+        [
+          4590,
+          1
+        ],
+        [
+          8190,
+          0
+        ]
+      ]
+    },
+    "expiry_queue_matched_membership_at_each_checkpoint": true,
+    "notices": [
+      {
+        "src": "192.0.2.60",
+        "ts": 1700000001.001401,
+        "note": "Scan::Port_Scan"
+      },
+      {
+        "src": "192.0.2.61",
+        "ts": 1700000601.001401,
+        "note": "Scan::Port_Scan"
+      },
+      {
+        "src": "192.0.2.60",
+        "ts": 1700004501.001401,
+        "note": "Scan::Port_Scan"
+      }
+    ],
+    "native_and_enclave_checked_in": "suppression-expiry",
+    "cpp_probe": "Same plugin/zeek.cpp translation unit. Fed each Ethernet packet through Scan::advance and parse_packet, sampled both the membership set and expiry queue at marker SYNs. The original Zeek probe sampled |Notice::suppressing| in new_connection for the same marker endpoints. The uninstrumented Zeek run emitted identical notices.",
+    "probes": [
+      "poc/falco/plugin/check-suppression.cpp",
+      "poc/falco/upstream/check-suppression.zeek"
+    ],
+    "upstream_table_timer": "https://github.com/zeek/zeek/blob/7a7864f89297e0fc3f3779ec2f8dc5100d8449c0/src/Val.cc#L2755-L2856",
+    "upstream_notice_table": "https://github.com/zeek/zeek/blob/7a7864f89297e0fc3f3779ec2f8dc5100d8449c0/scripts/base/frameworks/notice/main.zeek#L362-L379"
+  },
+  "additional_tests": {
+    "empty": {
+      "official": 2,
+      "active": 0,
+      "context_filtered": 0,
+      "notices": []
+    },
+    "tetragon-mixed": {
+      "official": 2,
+      "active": 3,
+      "context_filtered": 0,
+      "notices": []
+    },
+    "bad-json": {
+      "rejected_by": [
+        "native",
+        "sgx"
+      ],
+      "exit": 1,
+      "plugin_alerts": 0,
+      "diagnostic": "RAVEN line 1"
+    },
+    "bad-pcap": {
+      "rejected_by": [
+        "native",
+        "sgx"
+      ],
+      "exit": 1,
+      "plugin_alerts": 0,
+      "diagnostic": "truncated PCAP packet header"
+    },
+    "review-ppp-serial-healthchecks": {
+      "official": 2,
+      "active": 0,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "review-ppp-serial-ipv6": {
+      "official": 2,
+      "active": 0,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Port_Scan"
+      ]
+    },
+    "review-ppp-serial-mpls": {
+      "official": 2,
+      "active": 0,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Port_Scan"
+      ]
+    },
+    "review-pcapng-submicrosecond": {
+      "official": 2,
+      "active": 0,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Port_Scan"
+      ]
+    },
+    "A": {
+      "official": 2,
+      "active": 1,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "B": {
+      "official": 2,
+      "active": 1,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "C": {
+      "official": 2,
+      "active": 1,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "D": {
+      "official": 2,
+      "active": 3,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "E": {
+      "official": 2,
+      "active": 1,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "F": {
+      "official": 2,
+      "active": 3,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "G": {
+      "official": 2,
+      "active": 0,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "idle": {
+      "official": 2,
+      "active": 0,
+      "context_filtered": 0,
+      "notices": []
+    },
+    "tetragon": {
+      "official": 2,
+      "active": 1,
+      "context_filtered": 0,
+      "notices": [
+        "Scan::Address_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "states": {
+      "official": 2,
+      "active": 6,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Port_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "epochs": {
+      "official": 2,
+      "active": 6,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Port_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "suppression-expiry": {
+      "official": 2,
+      "active": 6,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Port_Scan",
+        "Scan::Port_Scan",
+        "Scan::Port_Scan"
+      ]
+    },
+    "ipv6-vlan": {
+      "official": 2,
+      "active": 6,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Port_Scan"
+      ]
+    },
+    "reverse-eof": {
+      "official": 2,
+      "active": 6,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Port_Scan"
+      ]
+    },
+    "fragments": {
+      "official": 2,
+      "active": 6,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Port_Scan"
+      ]
+    },
+    "pcapng": {
+      "official": 2,
+      "active": 6,
+      "context_filtered": 1,
+      "notices": [
+        "Scan::Port_Scan"
+      ]
+    }
+  },
+  "live_control": {
+    "workload": "One no-op shell and a single successful loopback TCP exchange of two bytes, newly recorded in the disposable guest.",
+    "input_sha256": {
+      "events.jsonl": "49df098406d0362c564d7bfb1c3a05fda05ef190db26c5ba86cf881b0abe37a5",
+      "packets.pcap": "2ac968fdee755b8b84a37d3e6177f7a609e7529ffaeb517ee4a2d89dccaeb629"
+    },
+    "ring": {
+      "raven_events": 144,
+      "packet_records": 8,
+      "records": 5556,
+      "accepted": 5556,
+      "discarded": 0,
+      "format_rejected": 0
+    },
+    "driver": {
+      "driver_events": 5548,
+      "driver_drops": 0,
+      "packet_submitted": 8,
+      "packet_drops": 0
+    },
+    "zeek_connections": 2,
+    "notices": 0,
+    "live_raven_snapshots": [
+      [
+        "privilege_change_chain",
+        "active"
+      ],
+      [
+        "server_spawns_shell",
+        "active"
+      ]
+    ],
+    "live_matches_original_snapshots": true,
+    "native_replay_matches_original_final": true,
+    "enclave_replay_matches_original_final": true,
+    "archive": "live-parity-inputs.tar.gz",
+    "archive_sha256": "8a4346efb851236c2e1bc0e769948e295f53921bcdefd4a0b34f9a33fa291b23",
+    "historical_input_availability": "The earlier live control retained input hashes only. This independent run repeated the same loopback workload and fed its newly recorded input bytes to both upstream engines and both Falco replay modes."
+  },
+  "binaries_sha256": {
+    "falco": "702900ebeee85e03823f817af99a19fcc0389bfc8f9cacab251bcaac0981d02e",
+    "libraven_zeek.so": "acd9b4f643be9cc125285849be635b63fe8226591d82ad72bf4ea9a9e80cdbe0",
+    "falco-enclave.signed": "79244744b30b1dc9e1749a1f0a03043f563baf88051ce9ebde906587cbf450a8",
+    "falco-sgx": "b463d98891cdd828fb31d2dc680ee51f14a3415af409f7b5fefb2367125f3edb",
+    "falco-live": "81fbd1a648b288fa5cee42b1713d4c3d26f42a62b4ff0c65e5069812a96ac8ff",
+    "zeek": "27c910b1be9f5cf0666d5f3510db48195dd92611aa47c8b11bdfc153999e68b0"
+  },
+  "source_sha256": {
+    "plugin/graph.cpp": "4163d5f85977eddcdc297268799c7a1aaa384b9807477c296b3be3700e057a60",
+    "plugin/raven.cpp": "68ecfee8df09f9d1caec40d5bde763d73db2825344860e4bea9da97bdfa57b2f",
+    "plugin/zeek.cpp": "5f0215b5438277e97afa5fb8ce77bfd467cfdf1851a85696d8ac0a8953b1973b",
+    "plugin/detectors.hpp": "82f3c9d900efc152a068894746462017fa39624c32ec798044c5ec80ef2c40ba",
+    "plugin/plugin.cpp": "183851cfd0dedd14a2ccfd4a2c71062694f267b4fb0f62da47df516f2985830c",
+    "trusted/enclave.cpp": "51c53bee7a78e7d7a9260ff61af0d0dbfd6f00ae5af8bf5ffbc02c73f2ac07a5",
+    "upstream/controls.py": "c1b233792d77f619e1d390171f007da2e9d95e67845273e6eef1a683cec15f30",
+    "upstream/check-reference.py": "fa96f30683a6564a302f751c66a70a0fdd2e94718fa7c10ee97c8c2866d69fcf",
+    "plugin/check.py": "754b5ce8446356beeeb8a0c18a5c638cbce7bb7b84cac15ad3196c237da3f5dc",
+    "plugin/check-suppression.cpp": "e7a55b85d97694243bb87a13a39c6cf7f3ec73454fe11c0f1474c56a719534f2",
+    "upstream/check-suppression.zeek": "175d8feba62111070811bc9f216eff6b231e5fb38697dca32b0df47763a6a8e2"
+  },
+  "reference_archives_sha256": {
+    "raven.tar.gz": "f53bbce4f31287a3528a5060aa52e056ca1ec10945121b7f64058be6aab0bd69",
+    "zeek_source.tar.gz": "77b921c05bf8edc476c3dc9c1190f99580537fad493fae4ebfe4bc1ee64f1d19"
+  },
+  "previous_review": "upstream-parity-review.json"
+}

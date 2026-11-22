@@ -1,0 +1,550 @@
+{
+  "environment": {
+    "date": "2026-11-21",
+    "kernel": "5.15.0-198-generic",
+    "python": "3.10.12",
+    "platform": "Ubuntu 22.04 x86_64, QEMU temporary snapshot",
+    "timezone": "UTC",
+    "falco": "0.45.2",
+    "raven_commit": "3b5fbf5f33e2d1287d3ff0f546023106f787a92e",
+    "raven_tier": "full",
+    "zeek": "6.0.9",
+    "zeek_commit": "7a7864f89297e0fc3f3779ec2f8dc5100d8449c0",
+    "zeek_script": "policy/misc/scan",
+    "zeek_image_digest": "sha256:a25a3c38497c5492dd4391c09595f0842b46a608fad4180df18549c754797f23"
+  },
+  "method": "Offline differential replay of identical input bytes. The Falco shared plugin and signed Open Enclave SGX Simulation binary use the workspace C++ detector sources. Successful runs compare ordered, complete rz.result payloads to RAVEN detections or Zeek notices, normalizing generated IDs and the RAVEN rule installation prefix with plugin/check.py. The recorded fields below summarize the full comparisons. Exit failure is reported separately from zero detections.",
+  "summary": {
+    "offline_cases": 10,
+    "native_matches_upstream": 4,
+    "native_differs_from_upstream": 6,
+    "sgx_matches_upstream": 4,
+    "native_matches_sgx": 10
+  },
+  "build_verification": {
+    "reference": "live-ring.json",
+    "matched_archived_sources": 24,
+    "matched_archived_binaries": [
+      "falco-live",
+      "falco-enclave.signed",
+      "libraven_zeek.so"
+    ]
+  },
+  "binaries_sha256": {
+    "falco": "702900ebeee85e03823f817af99a19fcc0389bfc8f9cacab251bcaac0981d02e",
+    "libraven_zeek.so": "701e1b381750a48d494606b543b4ee88328d908d009c73f068a26c3bcf303506",
+    "falco-enclave.signed": "e4d3d2c5ac4b7b1a5e666201c46fb207a56d0d7f5bd03014f5d45d568fc00f85",
+    "falco-sgx": "b463d98891cdd828fb31d2dc680ee51f14a3415af409f7b5fefb2367125f3edb",
+    "zeek": "27c910b1be9f5cf0666d5f3510db48195dd92611aa47c8b11bdfc153999e68b0",
+    "falco-live": "81fbd1a648b288fa5cee42b1713d4c3d26f42a62b4ff0c65e5069812a96ac8ff"
+  },
+  "cases": [
+    {
+      "case": "F",
+      "engine": "RAVEN",
+      "input_sha256": "29d67bbd4008611c777fc160ff7e7c2980335eb6642376e84ba048f9b922dcee",
+      "upstream": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "server_spawns_shell",
+            "ts": 1700000003.0,
+            "risk": 40,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          },
+          {
+            "rule": "server_spawns_outbound",
+            "ts": 1700000005.5,
+            "risk": 105,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          },
+          {
+            "rule": "staged_execution_chain",
+            "ts": 1700000005.5,
+            "risk": 115,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          }
+        ]
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "server_spawns_shell",
+            "ts": 1700000003.0,
+            "risk": 40,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          },
+          {
+            "rule": "server_spawns_outbound",
+            "ts": 1700000005.5,
+            "risk": 105,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          },
+          {
+            "rule": "staged_execution_chain",
+            "ts": 1700000005.5,
+            "risk": 115,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          }
+        ]
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": true,
+      "native_equals_upstream": true,
+      "native_plugin": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "server_spawns_shell",
+            "ts": 1700000003.0,
+            "risk": 40,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          },
+          {
+            "rule": "server_spawns_outbound",
+            "ts": 1700000005.5,
+            "risk": 105,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          },
+          {
+            "rule": "staged_execution_chain",
+            "ts": 1700000005.5,
+            "risk": 115,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          }
+        ]
+      },
+      "input_description": "Upstream built-in scenario F, canonical events serialized in order."
+    },
+    {
+      "case": "numeric-new-user",
+      "engine": "RAVEN",
+      "input_sha256": "af8513f29a8a3b7d8e10f1079daf9d461f74a780556507d780353adc346bc982",
+      "upstream": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "privilege_change_chain",
+            "ts": 1700000000,
+            "risk": 80,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          }
+        ]
+      },
+      "sgx_simulation": {
+        "exit": 1,
+        "records": [],
+        "diagnostic": "RAVEN line 1: [json.exception.type_error.302] type must be string, but is number"
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": false,
+      "native_equals_upstream": false,
+      "native_plugin": {
+        "exit": 1,
+        "records": [],
+        "diagnostic": "Error: RAVEN line 1: [json.exception.type_error.302] type must be string, but is number"
+      },
+      "input_description": "One privilege_change with numeric metadata.new_user=1001 and euid=1001.",
+      "source_comparison": {
+        "plugin": "poc/falco/plugin/graph.cpp:66",
+        "upstream": "https://github.com/Arthurs011/raven/blob/3b5fbf5f33e2d1287d3ff0f546023106f787a92e/raven/process_graph/behavior_graph.py#L173-L177"
+      }
+    },
+    {
+      "case": "utc-second-boundary",
+      "engine": "RAVEN",
+      "input_sha256": "6de5a91ac382d787a1370dc2674c7f6e8068ec2998d330233d43a7838394fd0f",
+      "upstream": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "privilege_change_chain",
+            "ts": 1700000000.9999998,
+            "risk": 80,
+            "state": "active",
+            "first_timeline_time": "22:13:21"
+          }
+        ]
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "privilege_change_chain",
+            "ts": 1700000000.9999998,
+            "risk": 80,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          }
+        ]
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": false,
+      "native_equals_upstream": false,
+      "native_plugin": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "privilege_change_chain",
+            "ts": 1700000000.9999998,
+            "risk": 80,
+            "state": "active",
+            "first_timeline_time": "22:13:20"
+          }
+        ]
+      },
+      "input_description": "One privilege_change at Unix timestamp 1700000000.9999998 in UTC.",
+      "source_comparison": {
+        "plugin": "poc/falco/plugin/raven.cpp:258",
+        "upstream": "https://github.com/Arthurs011/raven/blob/3b5fbf5f33e2d1287d3ff0f546023106f787a92e/raven/attack_reconstructor/reconstructor.py#L38-L42"
+      }
+    },
+    {
+      "case": "tetragon-rfc3339",
+      "engine": "RAVEN",
+      "input_sha256": "3f2b4bf0c827de65e7168348315032f347c57beffc161655d69993978c89ee7e",
+      "upstream": {
+        "exit": 1,
+        "records": [],
+        "diagnostic": "ValueError: could not convert string to float: '2025-01-01T12:00:00Z'"
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "server_spawns_shell",
+            "ts": 2025.0,
+            "risk": 40,
+            "state": "active",
+            "first_timeline_time": "00:33:45"
+          }
+        ]
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": false,
+      "native_equals_upstream": false,
+      "native_plugin": {
+        "exit": 0,
+        "records": [
+          {
+            "rule": "server_spawns_shell",
+            "ts": 2025.0,
+            "risk": 40,
+            "state": "active",
+            "first_timeline_time": "00:33:45"
+          }
+        ]
+      },
+      "input_description": "Two process_exec rows, a service and its shell child, with time values 2025-01-01T12:00:00Z and 2025-01-01T12:02:00Z.",
+      "source_comparison": {
+        "plugin": "poc/falco/plugin/raven.cpp:152",
+        "upstream": "https://github.com/Arthurs011/raven/blob/3b5fbf5f33e2d1287d3ff0f546023106f787a92e/raven/normalizer/normalizer.py#L145-L146"
+      }
+    },
+    {
+      "case": "special-purpose-ipv4",
+      "engine": "RAVEN",
+      "input_sha256": "5b00e474fa32c826b816d941589bbeccd8db36c5ced2b90e0346a9cceedf38ee",
+      "upstream": {
+        "exit": 0,
+        "records": []
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": []
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": true,
+      "native_equals_upstream": true,
+      "native_plugin": {
+        "exit": 0,
+        "records": []
+      },
+      "input_description": "A server, child curl and connection to 192.0.0.8, as canonical events on the guest Python version."
+    },
+    {
+      "case": "healthchecks",
+      "engine": "Zeek",
+      "input_sha256": "6c759fe144ce3aa8e117f831a18dd54e91fcc914cf48010a3fe3ec7b5c36e7c5",
+      "upstream": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Address_Scan",
+            "ts": 1700000001.002601,
+            "src": "192.0.2.10",
+            "msg": "192.0.2.10 scanned at least 25 unique hosts on port 443/tcp in 0m0s"
+          },
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000002.004101,
+            "src": "192.0.2.20",
+            "msg": "192.0.2.20 scanned at least 15 unique ports of host 203.0.113.5 in 0m0s"
+          }
+        ],
+        "connections": 90
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Address_Scan",
+            "ts": 1700000001.002601,
+            "src": "192.0.2.10",
+            "msg": "192.0.2.10 scanned at least 25 unique hosts on port 443/tcp in 0m0s"
+          },
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000002.004101,
+            "src": "192.0.2.20",
+            "msg": "192.0.2.20 scanned at least 15 unique ports of host 203.0.113.5 in 0m0s"
+          }
+        ]
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": true,
+      "native_equals_upstream": true,
+      "native_plugin": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Address_Scan",
+            "ts": 1700000001.002601,
+            "src": "192.0.2.10",
+            "msg": "192.0.2.10 scanned at least 25 unique hosts on port 443/tcp in 0m0s"
+          },
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000002.004101,
+            "src": "192.0.2.20",
+            "msg": "192.0.2.20 scanned at least 15 unique ports of host 203.0.113.5 in 0m0s"
+          }
+        ]
+      },
+      "input_description": "Original project upstream/scan-fixture.py Ethernet capture."
+    },
+    {
+      "case": "successful-handshakes",
+      "engine": "Zeek",
+      "input_sha256": "18a6a122d764b75c8779e766a8cd399d5b89139d0f9acfbaa8b762a8671069a3",
+      "upstream": {
+        "exit": 0,
+        "records": [],
+        "connections": 15
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": []
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": true,
+      "native_equals_upstream": true,
+      "native_plugin": {
+        "exit": 0,
+        "records": []
+      },
+      "input_description": "15 successful client handshakes from the existing states fixture, through the final handshake ACK, in normal capture order."
+    },
+    {
+      "case": "reordered-successful-handshakes",
+      "engine": "Zeek",
+      "input_sha256": "0db49e0943ba11c8cc35a3c58b087d638ccba06b8a995d3cfa0a42057e9edf29",
+      "upstream": {
+        "exit": 0,
+        "records": [],
+        "connections": 15
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000001.001402,
+            "src": "192.0.2.40",
+            "msg": "192.0.2.40 scanned at least 15 unique ports of host 198.51.100.1 in 0m0s"
+          }
+        ]
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": false,
+      "native_equals_upstream": false,
+      "native_plugin": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000001.001402,
+            "src": "192.0.2.40",
+            "msg": "192.0.2.40 scanned at least 15 unique ports of host 198.51.100.1 in 0m0s"
+          }
+        ]
+      },
+      "input_description": "Same packets as successful-handshakes. For each connection, the capture records the SYN-ACK before its matching SYN, followed by the ACK. Per-flow capture timestamps stay increasing.",
+      "source_comparison": {
+        "plugin": "poc/falco/plugin/zeek.cpp:178",
+        "upstream": "https://github.com/zeek/zeek/blob/7a7864f89297e0fc3f3779ec2f8dc5100d8449c0/src/packet_analysis/protocol/tcp/TCPSessionAdapter.cc#L1572-L1590"
+      }
+    },
+    {
+      "case": "ppp-serial-handshakes",
+      "engine": "Zeek",
+      "input_sha256": "70a7b8d1f0d3a1c9230eaa2c6fb41a82bf9851d36583712385f4ba803836f5ae",
+      "upstream": {
+        "exit": 0,
+        "records": [],
+        "connections": 15
+      },
+      "sgx_simulation": {
+        "exit": 1,
+        "records": [],
+        "diagnostic": "unsupported PCAP link type 50"
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": false,
+      "native_equals_upstream": false,
+      "native_plugin": {
+        "exit": 1,
+        "records": [],
+        "diagnostic": "Error: unsupported PCAP link type 50"
+      },
+      "input_description": "Same 15 successful handshakes and timestamps encoded as a standard PPP Serial link-layer PCAP.",
+      "source_comparison": {
+        "plugin": "poc/falco/plugin/zeek.cpp:339",
+        "upstream": "https://github.com/zeek/zeek/blob/7a7864f89297e0fc3f3779ec2f8dc5100d8449c0/scripts/base/packet-protocols/ppp_serial/main.zeek#L3-L11"
+      }
+    },
+    {
+      "case": "nanosecond-healthchecks",
+      "engine": "Zeek",
+      "input_sha256": "127b0598dcbd8510d7b0a7ec6fe45514e79cdfe7308d5ab2f1481806b331bb43",
+      "upstream": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Address_Scan",
+            "ts": 1700000001.002601,
+            "src": "192.0.2.10",
+            "msg": "192.0.2.10 scanned at least 25 unique hosts on port 443/tcp in 0m0s"
+          },
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000002.004101,
+            "src": "192.0.2.20",
+            "msg": "192.0.2.20 scanned at least 15 unique ports of host 203.0.113.5 in 0m0s"
+          }
+        ],
+        "connections": 90
+      },
+      "sgx_simulation": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Address_Scan",
+            "ts": 1700000001.002602,
+            "src": "192.0.2.10",
+            "msg": "192.0.2.10 scanned at least 25 unique hosts on port 443/tcp in 0m0s"
+          },
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000002.004102,
+            "src": "192.0.2.20",
+            "msg": "192.0.2.20 scanned at least 15 unique ports of host 203.0.113.5 in 0m0s"
+          }
+        ]
+      },
+      "native_equals_sgx": true,
+      "sgx_equals_upstream": false,
+      "native_equals_upstream": false,
+      "native_plugin": {
+        "exit": 0,
+        "records": [
+          {
+            "note": "Scan::Address_Scan",
+            "ts": 1700000001.002602,
+            "src": "192.0.2.10",
+            "msg": "192.0.2.10 scanned at least 25 unique hosts on port 443/tcp in 0m0s"
+          },
+          {
+            "note": "Scan::Port_Scan",
+            "ts": 1700000002.004102,
+            "src": "192.0.2.20",
+            "msg": "192.0.2.20 scanned at least 15 unique ports of host 203.0.113.5 in 0m0s"
+          }
+        ]
+      },
+      "input_description": "Original healthcheck packets in a nanosecond-resolution classic PCAP. Each packet time has another 900 ns beyond its original microsecond.",
+      "source_comparison": {
+        "plugin": "poc/falco/plugin/zeek.cpp:118",
+        "upstream": "https://github.com/zeek/zeek/blob/7a7864f89297e0fc3f3779ec2f8dc5100d8449c0/src/iosource/pcap/Source.cc#L175-L180"
+      }
+    }
+  ],
+  "live_control": {
+    "workload": "one local Python process launched a no-op shell and exchanged two bytes over one successful loopback TCP connection",
+    "raven_input": "exact normalized JSONL emitted by the live syscall adapter",
+    "raven_comparison": "ordered full detection and state-change snapshots at upstream on_event and final settlement, normalizing generated detection IDs and rule_source prefix",
+    "live_raven": [
+      [
+        "privilege_change_chain",
+        "active"
+      ],
+      [
+        "server_spawns_shell",
+        "active"
+      ]
+    ],
+    "upstream_raven": [
+      [
+        "privilege_change_chain",
+        "active"
+      ],
+      [
+        "server_spawns_shell",
+        "active"
+      ]
+    ],
+    "raven_snapshots_equal": true,
+    "raven_first_differing_field": null,
+    "zeek_input": "raw IP PCAP recorded by the ring, original Zeek default scan policy",
+    "live_notices": [],
+    "upstream_notices": [],
+    "notices_equal": true,
+    "upstream_zeek_connections": 2,
+    "ring": {
+      "raven_events": 169,
+      "packet_records": 8,
+      "records": 6575,
+      "accepted": 6575,
+      "discarded": 0,
+      "format_rejected": 0
+    },
+    "driver": {
+      "driver_events": 6567,
+      "driver_drops": 0,
+      "packet_submitted": 8,
+      "packet_drops": 0
+    },
+    "sha256": {
+      "events.jsonl": "9b15d0068e5c9c07ba0ff1a18a3a552087ed4d8efba298ba2c87cc660bfc00e1",
+      "packets.pcap": "1cf7f4436b87195b265b4410d9a1b9f2612784541aa64b2bf2470947805a65c6",
+      "falco-live": "81fbd1a648b288fa5cee42b1713d4c3d26f42a62b4ff0c65e5069812a96ac8ff"
+    }
+  },
+  "source_only_finding": {
+    "subject": "Zeek Notice suppression state retention",
+    "plugin": "poc/falco/plugin/zeek.cpp:110",
+    "upstream": "https://github.com/zeek/zeek/blob/7a7864f89297e0fc3f3779ec2f8dc5100d8449c0/scripts/base/frameworks/notice/main.zeek#L362-L379",
+    "observation": "The plugin retains entries keyed by source address and Notice kind for the session. It checks the timestamp on access and never erases expired keys. The upstream Notice table has an expiry function. No long-duration memory measurement was performed."
+  }
+}

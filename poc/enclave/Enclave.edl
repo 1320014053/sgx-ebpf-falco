@@ -1,0 +1,12 @@
+enclave {
+    include "event.h"
+    trusted {
+        public void ecall_config(uint32_t target_tgid);
+        public int ecall_register([in] const struct poc_ring_desc *desc);
+        public void ecall_event([in] const struct poc_event *event);
+        public int ecall_batch([in] const struct poc_batch *batch);
+        public int ecall_step([out] struct poc_stats *stats);
+        public int ecall_run([out] struct poc_stats *stats);
+        public void ecall_stats([out] struct poc_stats *stats);
+    };
+};

@@ -1,0 +1,276 @@
+diff --git a/userspace/libsinsp/dns_manager.h b/userspace/libsinsp/dns_manager.h
+--- a/userspace/libsinsp/dns_manager.h
++++ b/userspace/libsinsp/dns_manager.h
+@@ -29,9 +29,7 @@
+ #include <future>
+ #include <mutex>
+ #include <memory>
+-#ifndef FALCO_SGX
+-#include "tbb/concurrent_unordered_map.h"
+-#endif
++#include <unordered_map>
+ #include <libsinsp/sinsp.h>
+ 
+ struct sinsp_dns_resolver {
+@@ -47,6 +45,10 @@
+ 	std::string name_of(int af, const void *addr, uint64_t ts);
+ 
+ 	void cleanup();
++#ifdef FALCO_SGX
++	void use_live_resolver() { m_resolve_live = true; }
++	bool add_replay_address(const std::string &name, const std::string &address);
++#endif
+ 
+ 	static sinsp_dns_manager &get() {
+ 		static sinsp_dns_manager instance;
+@@ -58,7 +60,8 @@
+ 	void set_max_refresh_timeout(uint64_t ns) { m_max_refresh_timeout = ns; };
+ 
+ 	size_t size() const {
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++		const std::lock_guard<std::mutex> lock(m_cache_mutex);
+ 		return m_cache.size();
+ #else
+ 		return 0;
+@@ -76,7 +79,7 @@
+ 	sinsp_dns_manager(sinsp_dns_manager const &) = delete;
+ 	void operator=(sinsp_dns_manager const &) = delete;
+ 
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
+ 	struct dns_info {
+ 		bool operator==(const dns_info &other) const {
+ 			return m_v4_addrs == other.m_v4_addrs && m_v6_addrs == other.m_v6_addrs;
+@@ -90,16 +93,15 @@
+ 		std::set<ipv6addr> m_v6_addrs;
+ 	};
+ 
+-	static inline dns_info resolve(const std::string &name, uint64_t ts);
+-
+-	typedef tbb::concurrent_unordered_map<std::string, dns_info> c_dns_table;
+-	c_dns_table m_cache;
++	inline dns_info resolve(const std::string &name, uint64_t ts);
++	std::unordered_map<std::string, dns_info> m_cache;
+ #endif
+ 
+-	// tbb concurrent unordered map is not thread-safe for deletions,
+-	// so we still need a mutex, but the chances of waiting are really
+-	// low, since we will almost never do an erase.
+-	std::mutex m_erase_mutex;
++	mutable std::mutex m_cache_mutex;
++#ifdef FALCO_SGX
++	bool m_resolve_live = false;
++	std::unordered_map<std::string, dns_info> m_replay_answers;
++#endif
+ 
+ 	// used to let m_resolver know when to terminate
+ 	std::promise<void> m_exit_signal;
+diff --git a/userspace/libsinsp/dns_manager.cpp b/userspace/libsinsp/dns_manager.cpp
+--- a/userspace/libsinsp/dns_manager.cpp
++++ b/userspace/libsinsp/dns_manager.cpp
+@@ -17,51 +17,50 @@
+ */
+ 
+ #include <libsinsp/dns_manager.h>
++#ifdef FALCO_SGX
++#include <arpa/inet.h>
++#endif
+ 
+ void sinsp_dns_resolver::refresh(uint64_t erase_timeout,
+                                  uint64_t base_refresh_timeout,
+                                  uint64_t max_refresh_timeout,
+                                  std::future<void> f_exit) {
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
+ 	sinsp_dns_manager &manager = sinsp_dns_manager::get();
+ 	while(true) {
+-		if(!manager.m_cache.empty()) {
+-			std::list<std::string> to_delete;
+-
+-			uint64_t ts = sinsp_utils::get_current_time_ns();
+-
+-			for(auto &it : manager.m_cache) {
+-				const std::string &name = it.first;
+-				sinsp_dns_manager::dns_info &info = it.second;
+-
+-				if((ts > info.m_last_used_ts) && (ts - info.m_last_used_ts) > erase_timeout) {
+-					// remove the entry if it's hasn't been used for a whole hour
+-					to_delete.push_back(name);
+-				} else if(ts > (info.m_last_resolve_ts + info.m_timeout)) {
+-					sinsp_dns_manager::dns_info refreshed_info = manager.resolve(name, ts);
+-					refreshed_info.m_timeout = base_refresh_timeout;
+-					refreshed_info.m_last_resolve_ts = info.m_last_resolve_ts = ts;
+-
+-					// dns_info::operator!= will check if some
+-					// v4 or v6 addresses are changed from the
+-					// last resolution
+-					if(refreshed_info != info) {
+-						info = refreshed_info;
+-					} else if(info.m_timeout < max_refresh_timeout) {
+-						// double the timeout until 320 secs
+-						info.m_timeout <<= 1;
+-					}
++		const auto ts = sinsp_utils::get_current_time_ns();
++		std::vector<std::string> due;
++		{
++			const std::lock_guard<std::mutex> lock(manager.m_cache_mutex);
++			for(auto it = manager.m_cache.begin(); it != manager.m_cache.end();) {
++				const auto &info = it->second;
++				if(ts > info.m_last_used_ts && ts - info.m_last_used_ts > erase_timeout) {
++					it = manager.m_cache.erase(it);
++					continue;
+ 				}
+-			}
+-			if(!to_delete.empty()) {
+-				manager.m_erase_mutex.lock();
+-				for(const auto &name : to_delete) {
+-					manager.m_cache.unsafe_erase(name);
++				if(ts > info.m_last_resolve_ts + info.m_timeout) {
++					due.push_back(it->first);
+ 				}
+-				manager.m_erase_mutex.unlock();
++				++it;
+ 			}
+ 		}
+ 
++		// Resolve without holding the cache lock while the event loop is matching.
++		for(const auto &name : due) {
++			auto refreshed = manager.resolve(name, ts);
++			const std::lock_guard<std::mutex> lock(manager.m_cache_mutex);
++			auto &info = manager.m_cache.at(name);
++			info.m_last_resolve_ts = ts;
++			if(refreshed != info) {
++				refreshed.m_timeout = base_refresh_timeout;
++				refreshed.m_last_resolve_ts = ts;
++				refreshed.m_last_used_ts = info.m_last_used_ts;
++				info = std::move(refreshed);
++			} else if(info.m_timeout < max_refresh_timeout) {
++				info.m_timeout <<= 1;
++			}
++		}
++
+ 		if(f_exit.wait_for(std::chrono::nanoseconds(base_refresh_timeout)) ==
+ 		   std::future_status::ready) {
+ 			break;
+@@ -70,10 +69,16 @@
+ #endif
+ }
+ 
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
+ inline sinsp_dns_manager::dns_info sinsp_dns_manager::resolve(const std::string &name,
+                                                               uint64_t ts) {
+-	dns_info dinfo;
++	dns_info dinfo{};
++#ifdef FALCO_SGX
++	if(!m_resolve_live) {
++		const auto answer = m_replay_answers.find(name);
++		return answer == m_replay_answers.end() ? dinfo : answer->second;
++	}
++#endif
+ 
+ 	addrinfo hints, *result, *rp;
+ 	memset(&hints, 0, sizeof(addrinfo));
+@@ -99,9 +104,31 @@
+ }
+ #endif
+ 
++#ifdef FALCO_SGX
++bool sinsp_dns_manager::add_replay_address(const std::string &name, const std::string &address) {
++	const std::lock_guard<std::mutex> lock(m_cache_mutex);
++	uint32_t v4;
++	ipv6addr v6;
++	if(inet_pton(AF_INET, address.c_str(), &v4) == 1) {
++		m_replay_answers[name].m_v4_addrs.insert(v4);
++	} else if(inet_pton(AF_INET6, address.c_str(), v6.m_b) == 1) {
++		m_replay_answers[name].m_v6_addrs.insert(v6);
++	} else {
++		return false;
++	}
++	return true;
++}
++#endif
++
+ bool sinsp_dns_manager::match(const char *name, int af, const void *addr, uint64_t ts) {
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+-	if(!m_resolver) {
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++	const std::lock_guard<std::mutex> lock(m_cache_mutex);
++#ifdef FALCO_SGX
++	const bool refresh = m_resolve_live;
++#else
++	const bool refresh = true;
++#endif
++	if(refresh && !m_resolver) {
+ 		m_resolver = std::make_unique<std::thread>(sinsp_dns_resolver::refresh,
+ 		                                           m_erase_timeout,
+ 		                                           m_base_refresh_timeout,
+@@ -111,7 +138,6 @@
+ 
+ 	std::string sname = std::string(name);
+ 
+-	m_erase_mutex.lock();
+ 
+ 	if(m_cache.find(sname) == m_cache.end()) {
+ 		dns_info dinfo = resolve(sname, ts);
+@@ -123,7 +149,6 @@
+ 	m_cache[sname].m_last_used_ts = ts;
+ 	dns_info &dinfo = m_cache[sname];
+ 
+-	m_erase_mutex.unlock();
+ 
+ 	if(af == AF_INET6) {
+ 		ipv6addr v6;
+@@ -139,36 +164,33 @@
+ std::string sinsp_dns_manager::name_of(int af, const void *addr, uint64_t ts) {
+ 	std::string ret;
+ 
+-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
+-	if(!m_cache.empty()) {
+-		m_erase_mutex.lock();
+-		for(auto &it : m_cache) {
+-			const std::string &name = it.first;
+-			sinsp_dns_manager::dns_info &info = it.second;
++#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
++	const std::lock_guard<std::mutex> lock(m_cache_mutex);
++	for(auto &it : m_cache) {
++		const std::string &name = it.first;
++		sinsp_dns_manager::dns_info &info = it.second;
+ 
+-			if(af == AF_INET6) {
+-				ipv6addr v6;
+-				memcpy(v6.m_b, addr, sizeof(ipv6addr));
+-				if(info.m_v6_addrs.find(v6) != info.m_v6_addrs.end()) {
+-					info.m_last_used_ts = ts;
+-					ret = name;
+-					break;
+-				}
+-			} else if(af == AF_INET &&
+-			          info.m_v4_addrs.find(*(uint32_t *)addr) != info.m_v4_addrs.end()) {
++		if(af == AF_INET6) {
++			ipv6addr v6;
++			memcpy(v6.m_b, addr, sizeof(ipv6addr));
++			if(info.m_v6_addrs.find(v6) != info.m_v6_addrs.end()) {
+ 				info.m_last_used_ts = ts;
+ 				ret = name;
+ 				break;
+ 			}
++		} else if(af == AF_INET &&
++		          info.m_v4_addrs.find(*(uint32_t *)addr) != info.m_v4_addrs.end()) {
++			info.m_last_used_ts = ts;
++			ret = name;
++			break;
+ 		}
+-		m_erase_mutex.unlock();
+ 	}
+ #endif
+ 	return ret;
+ }
+ 
+ void sinsp_dns_manager::cleanup() {
+-#if !defined(__EMSCRIPTEN__) && !defined(FALCO_SGX)
++#if !defined(__EMSCRIPTEN__)
+ 	if(m_resolver) {
+ 		m_exit_signal.set_value();
+ 		m_resolver->join();

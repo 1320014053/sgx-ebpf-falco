@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+# Unified diff context and the published patch hashes depend on the original bytes.
+*.patch -text -whitespace
+*.zip binary
+*.png binary
+*.xz binary
+*.gz binary

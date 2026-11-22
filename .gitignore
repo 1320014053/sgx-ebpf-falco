@@ -1,0 +1,10 @@
+/poc/build*/
+/vm/runtime/
+/vm/downloads/
+*.iso
+*.qcow2
+*.pem
+__pycache__/
+*.pyc
+/results/runs.csv
+/*.log

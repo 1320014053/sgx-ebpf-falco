@@ -1,0 +1,6 @@
+repeat,environment,mode,ok,generator_calls,attempted,submitted,reserve_failed,processed,matched,format_rejected,last_seq,data_ecalls,total_ecalls,ocalls,payload_copy_bytes,sdk_input_bytes,host_pack_bytes,header_read_bytes,index_read_bytes,consumer_pos,producer_pos,batch_events,batches,worker_result,wall_ns,generation_wall_ns,generator_wall_ns,drain_ns,host_cpu_ns,consumer_cpu_ns,generator_cpu_ns
+1,QEMU TCG + SGX SIM,baseline,True,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10739164,10671561,6944400,0,310045,0,170616
+1,QEMU TCG + SGX SIM,host,True,3,3,3,0,3,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,39592411,7970444,6379176,781134,4792359,1799599,613336
+1,QEMU TCG + SGX SIM,ecall,True,3,3,3,0,3,3,0,3,3,5,0,768,768,0,0,0,0,0,0,0,0,42987357,9380305,7140208,1215453,6904915,3824407,574865
+1,QEMU TCG + SGX SIM,batch,True,3,3,3,0,3,3,0,3,1,3,0,768,16392,768,0,0,0,0,3,1,0,42240525,7547526,5478137,2253198,7466213,3909793,399435
+1,QEMU TCG + SGX SIM,direct,True,3,3,3,0,3,3,0,3,1,3,0,768,0,0,28,2155256,792,792,0,0,0,49005318,8964088,7291215,413218,50037658,47643245,432480

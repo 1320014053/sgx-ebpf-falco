@@ -1,0 +1,20 @@
+{
+  "kernel": "6.1.38-moat-falco2",
+  "build": "Linux version 6.1.38-moat-falco2 (github-actions@moat-kernel-build) (gcc-12 (Ubuntu 12.4.0-2ubuntu1~24.04.1) 12.4.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #4 SMP PREEMPT_DYNAMIC Thu Nov 19 20:42:33 UTC 2026",
+  "online_cpus": "0-1",
+  "taint": 0,
+  "tested_ring_id": 20,
+  "tested_ring_present_after_exit": false,
+  "remaining_ringbuf_ids": [],
+  "remaining_bpf_links": 0,
+  "active_falco_processes": [],
+  "falco_kmod_loaded": false,
+  "kernel_faults": [],
+  "kernel_image_sha256": "abd68034660d6b0e01a258f7b3685820e4303af37ffb0455198edebf4a7f940c",
+  "qemu_shutdown": {
+    "exit_code": 0,
+    "serial_power_down": "[  411.713369] reboot: Power down",
+    "serial_faults": [],
+    "stderr_bytes": 0
+  }
+}

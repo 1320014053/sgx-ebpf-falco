@@ -1,0 +1,553 @@
+diff --git a/include/moat/moat_bpf.h b/include/moat/moat_bpf.h
+index 72f143d..0a2c4f0 100644
+--- a/include/moat/moat_bpf.h
++++ b/include/moat/moat_bpf.h
+@@ -28,7 +28,8 @@ DECLARE_PER_CPU(void*, last_bpf);
+ // when deallocating, we only deallocate the original copy;
+ struct moat_mem {
+   void *addr;
+-  void *phys_pages; 
++  void *phys_pages;
++  struct page **page_array; /* Borrowed backing for a non-contiguous region. */
+   unsigned long nr_pages; 
+   // used by alloc_map_moat_mem to avoid repeative allocation
+   bool shared;
+@@ -83,6 +84,8 @@ extern void init_moat_mm(void);
+ 
+ extern int moat_vmap_range(unsigned long addr, unsigned long end, phys_addr_t phys_addr, pgprot_t prot, pgd_t* pgd);
+ extern void moat_vunmap_range(unsigned long start, unsigned long end, pgd_t *pgd);
++extern int moat_vmap_page_array(struct moat_mem *mem, pgprot_t prot, pgd_t *pgd);
++extern void moat_unmap_mem(struct moat_mem *mem);
+ 
+ extern struct moat_mem *build_moat_mem(unsigned long addr, unsigned long nr_pages, pgprot_t prot);
+ extern unsigned long alloc_virt_locked(unsigned long nr_pages);
+diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
+--- a/kernel/bpf/arraymap.c
++++ b/kernel/bpf/arraymap.c
+@@ -99,7 +99,8 @@ static void array_map_free_moat_mem(struct bpf_array *array) {
+     kfree(region);
+   }
+   if (WARN_ON(!array_mem))
+-    dealloc_moat_mem(array_mem);
++    return;
++  dealloc_moat_mem(array_mem);
+ }
+ 
+ static struct bpf_map *array_map_alloc(union bpf_attr *attr)
+@@ -857,7 +858,7 @@ static void fd_array_map_free(struct bpf_map *map)
+ 	for (i = 0; i < array->map.max_entries; i++)
+ 		BUG_ON(array->ptrs[i] != NULL);
+ 
+-	bpf_map_area_free(array);
++	array_map_free_moat_mem(array);
+ }
+ 
+ static void *fd_array_map_lookup_elem(struct bpf_map *map, void *key)
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 43616b2..b5892d1 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -2533,9 +2533,11 @@ static void bpf_prog_free_deferred(struct work_struct *work)
+ {
+ 	struct bpf_prog_aux *aux;
+ 	int i;
+-  return;
+ 
+ 	aux = container_of(work, struct bpf_prog_aux, work);
++	/* MOAT programs own a separate address space and execution image. */
++	if (aux->prog->addrspace)
++		return;
+ #ifdef CONFIG_BPF_SYSCALL
+ 	bpf_free_kfunc_btf_tab(aux->kfunc_btf_tab);
+ #endif
+diff --git a/kernel/bpf/moat_bpf.c b/kernel/bpf/moat_bpf.c
+index a69b9b9..98d1c01 100644
+--- a/kernel/bpf/moat_bpf.c
++++ b/kernel/bpf/moat_bpf.c
+@@ -236,6 +236,22 @@ void moat_vunmap_range(unsigned long start, unsigned long end, pgd_t *pgd)
+ 	} while (pgd++, addr = next, addr != end);
+ }
+ 
++/* On error the caller unmaps the reserved range from the same page table. */
++int moat_vmap_page_array(struct moat_mem *mem, pgprot_t prot, pgd_t *pgd)
++{
++	unsigned long addr = (unsigned long)mem->addr;
++	unsigned long i;
++	int ret;
++
++	for (i = 0; i < mem->nr_pages; i++, addr += PAGE_SIZE) {
++		ret = moat_vmap_range(addr, addr + PAGE_SIZE,
++				      page_to_phys(mem->page_array[i]), prot, pgd);
++		if (ret)
++			return ret;
++	}
++	return 0;
++}
++
+ /* this function should only be called when holding moat_mm.lock!
+  */
+ unsigned long alloc_virt_locked(unsigned long nr_pages) {
+@@ -255,6 +271,7 @@ struct moat_mem *build_moat_mem(unsigned long addr, unsigned long nr_pages, pgpr
+   new_mem = kmalloc(sizeof(struct moat_mem), GFP_KERNEL);
+   new_mem->addr = (void*)addr;
+   new_mem->phys_pages = NULL;
++  new_mem->page_array = NULL;
+   new_mem->nr_pages = nr_pages;
+   new_mem->prot = __pgprot(pgprot_val(prot) | _PAGE_PKEY_BIT0);
+   new_mem->shared = false;
+@@ -304,29 +321,29 @@ struct moat_mem *alloc_moat_mem(unsigned long nr_pages, pgprot_t prot, gfp_t gfp
+   return allocated;
+ }
+ 
+-void dealloc_moat_mem(struct moat_mem *allocated) {
+-  unsigned long size, addr;
+-  pgd_t *pgd;
+-  // return without free
+-  if (!allocated)
+-    return;
++void moat_unmap_mem(struct moat_mem *mem)
++{
++	unsigned long start = (unsigned long)mem->addr;
++	unsigned long end = start + mem->nr_pages * PAGE_SIZE;
+ 
+-  size = allocated->nr_pages * PAGE_SIZE;
+-  addr = (unsigned long)allocated->addr;
+-  spin_lock(&moat_mm.lock);
+-  if (moat_mm.cur == addr + size)
+-    moat_mm.cur -= size;
+-  spin_unlock(&moat_mm.lock);
++	moat_vunmap_range(start, end, init_mm.pgd);
++	flush_tlb_kernel_range(start, end);
+ 
+-  pgd = init_mm.pgd;
+-  moat_vunmap_range(addr, addr + size, pgd);
+-  // if not shared, free physical pages
+-  if (!allocated->shared)
+-    free_pages_exact(allocated->phys_pages, size);
+-  kfree(allocated);
+-  
+-  // we *only* flush the tlb in kernel.
+-  //flush_tlb_kernel_range(addr, addr+size);
++	spin_lock(&moat_mm.lock);
++	if (moat_mm.cur == end)
++		moat_mm.cur = start;
++	spin_unlock(&moat_mm.lock);
++}
++
++void dealloc_moat_mem(struct moat_mem *allocated)
++{
++	if (!allocated)
++		return;
++
++	moat_unmap_mem(allocated);
++	if (!allocated->shared && allocated->phys_pages)
++		free_pages_exact(allocated->phys_pages, allocated->nr_pages * PAGE_SIZE);
++	kfree(allocated);
+ }
+ 
+ struct desc {
+@@ -444,9 +461,12 @@ int addto_moat_addrspace(struct moat_addrspace* addrspace, struct moat_mem *mem,
+   pgd_t *pgd;
+   struct moat_region* region;
+ 
++  int ret;
++
+   region = kmalloc(sizeof(struct moat_region), GFP_KERNEL);
++  if (!region)
++    return -ENOMEM;
+   region->mem = mem;
+-  list_add(&region->entry, &addrspace->region_list);
+ 
+   start = (unsigned long)mem->addr;
+   end = start + mem->nr_pages * PAGE_SIZE;
+@@ -458,7 +478,18 @@ int addto_moat_addrspace(struct moat_addrspace* addrspace, struct moat_mem *mem,
+   //}
+   pgd = addrspace->pgd;
+   strcpy(region->name, name);
+-  return moat_vmap_range(start, end, virt_to_phys(mem->phys_pages), prot, pgd);
++  if (mem->page_array)
++    ret = moat_vmap_page_array(mem, prot, pgd);
++  else
++    ret = moat_vmap_range(start, end, virt_to_phys(mem->phys_pages), prot, pgd);
++  if (ret) {
++    moat_vunmap_range(start, end, pgd);
++    flush_tlb_kernel_range(start, end);
++    kfree(region);
++    return ret;
++  }
++  list_add(&region->entry, &addrspace->region_list);
++  return 0;
+ }
+ 
+ void delfrom_moat_addrspace(struct moat_addrspace* addrspace, struct moat_mem *mem) {
+@@ -704,6 +735,7 @@ struct moat_obj_mem* build_moat_obj_mem(unsigned long addr, unsigned long nr_pag
+   mem = &obj_mem->mem;
+   mem->addr = (void*)addr;
+   mem->phys_pages = NULL;
++  mem->page_array = NULL;
+   mem->nr_pages = nr_pages;
+   mem->prot = prot;
+   mem->shared = false;
+diff --git a/kernel/bpf/ringbuf.c b/kernel/bpf/ringbuf.c
+index 009964e..fd537aa 100644
+--- a/kernel/bpf/ringbuf.c
++++ b/kernel/bpf/ringbuf.c
+@@ -36,8 +36,6 @@ struct bpf_ringbuf {
+ 	wait_queue_head_t waitq;
+ 	struct irq_work work;
+ 	u64 mask;
+-	struct page **pages;
+-	int nr_pages;
+ 	struct bpf_ringbuf *krb;
+ 	spinlock_t spinlock ____cacheline_aligned_in_smp;
+ 	/* For user-space producer ring buffers, an atomic_t busy bit is used
+@@ -87,6 +85,8 @@ struct bpf_ringbuf_map {
+ 	struct bpf_map map;
+ 	struct bpf_ringbuf *rb;
+ 	struct bpf_ringbuf *krb;
++	struct moat_mem mem;
++	struct moat_region region;
+ };
+ 
+ /* 8-byte ring buffer record header structure */
+@@ -95,132 +95,67 @@ struct bpf_ringbuf_hdr {
+ 	u32 pg_off;
+ };
+ 
+-static struct bpf_ringbuf *bpf_ringbuf_area_alloc(struct bpf_map *map,
++static void ringbuf_free_pages(struct page **pages, unsigned int nr_pages)
++{
++	while (nr_pages)
++		__free_page(pages[--nr_pages]);
++	bpf_map_area_free(pages);
++}
++
++static struct bpf_ringbuf *bpf_ringbuf_area_alloc(struct bpf_ringbuf_map *rb_map,
+ 						  size_t data_sz, int numa_node)
+ {
+-	const gfp_t flags = GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_NOWARN |
+-			    __GFP_ZERO;
+-	int nr_meta_pages = RINGBUF_PGOFF + RINGBUF_POS_PAGES;
+-	int nr_data_pages = data_sz >> PAGE_SHIFT;
+-	//int nr_pages = nr_meta_pages + nr_data_pages;
++	const gfp_t flags = GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL |
++			    __GFP_NOWARN | __GFP_ZERO;
++	unsigned int meta = RINGBUF_PGOFF + RINGBUF_POS_PAGES;
++	unsigned int data = data_sz >> PAGE_SHIFT;
++	unsigned int unique = meta + data, total = unique + data;
++	struct moat_mem *mem = &rb_map->mem;
+ 	struct page **pages;
+-	struct bpf_ringbuf *rb;
+-	size_t array_size;
+-	int i;
+-  struct bpf_ringbuf_map *rb_map = container_of(map, struct bpf_ringbuf_map, map);
+-	//struct vm_struct *area;
+-
+-	/* Each data page is mapped twice to allow "virtual"
+-	 * continuous read of samples wrapping around the end of ring
+-	 * buffer area:
+-	 * ------------------------------------------------------
+-	 * | meta pages |  real data pages  |  same data pages  |
+-	 * ------------------------------------------------------
+-	 * |            | 1 2 3 4 5 6 7 8 9 | 1 2 3 4 5 6 7 8 9 |
+-	 * ------------------------------------------------------
+-	 * |            | TA             DA | TA             DA |
+-	 * ------------------------------------------------------
+-	 *                               ^^^^^^^
+-	 *                                  |
+-	 * Here, no need to worry about special handling of wrapped-around
+-	 * data due to double-mapped data pages. This works both in kernel and
+-	 * when mmap()'ed in user-space, simplifying both kernel and
+-	 * user-space implementations significantly.
+-	 */
+-
+-	struct moat_mem *meta_mem = NULL, *real_mem = NULL, *virt_mem = NULL;
+-	struct moat_region *region;
+-	unsigned long addr;
+-	spin_lock(&moat_mm.lock);
+-	addr = alloc_virt_locked(nr_meta_pages + 2 * nr_data_pages);
+-	spin_unlock(&moat_mm.lock);
+-
+-	// allocate two concreate memory
+-	meta_mem = build_moat_mem(addr, nr_meta_pages, PAGE_KERNEL);
+-	real_mem = build_moat_mem(addr + nr_meta_pages * PAGE_SIZE,
+-				  nr_data_pages, PAGE_KERNEL);
+-	if (alloc_map_moat_mem(meta_mem, flags) ||
+-	    alloc_map_moat_mem(real_mem, flags))
+-		goto err_free;
+-
+-	// allocate virtual memory
+-	virt_mem = build_moat_mem(addr + (nr_meta_pages + nr_data_pages) *
+-						  PAGE_SIZE,
+-				  nr_data_pages, PAGE_KERNEL);
+-	virt_mem->shared = true;
+-	// same physical page set
+-	virt_mem->phys_pages = real_mem->phys_pages;
+-
+-	if (alloc_map_moat_mem(virt_mem, flags))
+-		goto err_free;
+-
+-	INIT_LIST_HEAD(&map->region_list);
+-	region = kmalloc(sizeof(struct moat_region), GFP_KERNEL);
+-	region->mem = meta_mem;
+-	region->id = 0;
+-	list_add(&region->entry, &map->region_list);
+-
+-	region = kmalloc(sizeof(struct moat_region), GFP_KERNEL);
+-	region->mem = real_mem;
+-	region->id = 1;
+-	list_add(&region->entry, &map->region_list);
+-
+-	region = kmalloc(sizeof(struct moat_region), GFP_KERNEL);
+-	region->mem = virt_mem;
+-	region->id = 2;
+-	list_add(&region->entry, &map->region_list);
+-
+-	array_size = (nr_meta_pages + 2 * nr_data_pages) * sizeof(*pages);
+-	pages = kmalloc(array_size, GFP_KERNEL);
+-	for (i = 0; i < nr_meta_pages; i++)
+-		pages[i] = virt_to_page(meta_mem->phys_pages + PAGE_SIZE * i);
+-	for (i = 0; i < nr_data_pages; i++) {
+-		pages[i + nr_meta_pages] = virt_to_page(real_mem->phys_pages + PAGE_SIZE * i);
+-		pages[i + nr_meta_pages + nr_data_pages] = pages[i + nr_meta_pages];
+-	}
+-	rb_map->krb = vmap(pages, nr_meta_pages + 2 * nr_data_pages, VM_READ | VM_WRITE, PAGE_KERNEL);
+-  kfree(pages);
++	unsigned int i;
+ 
+-	rb = meta_mem->addr;
+-  rb->krb = rb_map->krb;
+-
+-	return rb;
+-
+-err_free:
+-	dealloc_moat_mem(meta_mem);
+-	dealloc_moat_mem(virt_mem);
+-	dealloc_moat_mem(real_mem);
+-	return NULL;
+-	/*	array_size = (nr_meta_pages + 2 * nr_data_pages) * sizeof(*pages);
+-	pages = bpf_map_area_alloc(array_size, numa_node);
++	pages = bpf_map_area_alloc(array_size(total, sizeof(*pages)), numa_node);
+ 	if (!pages)
+ 		return NULL;
+ 
+-	for (i = 0; i < nr_pages; i++) {
+-		page = alloc_pages_node(numa_node, flags, 0);
+-		if (!page) {
+-			nr_pages = i;
+-			goto err_free_pages;
+-		}
+-		pages[i] = page;
+-		if (i >= nr_meta_pages)
+-			pages[nr_data_pages + i] = page;
++	/* Both views of the data use the same pages, in the same order. */
++	for (i = 0; i < unique; i++) {
++		pages[i] = alloc_pages_node(numa_node, flags, 0);
++		if (!pages[i])
++			goto free_pages;
++		if (i >= meta)
++			pages[i + data] = pages[i];
+ 	}
+ 
+-	rb = vmap(pages, nr_meta_pages + 2 * nr_data_pages,
+-		  VM_MAP | VM_USERMAP, PAGE_KERNEL);
+-	if (rb) {
+-		kmemleak_not_leak(pages);
+-		rb->pages = pages;
+-		rb->nr_pages = nr_pages;
+-		return rb;
++	rb_map->krb = vmap(pages, total, VM_MAP | VM_USERMAP, PAGE_KERNEL);
++	if (!rb_map->krb)
++		goto free_pages;
++
++	mem->page_array = pages;
++	mem->nr_pages = total;
++	mem->shared = true;
++	mem->prot = __pgprot(pgprot_val(PAGE_KERNEL) | _PAGE_PKEY_BIT0);
++	spin_lock(&moat_mm.lock);
++	if (total < ((MOAT_END - moat_mm.cur) >> PAGE_SHIFT))
++		mem->addr = (void *)alloc_virt_locked(total);
++	spin_unlock(&moat_mm.lock);
++	if (!mem->addr)
++		goto unmap_kernel;
++	if (moat_vmap_page_array(mem, mem->prot, init_mm.pgd)) {
++		moat_unmap_mem(mem);
++		goto unmap_kernel;
+ 	}
+ 
+-err_free_pages:
+-	for (i = 0; i < nr_pages; i++)
+-		__free_page(pages[i]);
+-	bpf_map_area_free(pages);
+-	return NULL; */
++	INIT_LIST_HEAD(&rb_map->map.region_list);
++	rb_map->region.mem = mem;
++	list_add(&rb_map->region.entry, &rb_map->map.region_list);
++	return mem->addr;
++
++unmap_kernel:
++	vunmap(rb_map->krb);
++free_pages:
++	ringbuf_free_pages(pages, i);
++	return NULL;
+ }
+ 
+ static void bpf_ringbuf_notify(struct irq_work *work)
+@@ -230,15 +165,15 @@ static void bpf_ringbuf_notify(struct irq_work *work)
+ 	wake_up_all(&krb->waitq);
+ }
+ 
+-static struct bpf_ringbuf *bpf_ringbuf_alloc(struct bpf_map *map,
++static struct bpf_ringbuf *bpf_ringbuf_alloc(struct bpf_ringbuf_map *rb_map,
+ 					     size_t data_sz, int numa_node)
+ {
+ 	struct bpf_ringbuf *rb, *krb;
+ 
+-	rb = bpf_ringbuf_area_alloc(map, data_sz, numa_node);
+-  krb = container_of(map, struct bpf_ringbuf_map, map)->krb;
++	rb = bpf_ringbuf_area_alloc(rb_map, data_sz, numa_node);
+ 	if (!rb)
+ 		return NULL;
++	krb = rb_map->krb;
+ 
+ 	spin_lock_init(&krb->spinlock);
+ 	atomic_set(&krb->busy, 0);
+@@ -248,7 +183,7 @@ static struct bpf_ringbuf *bpf_ringbuf_alloc(struct bpf_map *map,
+ 	krb->mask = data_sz - 1;
+ 	krb->consumer_pos = 0;
+ 	krb->producer_pos = 0;
+-  rb->krb = krb;
++	krb->krb = krb;
+ 
+ 	return rb;
+ }
+@@ -277,7 +212,7 @@ static struct bpf_map *ringbuf_map_alloc(union bpf_attr *attr)
+ 
+ 	bpf_map_init_from_attr(&rb_map->map, attr);
+ 
+-	rb_map->rb = bpf_ringbuf_alloc(&rb_map->map, attr->max_entries,
++	rb_map->rb = bpf_ringbuf_alloc(rb_map, attr->max_entries,
+ 				       rb_map->map.numa_node);
+ 	if (!rb_map->rb) {
+ 		bpf_map_area_free(rb_map);
+@@ -287,33 +222,16 @@ static struct bpf_map *ringbuf_map_alloc(union bpf_attr *attr)
+ 	return &rb_map->map;
+ }
+ 
+-static void bpf_ringbuf_free(struct bpf_ringbuf *rb)
+-{
+-	/* copy pages pointer and nr_pages to local variable, as we are going
+-	 * to unmap rb itself with vunmap() below
+-	 */
+-	struct page **pages = rb->pages;
+-	int i, nr_pages = rb->nr_pages;
+-
+-	vunmap(rb);
+-	for (i = 0; i < nr_pages; i++)
+-		__free_page(pages[i]);
+-	bpf_map_area_free(pages);
+-}
+-
+ static void ringbuf_map_free(struct bpf_map *map)
+ {
+-	struct bpf_ringbuf_map *rb_map;
+-	struct list_head *entry, *temp;
+-	rb_map = container_of(map, struct bpf_ringbuf_map, map);
+-	list_for_each_safe(entry, temp, &map->region_list) {
+-		struct moat_region *region;
+-		region = list_entry(entry, struct moat_region, entry);
+-		dealloc_moat_mem(region->mem);
+-		list_del(entry);
+-		kfree(region);
+-	}
+-	// bpf_ringbuf_free(rb_map->rb);
++	struct bpf_ringbuf_map *rb_map = container_of(map, struct bpf_ringbuf_map, map);
++	unsigned int unique = RINGBUF_PGOFF + RINGBUF_POS_PAGES +
++			      (map->max_entries >> PAGE_SHIFT);
++
++	irq_work_sync(&rb_map->krb->work);
++	moat_unmap_mem(&rb_map->mem);
++	vunmap(rb_map->krb);
++	ringbuf_free_pages(rb_map->mem.page_array, unique);
+ 	bpf_map_area_free(rb_map);
+ }
+ 
+@@ -339,50 +257,27 @@ static int ringbuf_map_get_next_key(struct bpf_map *map, void *key,
+ 	return -ENOTSUPP;
+ }
+ 
+-static int ringbuf_map_mmap_kern(struct bpf_map *map,
+-				 struct vm_area_struct *vma)
++static int ringbuf_map_mmap_kern(struct bpf_map *map, struct vm_area_struct *vma)
+ {
+-	unsigned long nr_pages = 0;
+ 	struct bpf_ringbuf_map *rb_map;
+-	struct moat_mem temp_mem;
+-	struct moat_region *region;
+-	struct list_head *entry;
+ 
+ 	rb_map = container_of(map, struct bpf_ringbuf_map, map);
+ 
+ 	if (vma->vm_flags & VM_WRITE) {
+ 		/* allow writable mapping for the consumer_pos only */
+-		if (vma->vm_pgoff != 0 ||
+-		    vma->vm_end - vma->vm_start != PAGE_SIZE)
++		if (vma->vm_pgoff != 0 || vma->vm_end - vma->vm_start != PAGE_SIZE)
+ 			return -EPERM;
+ 	} else {
+ 		vma->vm_flags &= ~VM_MAYWRITE;
+ 	}
+-
+-	temp_mem.addr = NULL;
+-	list_for_each(entry, &map->region_list) {
+-		region = list_entry(entry, struct moat_region, entry);
+-		nr_pages += region->mem->nr_pages;
+-		if (region->id == 0)
+-			temp_mem.addr = region->mem->addr;
+-	}
+-	if (temp_mem.addr == NULL)
+-		return -ENOMEM;
+-	temp_mem.nr_pages = nr_pages;
+-	return moat_mem_mmap(vma, &temp_mem, vma->vm_pgoff + RINGBUF_PGOFF);
+ 	/* remap_vmalloc_range() checks size and offset constraints */
+-	//return remap_vmalloc_range(vma, rb_map->rb,
+-	//vma->vm_pgoff + RINGBUF_PGOFF);
++	return remap_vmalloc_range(vma, rb_map->krb,
++				   vma->vm_pgoff + RINGBUF_PGOFF);
+ }
+ 
+-static int ringbuf_map_mmap_user(struct bpf_map *map,
+-				 struct vm_area_struct *vma)
++static int ringbuf_map_mmap_user(struct bpf_map *map, struct vm_area_struct *vma)
+ {
+-	unsigned long nr_pages = 0;
+ 	struct bpf_ringbuf_map *rb_map;
+-	struct moat_mem temp_mem;
+-	struct moat_region *region;
+-	struct list_head *entry;
+ 
+ 	rb_map = container_of(map, struct bpf_ringbuf_map, map);
+ 
+@@ -396,21 +291,8 @@ static int ringbuf_map_mmap_user(struct bpf_map *map,
+ 	} else {
+ 		vma->vm_flags &= ~VM_MAYWRITE;
+ 	}
+-	temp_mem.addr = NULL;
+-	list_for_each(entry, &map->region_list) {
+-		region = list_entry(entry, struct moat_region, entry);
+-		nr_pages += region->mem->nr_pages;
+-		if (region->id == 0)
+-			temp_mem.addr = region->mem->addr;
+-	}
+-	if (temp_mem.addr == NULL)
+-		return -ENOMEM;
+-	temp_mem.nr_pages = nr_pages;
+-	return moat_mem_mmap(vma, &temp_mem, vma->vm_pgoff + RINGBUF_PGOFF);
+-
+ 	/* remap_vmalloc_range() checks size and offset constraints */
+-	//return remap_vmalloc_range(vma, rb_map->rb,
+-	//			   vma->vm_pgoff + RINGBUF_PGOFF);
++	return remap_vmalloc_range(vma, rb_map->krb, vma->vm_pgoff + RINGBUF_PGOFF);
+ }
+ 
+ static unsigned long ringbuf_avail_data_sz(struct bpf_ringbuf *rb)

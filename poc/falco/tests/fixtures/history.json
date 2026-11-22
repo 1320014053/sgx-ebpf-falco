@@ -1,0 +1,737 @@
+{
+  "archive": "regression.zip",
+  "sha256": "ce8580f354272d83e2905c775cbab5a75961d257c3be70e194b19cdd7a043984",
+  "source_archives": {
+    "detector-lifecycle-fixes-2026-11-22-evidence.zip": "50234f5d2fd03616841106d153bd9ab0a5e24dac2597ccbd64c467811bb479c9",
+    "structure-parity-fixes-2026-11-22-evidence.zip": "6495a56ab08a306369987a74ec05e6fa95b2d3b440c45d5753de62531fb5af05",
+    "behavior-parity-fixed-evidence.zip": "0fab306254d998c91d7c05689d1cebd2c9db25c439efbc0a596d1f9e5024010d",
+    "runtime-parity-fixes-2026-11-22-evidence.zip": "c412fcd15df7f6b179df74a505e6b293539841ade17bc93fe15e3814809f10c4",
+    "parity-fixes-2026-11-22-evidence.zip": "5ebda615eadeb79de81599b2bde899614d4bab99df2444046e331c59d373ee22",
+    "raven-zeek-audit-2026-11-22-evidence.zip": "76ec3de220333515fb13774e708210e6932c28924d3e183061b52334550a377a"
+  },
+  "cases": [
+    {
+      "name": "connections-125",
+      "mode": "zeek",
+      "input": "history/inputs/connections-125.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-135",
+      "mode": "zeek",
+      "input": "history/inputs/connections-135.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-140",
+      "mode": "zeek",
+      "input": "history/inputs/connections-140.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-145",
+      "mode": "zeek",
+      "input": "history/inputs/connections-145.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-148",
+      "mode": "zeek",
+      "input": "history/inputs/connections-148.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-149",
+      "mode": "zeek",
+      "input": "history/inputs/connections-149.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-150",
+      "mode": "zeek",
+      "input": "history/inputs/connections-150.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-151",
+      "mode": "zeek",
+      "input": "history/inputs/connections-151.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-155",
+      "mode": "zeek",
+      "input": "history/inputs/connections-155.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-165",
+      "mode": "zeek",
+      "input": "history/inputs/connections-165.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-180",
+      "mode": "zeek",
+      "input": "history/inputs/connections-180.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-183",
+      "mode": "zeek",
+      "input": "history/inputs/connections-183.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-187",
+      "mode": "zeek",
+      "input": "history/inputs/connections-187.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-190",
+      "mode": "zeek",
+      "input": "history/inputs/connections-190.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-193",
+      "mode": "zeek",
+      "input": "history/inputs/connections-193.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-195",
+      "mode": "zeek",
+      "input": "history/inputs/connections-195.pcap",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "connections-197",
+      "mode": "zeek",
+      "input": "history/inputs/connections-197.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-199",
+      "mode": "zeek",
+      "input": "history/inputs/connections-199.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-201",
+      "mode": "zeek",
+      "input": "history/inputs/connections-201.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-204",
+      "mode": "zeek",
+      "input": "history/inputs/connections-204.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-205",
+      "mode": "zeek",
+      "input": "history/inputs/connections-205.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-206",
+      "mode": "zeek",
+      "input": "history/inputs/connections-206.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-208",
+      "mode": "zeek",
+      "input": "history/inputs/connections-208.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-210",
+      "mode": "zeek",
+      "input": "history/inputs/connections-210.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-212",
+      "mode": "zeek",
+      "input": "history/inputs/connections-212.pcap",
+      "expected": "history/oracles/connections-193.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "connections-215",
+      "mode": "zeek",
+      "input": "history/inputs/connections-215.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-217",
+      "mode": "zeek",
+      "input": "history/inputs/connections-217.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-225",
+      "mode": "zeek",
+      "input": "history/inputs/connections-225.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-250",
+      "mode": "zeek",
+      "input": "history/inputs/connections-250.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-275",
+      "mode": "zeek",
+      "input": "history/inputs/connections-275.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-280",
+      "mode": "zeek",
+      "input": "history/inputs/connections-280.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-285",
+      "mode": "zeek",
+      "input": "history/inputs/connections-285.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-290",
+      "mode": "zeek",
+      "input": "history/inputs/connections-290.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-295",
+      "mode": "zeek",
+      "input": "history/inputs/connections-295.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-298",
+      "mode": "zeek",
+      "input": "history/inputs/connections-298.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-299",
+      "mode": "zeek",
+      "input": "history/inputs/connections-299.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-300",
+      "mode": "zeek",
+      "input": "history/inputs/connections-300.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-301",
+      "mode": "zeek",
+      "input": "history/inputs/connections-301.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-305",
+      "mode": "zeek",
+      "input": "history/inputs/connections-305.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-310",
+      "mode": "zeek",
+      "input": "history/inputs/connections-310.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-320",
+      "mode": "zeek",
+      "input": "history/inputs/connections-320.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "connections-600",
+      "mode": "zeek",
+      "input": "history/inputs/connections-600.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "basename-derived",
+      "mode": "stream",
+      "input": "inputs/basename-derived.jsonl",
+      "expected": "history/oracles/basename-derived.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "basename-null",
+      "mode": "stream",
+      "input": "inputs/basename-null.jsonl",
+      "expected": "history/oracles/basename-null.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "context-before-grace",
+      "mode": "stream",
+      "input": "inputs/context-before-grace.jsonl",
+      "expected": "history/oracles/context-before-grace.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "context-benign-at-grace",
+      "mode": "stream",
+      "input": "inputs/context-benign-at-grace.jsonl",
+      "expected": "history/oracles/context-benign-at-grace.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "context-sensitive-at-grace",
+      "mode": "stream",
+      "input": "inputs/context-sensitive-at-grace.jsonl",
+      "expected": "history/oracles/context-sensitive-at-grace.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "ignore-null-event",
+      "mode": "stream",
+      "input": "inputs/ignore-null-event.jsonl",
+      "expected": "history/oracles/ignore-null-event.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "boundary-benign",
+      "mode": "ring",
+      "input": "history/inputs/boundary-benign.bin",
+      "expected": "history/oracles/boundary-benign.ring.jsonl",
+      "exit": 0,
+      "snapshot": "history/ring/lifecycle.scap",
+      "translated": "history/translated/boundary-benign.jsonl"
+    },
+    {
+      "name": "boundary-review",
+      "mode": "ring",
+      "input": "history/inputs/boundary-review.bin",
+      "expected": "history/oracles/boundary-review.ring.jsonl",
+      "exit": 0,
+      "snapshot": "history/ring/lifecycle.scap",
+      "translated": "history/translated/boundary-review.jsonl"
+    },
+    {
+      "name": "early-review",
+      "mode": "ring",
+      "input": "history/inputs/early-review.bin",
+      "expected": "history/oracles/early-review.ring.jsonl",
+      "exit": 0,
+      "snapshot": "history/ring/lifecycle.scap",
+      "translated": "history/translated/early-review.jsonl"
+    },
+    {
+      "name": "timer-queue-30",
+      "mode": "ring",
+      "input": "history/inputs/timer-queue-30.bin",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0,
+      "snapshot": "history/ring/lifecycle.scap",
+      "translated": null
+    },
+    {
+      "name": "timer-queue-360",
+      "mode": "ring",
+      "input": "history/inputs/timer-queue-360.bin",
+      "expected": "runs/timer-queue-360/notice.log",
+      "exit": 0,
+      "snapshot": "history/ring/lifecycle.scap",
+      "translated": null
+    },
+    {
+      "name": "timer-queue-reply-30",
+      "mode": "ring",
+      "input": "history/inputs/timer-queue-reply-30.bin",
+      "expected": "runs/timer-queue-reply-30/notice.log",
+      "exit": 0,
+      "snapshot": "history/ring/lifecycle.scap",
+      "translated": null
+    },
+    {
+      "name": "timer-queue-reply-360",
+      "mode": "ring",
+      "input": "history/inputs/timer-queue-reply-360.bin",
+      "expected": null,
+      "exit": 0,
+      "snapshot": "history/ring/lifecycle.scap",
+      "translated": null
+    },
+    {
+      "name": "normalized-omitted-event-id",
+      "mode": "stream",
+      "input": "inputs/normalized-omitted-event-id.jsonl",
+      "expected": "history/oracles/normalized-omitted-event-id.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "timer-ordered",
+      "mode": "ip",
+      "input": "inputs/timer-ordered.pcap",
+      "expected": "cases/timer-out-of-order/original.rows.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "normalized-null-event-id",
+      "mode": "stream",
+      "input": "inputs/normalized-null-event-id.jsonl",
+      "expected": "history/oracles/normalized-null-event-id.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "timer-out-of-order",
+      "mode": "ip",
+      "input": "inputs/timer-out-of-order.pcap",
+      "expected": "cases/timer-out-of-order/original.rows.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "normalized-empty-event-id",
+      "mode": "stream",
+      "input": "inputs/normalized-empty-event-id.jsonl",
+      "expected": "history/oracles/normalized-empty-event-id.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "two-generated-ids-in-envelope",
+      "mode": "stream",
+      "input": "inputs/two-generated-ids-in-envelope.jsonl",
+      "expected": "history/oracles/two-generated-ids-in-envelope.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "valid-id",
+      "mode": "tetragon",
+      "input": "history/inputs/valid-id.jsonl",
+      "expected": "history/oracles/valid-id.tetragon.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "invalid-separator",
+      "mode": "tetragon",
+      "input": "history/inputs/invalid-separator.jsonl",
+      "expected": null,
+      "exit": 1
+    },
+    {
+      "name": "container-image-empty",
+      "mode": "tetragon",
+      "input": "history/inputs/container-image-empty.jsonl",
+      "expected": "history/oracles/container-image-empty.tetragon.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "container-image-null",
+      "mode": "tetragon",
+      "input": "history/inputs/container-image-null.jsonl",
+      "expected": "history/oracles/container-image-null.tetragon.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "container-image-omitted",
+      "mode": "tetragon",
+      "input": "history/inputs/container-image-omitted.jsonl",
+      "expected": "history/oracles/container-image-omitted.tetragon.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "early-tail",
+      "mode": "zeek",
+      "input": "history/inputs/early-tail.pcap",
+      "expected": null,
+      "exit": 1
+    },
+    {
+      "name": "early-tail-ng",
+      "mode": "zeek",
+      "input": "history/inputs/early-tail-ng.pcap",
+      "expected": null,
+      "exit": 1
+    },
+    {
+      "name": "health-ng",
+      "mode": "zeek",
+      "input": "history/inputs/health-ng.pcap",
+      "expected": "upstream/ppp-serial-healthchecks.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "live-basenames",
+      "mode": "raven",
+      "input": "history/inputs/live-basenames.jsonl",
+      "expected": "history/oracles/live-basenames.raven.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "live-recorded",
+      "mode": "raven",
+      "input": "history/inputs/live-recorded.jsonl",
+      "expected": "history/oracles/live-recorded.raven.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "pending-error",
+      "mode": "zeek",
+      "input": "history/inputs/pending-error.pcap",
+      "expected": null,
+      "exit": 1
+    },
+    {
+      "name": "short-tail-ng",
+      "mode": "zeek",
+      "input": "history/inputs/short-tail-ng.pcap",
+      "expected": "upstream/ppp-serial-healthchecks.jsonl",
+      "exit": 1
+    },
+    {
+      "name": "uid-translated",
+      "mode": "raven",
+      "input": "history/inputs/uid-translated.jsonl",
+      "expected": "history/oracles/uid-translated.raven.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "uid-translation",
+      "mode": "ring",
+      "input": "history/inputs/uid-translation.bin",
+      "expected": "history/oracles/uid-translation.ring.jsonl",
+      "exit": 0,
+      "snapshot": "history/ring/uid.scap",
+      "translated": "history/inputs/uid-translated.jsonl",
+      "collector_pid": 65535,
+      "realtime_ns": 1700000001000000000
+    },
+    {
+      "name": "bsd-loop",
+      "mode": "zeek",
+      "input": "history/inputs/bsd-loop.pcap",
+      "expected": null,
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "bsd-null",
+      "mode": "zeek",
+      "input": "history/inputs/bsd-null.pcap",
+      "expected": "runs/refused-control/notice.log",
+      "exit": 0
+    },
+    {
+      "name": "ethernet-snap",
+      "mode": "zeek",
+      "input": "history/inputs/ethernet-snap.pcap",
+      "expected": "runs/refused-control/notice.log",
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "nullable-dst-ip",
+      "mode": "raven",
+      "input": "history/inputs/nullable-dst-ip.jsonl",
+      "expected": "history/oracles/nullable-dst-ip.raven.jsonl",
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "nullable-empty",
+      "mode": "raven",
+      "input": "history/inputs/nullable-empty.jsonl",
+      "expected": "history/oracles/nullable-empty.raven.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "nullable-file-path",
+      "mode": "raven",
+      "input": "history/inputs/nullable-file-path.jsonl",
+      "expected": "history/oracles/nullable-file-path.raven.jsonl",
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "nullable-omitted",
+      "mode": "raven",
+      "input": "history/inputs/nullable-omitted.jsonl",
+      "expected": "history/oracles/nullable-omitted.raven.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "nullable-user",
+      "mode": "raven",
+      "input": "history/inputs/nullable-user.jsonl",
+      "expected": "history/oracles/nullable-user.raven.jsonl",
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "stream-history-3999",
+      "mode": "stream",
+      "input": "history/inputs/stream-history-3999.jsonl",
+      "expected": "history/oracles/stream-history-3999.stream.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "stream-history-4000",
+      "mode": "stream",
+      "input": "history/inputs/stream-history-4000.jsonl",
+      "expected": "history/oracles/stream-history-4000.stream.jsonl",
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "tcp-abort",
+      "mode": "zeek",
+      "input": "history/inputs/tcp-abort.pcap",
+      "expected": "history/oracles/tcp-abort.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "tcp-abort",
+      "mode": "ip",
+      "input": "history/inputs/tcp-abort.pcap",
+      "expected": "history/oracles/tcp-abort.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "tcp-graceful",
+      "mode": "zeek",
+      "input": "history/inputs/tcp-graceful.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "tcp-graceful",
+      "mode": "ip",
+      "input": "history/inputs/tcp-graceful.pcap",
+      "expected": null,
+      "exit": 0
+    },
+    {
+      "name": "tcp-half-close-reset-only",
+      "mode": "zeek",
+      "input": "history/inputs/tcp-half-close-reset-only.pcap",
+      "expected": null,
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "tcp-half-close-reset-only",
+      "mode": "ip",
+      "input": "history/inputs/tcp-half-close-reset-only.pcap",
+      "expected": null,
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "tcp-half-close-reset-peer-fin",
+      "mode": "zeek",
+      "input": "history/inputs/tcp-half-close-reset-peer-fin.pcap",
+      "expected": null,
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "tcp-half-close-reset-peer-fin",
+      "mode": "ip",
+      "input": "history/inputs/tcp-half-close-reset-peer-fin.pcap",
+      "expected": null,
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "udp-background-0",
+      "mode": "zeek",
+      "input": "history/inputs/udp-background-0.pcap",
+      "expected": "history/oracles/udp-background-0.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "udp-background-0",
+      "mode": "ip",
+      "input": "history/inputs/udp-background-0.pcap",
+      "expected": "history/oracles/udp-background-0.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "udp-background-120",
+      "mode": "zeek",
+      "input": "history/inputs/udp-background-120.pcap",
+      "expected": "history/oracles/udp-background-0.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "udp-background-120",
+      "mode": "ip",
+      "input": "history/inputs/udp-background-120.pcap",
+      "expected": "history/oracles/udp-background-0.zeek.jsonl",
+      "exit": 0
+    },
+    {
+      "name": "udp-background-360",
+      "mode": "zeek",
+      "input": "history/inputs/udp-background-360.pcap",
+      "expected": null,
+      "exit": 0,
+      "previously_differed": true
+    },
+    {
+      "name": "udp-background-360",
+      "mode": "ip",
+      "input": "history/inputs/udp-background-360.pcap",
+      "expected": null,
+      "exit": 0,
+      "previously_differed": true
+    }
+  ]
+}

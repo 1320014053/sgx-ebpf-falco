@@ -1,0 +1,132 @@
+name: Build MOAT Linux 6.1.38
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/build.yml', 'moat-kernel-build/patches/**']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      LOCALVERSION: ''
+      KDEB_PKGVERSION: '6.1.38-4'
+      KDEB_COMPRESS: gzip
+      KBUILD_BUILD_USER: github-actions
+      KBUILD_BUILD_HOST: moat-kernel-build
+    steps:
+      - name: Check out the build recipe
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          path: recipe
+          persist-credentials: false
+
+      - name: Check out the MOAT artifact
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: jwnhy/MOAT-Open
+          ref: b1cfea3114ddf237c2100bc1bdc53f4030f4780b
+          path: upstream
+          persist-credentials: false
+
+      - name: Apply the JIT and ring buffer fixes
+        working-directory: upstream
+        run: |
+          git apply --directory=moat_linux \
+            "$GITHUB_WORKSPACE/recipe/moat-kernel-build/patches/x86-bpf-jit-convergence.patch" \
+            "$GITHUB_WORKSPACE/recipe/moat-kernel-build/patches/moat-ringbuf-page-backing.patch"
+
+      - name: Install kernel build tools
+        run: |
+          printf '%s\n' https://mirrors.mit.edu/ubuntu/ https://mirrors.edge.kernel.org/ubuntu/ https://azure.archive.ubuntu.com/ubuntu/ > /tmp/moat-mirrors.txt
+          for suite in noble noble-updates noble-security; do
+            echo "deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] mirror+file:/tmp/moat-mirrors.txt $suite main universe"
+          done > /tmp/moat-ubuntu.list
+          apt_opts=(-o Dir::Etc::sourcelist=/tmp/moat-ubuntu.list -o Dir::Etc::sourceparts=- -o Acquire::Retries=1 -o Acquire::Languages=none)
+          sudo apt-get "${apt_opts[@]}" update -qq
+          sudo apt-get "${apt_opts[@]}" install -y --no-install-recommends \
+            bc bison build-essential cpio dpkg-dev dwarves fakeroot flex g++-12 gcc-12-plugin-dev \
+            kmod libdw-dev libelf-dev libssl-dev rsync zstd
+
+      - name: Restore build inputs omitted from the MOAT snapshot
+        working-directory: upstream/moat_linux
+        env:
+          STABLE_COMMIT: 61fd484b2cf6bc8022e8e5ea6f693a9991740ac2
+        run: |
+          for file in scripts/Makefile.lib scripts/Makefile.modfinal scripts/Makefile.modinst scripts/Makefile.modpost \
+                      drivers/tty/vt/defkeymap.map net/wireless/certs/sforshee.hex tools/lib/bpf/libbpf.map; do
+            test ! -e "$file"
+            mkdir -p "$(dirname "$file")"
+            curl -fsSL --retry 3 "https://raw.githubusercontent.com/gregkh/linux/$STABLE_COMMIT/$file" -o "$file"
+            sha256sum "$file" >> "$RUNNER_TEMP/moat-upstream-inputs"
+          done
+
+      - name: Configure the x86-64 kernel from the author's config
+        working-directory: upstream/moat_linux
+        run: |
+          cp config .config
+          scripts/config --set-str LOCALVERSION '-moat-falco2' --enable BPF_UNPRIV_DEFAULT_OFF
+          make CC=gcc-12 HOSTCC=gcc-12 HOSTCXX=g++-12 olddefconfig
+          test "$(make -s CC=gcc-12 kernelrelease)" = 6.1.38-moat-falco2
+          for option in X86_64 BPF_SYSCALL BPF_JIT BPF_EVENTS DEBUG_INFO_BTF FTRACE_SYSCALLS VIRTIO_BLK VIRTIO_PCI EXT4_FS; do
+            grep -Fx "CONFIG_$option=y" .config
+          done
+
+      - name: Build the kernel and modules
+        working-directory: upstream/moat_linux
+        run: |
+          make -j"$(nproc)" CC=gcc-12 HOSTCC=gcc-12 HOSTCXX=g++-12 bzImage modules
+
+      - name: Build the Debian packages
+        working-directory: upstream/moat_linux
+        run: make -j"$(nproc)" CC=gcc-12 HOSTCC=gcc-12 HOSTCXX=g++-12 bindeb-pkg
+
+      - name: Verify the packages, MOAT symbols and BTF
+        working-directory: upstream/moat_linux
+        run: |
+          release=6.1.38-moat-falco2
+          out="$GITHUB_WORKSPACE/artifacts"
+          mkdir "$out"
+          image="../linux-image-${release}_${KDEB_PKGVERSION}_amd64.deb"
+          headers="../linux-headers-${release}_${KDEB_PKGVERSION}_amd64.deb"
+          test "$(dpkg-deb -f "$image" Package)" = "linux-image-$release"
+          test "$(dpkg-deb -f "$headers" Package)" = "linux-headers-$release"
+          test "$(dpkg-deb -f "$image" Architecture)" = amd64
+          dpkg-deb -x "$image" "$RUNNER_TEMP/moat-image"
+          cmp "arch/x86/boot/bzImage" "$RUNNER_TEMP/moat-image/boot/vmlinuz-$release"
+          cmp .config "$RUNNER_TEMP/moat-image/boot/config-$release"
+          test -s "$RUNNER_TEMP/moat-image/lib/modules/$release/modules.builtin"
+          for symbol in init_moat_mm prepare_moat_prog moat_vmap_page_array; do
+            grep -E "[[:space:]]${symbol}$" System.map
+          done
+          readelf -SW vmlinux > "$RUNNER_TEMP/moat-sections"
+          grep -E '[[:space:]]\.BTF[[:space:]]' "$RUNNER_TEMP/moat-sections"
+          cp "$image" "$headers" "$out/"
+          cp .config "$out/config-$release"
+          {
+            echo "Source: https://github.com/jwnhy/MOAT-Open"
+            echo "Commit: $(git rev-parse HEAD)"
+            echo "Linux x86 BPF JIT fix: c8831bdbfbab672c006a18006d36932a494b2fd6"
+            (cd "$GITHUB_WORKSPACE/recipe/moat-kernel-build" && sha256sum patches/x86-bpf-jit-convergence.patch patches/moat-ringbuf-page-backing.patch)
+            echo "Supplemental build files: Linux 6.1.38 commit 61fd484b2cf6bc8022e8e5ea6f693a9991740ac2"
+            cat "$RUNNER_TEMP/moat-upstream-inputs"
+            echo "Kernel: $release"
+            gcc-12 --version | head -n 1
+            pahole --version
+          } > "$out/BUILD-INFO.txt"
+          cd "$out"
+          sha256sum *.deb "config-$release" BUILD-INFO.txt > SHA256SUMS
+          sha256sum -c SHA256SUMS
+
+      - name: Upload kernel packages
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: moat-linux-6.1.38-falco2-amd64
+          path: artifacts/
+          if-no-files-found: error
+          compression-level: 0

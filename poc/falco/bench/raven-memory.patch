@@ -1,0 +1,94 @@
+--- a/host.cpp
++++ b/host.cpp
+@@ -1,4 +1,5 @@
+ #include "host.hpp"
++#include "bench/raven_memory_probe.hpp"
+ #include <cstdlib>
+ #include <fstream>
+ #include <filesystem>
+@@ -57,6 +58,10 @@
+ }
+ 
+ int falco_emit(const char* data, size_t bytes, int diagnostics) {
++    if (diagnostics && bytes >= 6 && !std::memcmp(data, "RZMEM ", 6)) {
++        rz_bench::write_process_sample(data, bytes);
++        return 0;
++    }
+     ++falco_output_ocalls;
+     auto* stream = diagnostics ? stderr : stdout;
+     return std::fwrite(data, 1, bytes, stream) == bytes && std::fflush(stream) == 0 ? 0 : 1;
+--- a/plugin/graph.hpp
++++ b/plugin/graph.hpp
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include "detectors.hpp"
++#include <array>
+ #include <map>
+ #include <set>
+ #include <string>
+@@ -30,6 +31,11 @@
+     std::string node(const std::string& kind, const std::string& value, const std::string& label);
+     Json& edge(const std::string& src, const std::string& dst, const std::string& type, const Event& e);
+ public:
++    std::array<size_t, 3> bench_counts() const {
++        size_t ids = 0;
++        for (const auto& edge : edges) ids += edge.at("event_ids").size();
++        return {nodes.size(), edges.size(), ids};
++    }
+     void observe(const Event& e);
+     Json subgraph(const std::set<std::string>& ids) const;
+     void refresh(Json& subgraph) const;
+--- a/plugin/raven.cpp
++++ b/plugin/raven.cpp
+@@ -1,4 +1,5 @@
+ #include "graph.hpp"
++#include "../bench/raven_memory_probe.hpp"
+ #include <arpa/inet.h>
+ #include <array>
+ #include <cmath>
+@@ -470,6 +471,12 @@
+ Json raven(std::string_view text, bool tetragon) {
+     Engine engine;
+     size_t line_number = 0;
++    auto measure = [&](const char* phase) {
++        const auto counts = engine.graph.bench_counts();
++        rz_bench::sample(phase, line_number, counts[0], counts[1], counts[2],
++                         engine.tree.size(), engine.ledger.size(), engine.detections.size());
++    };
++    measure("start");
+     while (!text.empty()) {
+         auto pos = text.find('\n');
+         auto line = text.substr(0, pos);
+@@ -487,11 +494,13 @@
+         } catch (const std::exception& error) {
+             throw std::runtime_error("RAVEN line " + std::to_string(line_number) + ": " + error.what());
+         }
++        if (line_number % 10000 == 0) measure("events");
+     }
+     for (auto& d : engine.detections) {
+         engine.settle(d);
+         engine.graph.refresh(d.at("reconstruction").at("graph"));
+     }
++    measure("settled");
+     return engine.detections;
+ }
+ }
+--- a/trusted/enclave.cpp
++++ b/trusted/enclave.cpp
+@@ -3,6 +3,7 @@
+ #include "../live/packet_record.h"
+ #include "../plugin/detectors.hpp"
+ #include "raven_syscalls.hpp"
++#include "../bench/raven_memory_probe.hpp"
+ #include <array>
+ #include <cstring>
+ #include <falco_engine.h>
+@@ -344,6 +345,7 @@
+         detector->inspect_plugin(false);
+         detector->plugin_inspector->close();
+         detector->flush();
++        rz_bench::sample("flushed");
+         return 0;
+     } catch (const std::exception& error) {
+         rz::trusted_inputs = nullptr;
