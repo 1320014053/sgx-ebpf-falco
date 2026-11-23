@@ -1,0 +1,19 @@
+{
+  "trial_id": "falco-replay-hw-500-r02",
+  "experiment": "falco-replay",
+  "mode": "hw",
+  "workload": "official-scap",
+  "load_level": "500",
+  "repeat": 2,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 3.993731679,
+  "raw_path": "raw/falco-replay-hw-500-r02/",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/bin/falco-sgx",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "reference.yaml",
+    "reference.scap",
+    "falco_rules.yaml"
+  ]
+}

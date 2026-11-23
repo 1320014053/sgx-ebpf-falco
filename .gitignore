@@ -7,4 +7,5 @@
 __pycache__/
 *.pyc
 /results/runs.csv
+/results/aliyun-c7t-large/runs/*/bulk/
 /*.log

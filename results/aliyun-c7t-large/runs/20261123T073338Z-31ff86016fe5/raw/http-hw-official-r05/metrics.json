@@ -1,0 +1,23 @@
+{
+  "window_s": 60.066395913,
+  "collector_cpu_s": 36.62,
+  "system_ticks": [
+    9932,
+    0,
+    1280,
+    370,
+    0,
+    0,
+    381,
+    0
+  ],
+  "clock_ticks_per_s": 100,
+  "system_busy_fraction": 0.9690713031848198,
+  "affinity": [
+    0,
+    1
+  ],
+  "markers": 116,
+  "paired": 116,
+  "warnings": []
+}

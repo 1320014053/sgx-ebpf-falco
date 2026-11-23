@@ -1,0 +1,17 @@
+{
+  "trial_id": "falco-replay-native-500-r04",
+  "experiment": "falco-replay",
+  "mode": "native",
+  "workload": "official-scap",
+  "load_level": "500",
+  "repeat": 4,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 0.734836837,
+  "raw_path": "raw/falco-replay-native-500-r04/",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/deps/package/usr/bin/falco",
+    "-c",
+    "reference.yaml"
+  ]
+}

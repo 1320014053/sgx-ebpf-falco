@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-ecall-100k-r04",
+  "experiment": "getpid",
+  "mode": "ecall",
+  "workload": "getpid",
+  "load_level": "100k",
+  "repeat": 4,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.000000104,
+  "raw_path": "raw/getpid-ecall-100k-r04/",
+  "start_utc": "2026-11-23T10:28:52.716022+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "ecall",
+    "--seconds",
+    "60",
+    "--rate",
+    "100000",
+    "--allow-drops"
+  ]
+}

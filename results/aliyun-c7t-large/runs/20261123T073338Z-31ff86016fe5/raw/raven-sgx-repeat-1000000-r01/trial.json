@@ -1,0 +1,26 @@
+{
+  "trial_id": "raven-sgx-repeat-1000000-r01",
+  "experiment": "raven-memory",
+  "mode": "sgx",
+  "workload": "repeat",
+  "load_level": "1000000",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 46.95747388399968,
+  "raw_path": "raw/raven-sgx-repeat-1000000-r01/",
+  "command": [
+    "/usr/bin/python3",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/falco/bench/raven-retention.py",
+    "run",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/deps/package",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/data/falco-offline-r02",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/data/raven-sgx-repeat-1000000-r01",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/memory-inputs/1000000/repeat.jsonl",
+    "sgx",
+    "repeat",
+    "--events",
+    "1000000"
+  ]
+}

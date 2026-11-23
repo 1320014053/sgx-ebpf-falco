@@ -1,0 +1,12 @@
+2026-11-23T08:02:03+0000: Falco version: 0.45.2 (x86_64)
+2026-11-23T08:02:03+0000: Falco initialized with configuration files:
+2026-11-23T08:02:03+0000:    reference.yaml | schema validation: ok
+2026-11-23T08:02:03+0000: Loaded plugin 'container@0.7.6' from file /proc/self/cwd/libcontainer.so
+2026-11-23T08:02:03+0000: Loading rules from:
+2026-11-23T08:02:04+0000:    falco_rules.yaml | schema validation: ok
+2026-11-23T08:02:04+0000: Hostname value has been overridden via environment variable to: falco-sgx-fixture
+2026-11-23T08:02:04+0000: [libs]: Trying to open the right engine!
+2026-11-23T08:02:04+0000: Replaying events from the capture file: reference.scap
+Syscall event drop monitoring:
+   - event drop detected: 0 occurrences
+   - num times actions taken: 0

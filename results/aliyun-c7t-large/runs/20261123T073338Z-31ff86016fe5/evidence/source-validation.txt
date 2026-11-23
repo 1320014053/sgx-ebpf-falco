@@ -1,0 +1,21 @@
+git apply --reverse --check hardware.patch: OK
+patch SHA256 8a6242474fc74259010f1d84e401dda6a7072b1ef5cf1fa35e6dc9a7d8a0c979
+base 31ff86016fe5719600a65acee8c77204ed9fd63f
+tracked source files changed since base
+poc/Makefile
+poc/enclave/Enclave.cpp
+poc/enclave/Enclave.edl
+poc/falco/CMakeLists.txt
+poc/falco/host.cpp
+poc/falco/live/CMakeLists.txt
+poc/falco/live/check-detectors.py
+poc/falco/live/check.sh
+poc/falco/trusted/CMakeLists.txt
+poc/falco/trusted/enclave.conf
+poc/host/main.cpp
+poc/scripts/build.sh
+poc/scripts/compare.py
+poc/scripts/run.sh
+poc/scripts/smoke.sh
+poc/tests/generator.c
+poc/tests/ring_tests.cpp

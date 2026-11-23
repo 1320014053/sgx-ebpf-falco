@@ -1,0 +1,22 @@
+{
+  "trial_id": "alert-latency-hw-official-r01",
+  "experiment": "alert-latency",
+  "mode": "hw-official",
+  "workload": "http-loopback-1KiB",
+  "load_level": "20-rps",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.133226242,
+  "raw_path": "raw/alert-latency-hw-official-r01/",
+  "start_utc": "2026-11-23T08:29:11.033514+00:00",
+  "collector_command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-live/falco-live",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "falco.yaml",
+    "8192",
+    "-",
+    "falco_rules.yaml"
+  ],
+  "duration": 60
+}

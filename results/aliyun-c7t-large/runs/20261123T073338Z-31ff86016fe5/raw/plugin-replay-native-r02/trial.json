@@ -1,0 +1,21 @@
+{
+  "trial_id": "plugin-replay-native-r02",
+  "experiment": "plugin-replay",
+  "mode": "native",
+  "workload": "fixed-jsonl-pcap",
+  "load_level": "captured",
+  "repeat": 2,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 0.211751817,
+  "raw_path": "raw/plugin-replay-native-r02/",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/deps/package/usr/bin/falco",
+    "-c",
+    "native.yaml",
+    "-o",
+    "engine.kind=modern_ebpf",
+    "--enable-source",
+    "raven_zeek"
+  ]
+}

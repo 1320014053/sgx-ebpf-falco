@@ -1,0 +1,23 @@
+{
+  "trial_id": "idle-hw-full-r01",
+  "experiment": "idle",
+  "mode": "hw-full",
+  "workload": "idle",
+  "load_level": "idle",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 15.011199703,
+  "raw_path": "raw/idle-hw-full-r01/",
+  "start_utc": "2026-11-23T08:23:22.415262+00:00",
+  "collector_command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-live/falco-live",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "falco.yaml",
+    "8192",
+    "-",
+    "falco_rules.yaml",
+    "raven_zeek_rules.yaml"
+  ],
+  "duration": 15
+}

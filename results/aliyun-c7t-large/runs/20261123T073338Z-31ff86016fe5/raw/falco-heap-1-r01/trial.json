@@ -1,0 +1,21 @@
+{
+  "trial_id": "falco-heap-1-r01",
+  "experiment": "replay-heap",
+  "mode": "hw",
+  "workload": "official-scap-empty-plugin-sampler",
+  "load_level": "1",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 3.914964618999875,
+  "raw_path": "raw/falco-heap-1-r01/",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/bin/falco-sgx",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "probe.yaml",
+    "reference.scap",
+    "--plugin-stream",
+    "empty.jsonl",
+    "falco_rules.yaml"
+  ]
+}

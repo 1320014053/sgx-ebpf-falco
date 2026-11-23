@@ -1,0 +1,15 @@
+{
+  "pairs": 240000,
+  "producer_seconds": 60.000000101,
+  "capture_s": 60.318,
+  "driver_events": 905171,
+  "kernel_records": 905171,
+  "driver_drops": 0,
+  "packet_records": 24,
+  "packet_drops": 0,
+  "discarded": 0,
+  "invalid": 0,
+  "delivered_s": 15006.648098411752,
+  "offered_s": 15006.648098411752,
+  "drain_ms": 32
+}

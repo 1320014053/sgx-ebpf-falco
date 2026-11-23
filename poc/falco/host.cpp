@@ -123,10 +123,27 @@ Enclave load_enclave(const char* image, const char* config_path, char* const* ru
     }
     const char* host = std::getenv("FALCO_HOSTNAME");
     oe_enclave_t* handle = nullptr;
-    check(oe_create_Falco_enclave(image, OE_ENCLAVE_TYPE_SGX,
-                                OE_ENCLAVE_FLAG_SIMULATE | OE_ENCLAVE_FLAG_DEBUG,
-                                nullptr, 0, &handle), 0, "create Falco SIM enclave");
+    const uint32_t flags = FALCO_SGX_HARDWARE ? 0 : OE_ENCLAVE_FLAG_SIMULATE | OE_ENCLAVE_FLAG_DEBUG;
+    check(oe_create_Falco_enclave(image, OE_ENCLAVE_TYPE_SGX, flags, nullptr, 0, &handle), 0, "create Falco enclave");
     Enclave enclave(handle, oe_terminate_enclave);
+#if FALCO_SGX_HARDWARE
+    if (std::getenv("FALCO_SGX_REPORT")) {
+        uint8_t* report = nullptr;
+        size_t length = 0;
+        check(oe_get_report(handle, 0, nullptr, 0, &report, &length), 0, "get Falco local REPORT");
+        oe_report_t parsed{};
+        const auto status = oe_parse_report(report, length, &parsed);
+        oe_free_report(report);
+        check(status, 0, "parse Falco local REPORT");
+        const bool debug = (parsed.identity.attributes & OE_REPORT_ATTRIBUTES_DEBUG) != 0;
+        std::fprintf(stderr, "REPORT DEBUG=%d MRENCLAVE=", debug);
+        for (auto byte : parsed.identity.unique_id) std::fprintf(stderr, "%02x", byte);
+        std::fprintf(stderr, " MRSIGNER=");
+        for (auto byte : parsed.identity.signer_id) std::fprintf(stderr, "%02x", byte);
+        std::fputc('\n', stderr);
+        if (debug) throw std::runtime_error("Falco enclave DEBUG bit set");
+    }
+#endif
     int result = -1;
     auto status = falco_config(handle, &result, config.c_str(), host ? host : hostname, live);
     check(status, result, "load configuration");

@@ -1,6 +1,7 @@
 #include "Enclave_t.h"
 #include "event_logic.h"
 #include <sgx_trts.h>
+#include <sgx_utils.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -20,6 +21,14 @@ static bool external_range(poc_u64 address, poc_u64 bytes)
 static bool overlap(poc_u64 a, poc_u64 an, poc_u64 b, poc_u64 bn)
 {
     return a < b + bn && b < a + an;
+}
+
+void ecall_identity(uint64_t *flags, uint8_t *measurement, uint8_t *signer)
+{
+    const sgx_report_body_t &body = sgx_self_report()->body;
+    *flags = body.attributes.flags;
+    memcpy(measurement, body.mr_enclave.m, sizeof(body.mr_enclave.m));
+    memcpy(signer, body.mr_signer.m, sizeof(body.mr_signer.m));
 }
 
 void ecall_config(uint32_t target_tgid)

@@ -1,0 +1,19 @@
+{
+  "trial_id": "alert-latency-native-r01",
+  "experiment": "alert-latency",
+  "mode": "native",
+  "workload": "http-loopback-1KiB",
+  "load_level": "20-rps",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.114469906,
+  "raw_path": "raw/alert-latency-native-r01/",
+  "start_utc": "2026-11-23T08:28:06.412247+00:00",
+  "collector_command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/deps/package/usr/bin/falco",
+    "-c",
+    "falco.yaml"
+  ],
+  "duration": 60
+}

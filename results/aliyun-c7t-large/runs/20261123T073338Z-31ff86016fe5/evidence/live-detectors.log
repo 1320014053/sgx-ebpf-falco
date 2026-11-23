@@ -1,0 +1,48 @@
+{
+  "kernel": "5.15.0-198-generic",
+  "enclave_mode": "SGX hardware DEBUG=0",
+  "ring-only": {
+    "before_workload_exit": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan",
+      "server_spawns_shell"
+    ],
+    "syscall_records": 10113,
+    "raven_events": 385,
+    "packets": 121,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 118,
+    "drained_position": 848024,
+    "stopped_by": "SIGTERM",
+    "input_files": []
+  },
+  "recorded": {
+    "before_workload_exit": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan",
+      "server_spawns_shell"
+    ],
+    "syscall_records": 8620,
+    "raven_events": 287,
+    "packets": 92,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 141,
+    "drained_position": 706320,
+    "stopped_by": "workload exit",
+    "input_files": [
+      "events.jsonl",
+      "packets.pcap",
+      "reference.scap"
+    ],
+    "recorded_replay": [
+      "enclave",
+      "native"
+    ]
+  }
+}

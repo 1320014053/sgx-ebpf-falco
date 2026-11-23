@@ -1,13 +1,15 @@
 # SGX eBPF Falco
 
-在 x86-64 Linux 上采集内核事件，用 SGX Simulation 验证 enclave 对共享 ring buffer 的读取、解析和告警。最小 GETPID 实验使用 Intel SGX SDK。完整检测链使用 Falco 0.45.2、Open Enclave 和 `raven_zeek` 插件，支持现场采集与离线回放。
+在 x86-64 Linux 上采集内核事件，使用 SGX enclave 读取并解析共享 ring buffer，生成告警。支持 SGX Simulation 和已在阿里云 ECS 验收的硬件非调试模式。最小 GETPID 实验使用 Intel SGX SDK。完整检测链使用 Falco 0.45.2、Open Enclave 和 `raven_zeek` 插件，支持现场采集与离线回放。
 
 | 入口 | 内容 |
 | --- | --- |
+| [项目实现与测试总结](项目实现与测试总结.md) | 从一条系统调用读懂架构、硬件适配、验证方法和实测边界 |
 | [GETPID 通信实验](poc/README.md) | eBPF 探针、宿主、enclave、发生器和 ring 解析测试 |
 | [Falco 构建与运行](poc/falco/README.md) | 原版规则、RAVEN 进程事件、Zeek 报文、容器及 Kubernetes 集成 |
 | [回归测试](poc/falco/tests/README.md) | 固定上游参考、共享输入、历史独立用例及签名 enclave 回放 |
 | [RAVEN 内存测试](poc/falco/RAVEN-历史回收.md) | 事件保留策略、长时间负载和验收阈值 |
+| [阿里云 c7t.large 硬件 SGX 性能测试计划](results/aliyun-c7t-large/README.md) | 关闭 enclave 调试后的硬件验收、性能对照和[实测批次记录](results/aliyun-c7t-large/runs/README.md) |
 | [MOAT 内核工作流](.github/workflows/build.yml) | 从固定提交构建 Linux 6.1.38，生成带校验和的 Debian 包 |
 | [Windows QEMU 客体](vm/README.md) | 安装 Ubuntu、启动实验客体和传输源码 |
 
@@ -22,7 +24,7 @@ bash scripts/build.sh
 sudo bash scripts/smoke.sh
 ```
 
-`smoke.sh` 在签名的 SIM enclave 内测试解析器，再加载真实内核探针，检查五种消费方式和满环恢复后的排空。只跑解析器时可执行 `make test`。
+上述命令默认在签名的 SIM enclave 内测试解析器，再加载真实内核探针，检查五种消费方式和满环恢复后的排空。只跑解析器时可执行 `make test`。
 
 继续在同一份 `poc/` 源码中按 [Falco 构建说明](poc/falco/README.md)编译离线 enclave 和实时探针。`replay.sh` 生成 `build-falco/offline-run`，`upstream/check-reference.py` 生成 `build-falco/native-run`。两份结果供 `raven_zeek` 的普通 Falco 和签名 enclave 回归共用。各套件的命令和预期结果见[回归测试说明](poc/falco/tests/README.md)。
 
@@ -41,4 +43,6 @@ sudo python3 moat-kernel-build/tests/falco-modern-smoke.py --default-buffer \
 
 从完整 Git 提交重新构建的结果见[独立构建验收记录](results/repository-build.json)，其中记录了源码提交、编译产物指纹、TCG 现场测试和历史回归的实际差异。
 
-已有验收涵盖 GETPID 通信、Falco 规则、检测器回放及 MOAT 上的 SGX Simulation。回放中仍有与固定上游不一致的用例，内存长测也保留了超过阈值的实测值。硬件 SGX 隔离和内核事件来源认证仍待验证。[验收摘要与原始记录](results/falco/acceptance.md)
+已有验收涵盖 GETPID 通信、Falco 规则、检测器回放及 MOAT 上的 SGX Simulation。回放中仍有与固定上游不一致的用例，内存长测也保留了超过阈值的实测值。这批历史验收未覆盖硬件 SGX 隔离和内核事件来源认证。[验收摘要与原始记录](results/falco/acceptance.md)
+
+阿里云 `ecs.c7t.large` 的硬件批次另行保存了 GETPID 和 Falco 的 `DEBUG=0` 运行报告、签名度量与性能记录。[硬件实测批次](results/aliyun-c7t-large/runs/README.md)

@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-direct-low-r01",
+  "experiment": "getpid",
+  "mode": "direct",
+  "workload": "getpid",
+  "load_level": "low",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.000608828,
+  "raw_path": "raw/getpid-direct-low-r01/",
+  "start_utc": "2026-11-23T07:54:17.209690+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "direct",
+    "--seconds",
+    "60",
+    "--interval-us",
+    "1000",
+    "--allow-drops"
+  ]
+}

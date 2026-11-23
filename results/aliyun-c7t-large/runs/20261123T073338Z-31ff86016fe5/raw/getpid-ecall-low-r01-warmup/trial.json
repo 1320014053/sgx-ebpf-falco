@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-ecall-low-r01-warmup",
+  "experiment": "warmup",
+  "mode": "ecall",
+  "workload": "getpid",
+  "load_level": "low",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 2.00017217,
+  "raw_path": "raw/getpid-ecall-low-r01-warmup/",
+  "start_utc": "2026-11-23T07:52:10.839799+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "ecall",
+    "--seconds",
+    "2",
+    "--interval-us",
+    "1000",
+    "--allow-drops"
+  ]
+}

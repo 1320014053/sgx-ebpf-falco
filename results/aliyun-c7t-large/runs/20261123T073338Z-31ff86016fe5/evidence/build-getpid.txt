@@ -1,0 +1,56 @@
+a6a6b2bccd5f5f619b9fe9e968e2edb40eeb7677a405d57178cbfc53efd42e0d  getpid-source.tgz
+gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0
+Ubuntu clang version 14.0.0-1ubuntu1.1
+0.5.0
+mkdir -p build/hw0
+/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/bin/x64/sgx_edger8r --untrusted enclave/Enclave.edl --search-path include --search-path /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include --untrusted-dir build/hw0
+/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/bin/x64/sgx_edger8r --trusted enclave/Enclave.edl --search-path include --search-path /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include --trusted-dir build/hw0
+openssl genrsa -3 -out build/hw0/test-key.pem 3072
+sed 's/<DisableDebug>0</<DisableDebug>1</' enclave/Enclave.config.xml > build/hw0/Enclave.config.xml
+clang-14 -g -O2 -target bpf -D__BPF__ -D__TARGET_ARCH_x86 -Iinclude -I/usr/include/x86_64-linux-gnu -c bpf/probe.bpf.c -o build/hw0/probe.bpf.o
+gcc -m64 -O2 -Wall -Wextra -Iinclude -std=c11 tests/generator.c -o build/hw0/generator
+g++ -DPOC_CREATE_DEBUG=0 -DPOC_HW=1 -m64 -O2 -Wall -Wextra -Iinclude -Ibuild/hw0 -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include -fPIC -std=c++11  -c host/main.cpp -o build/hw0/main.o
+gcc -DPOC_CREATE_DEBUG=0 -DPOC_HW=1 -m64 -O2 -Wall -Wextra -Iinclude -Ibuild/hw0 -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include -fPIC -c build/hw0/Enclave_u.c -o build/hw0/Enclave_u.o
+g++ -m64 -O2 -Wall -Wextra -Iinclude -Ibuild/hw0 -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include/tlibc -nostdinc -fvisibility=hidden -fpie -fstack-protector-strong -ffunction-sections -fdata-sections -std=c++11 -nostdinc++ -fno-exceptions -fno-rtti -c enclave/Enclave.cpp -o build/hw0/Enclave.o
+gcc -m64 -O2 -Wall -Wextra -Iinclude -Ibuild/hw0 -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include/tlibc -nostdinc -fvisibility=hidden -fpie -fstack-protector-strong -ffunction-sections -fdata-sections -c build/hw0/Enclave_t.c -o build/hw0/Enclave_t.o
+g++ -DPOC_CREATE_DEBUG=0 -DPOC_HW=1 -m64 -O2 -Wall -Wextra -Iinclude -Ibuild/hw0 -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include -fPIC -std=c++11 tests/ring_tests.cpp build/hw0/Enclave_u.o -o build/hw0/ring_tests -L/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/lib64 -Wl,-rpath,/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/lib64 -lsgx_urts
+g++ build/hw0/main.o build/hw0/Enclave_u.o -o build/hw0/poc -L/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/lib64 -Wl,-rpath,/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/lib64 -lsgx_urts -lpthread -lbpf -lelf -lz
+g++ build/hw0/Enclave.o build/hw0/Enclave_t.o -o build/hw0/enclave.so -m64 -nostdlib -nodefaultlibs -nostartfiles -L/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/lib64 \
+  -Wl,--no-undefined -Wl,--whole-archive -lsgx_trts -Wl,--no-whole-archive \
+  -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto -lsgx_tservice -Wl,--end-group \
+  -Wl,-Bstatic -Wl,-Bsymbolic -Wl,-pie,-eenclave_entry -Wl,--export-dynamic \
+  -Wl,--defsym,__ImageBase=0 -Wl,--gc-sections -Wl,--version-script=enclave/Enclave.lds \
+  -Wl,-z,relro,-z,now,-z,noexecstack
+/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/bin/x64/sgx_sign sign -key build/hw0/test-key.pem -enclave build/hw0/enclave.so -out build/hw0/enclave.signed.so -config build/hw0/Enclave.config.xml
+<EnclaveConfiguration>
+    <ProdID>0</ProdID>
+    <ISVSVN>0</ISVSVN>
+    <StackMaxSize>0x40000</StackMaxSize>
+    <HeapMaxSize>0x100000</HeapMaxSize>
+    <TCSNum>1</TCSNum>
+    <TCSPolicy>1</TCSPolicy>
+    <DisableDebug>1</DisableDebug>
+    <MiscSelect>0</MiscSelect>
+    <MiscMask>0xFFFFFFFF</MiscMask>
+</EnclaveConfiguration>
+1a07d8da4b2370afdf60cb658bcfaef9d422966246823117798114161ef50576  build/hw0/poc
+6a5c6aacb599f8effaeab03bb1f06486b5b92ce64ad59fe17e692849242f080b  build/hw0/generator
+8e2c17e71d74d99d74d3e93093c602fb8953641873576d4ecc213666a1f50398  build/hw0/probe.bpf.o
+dae0ab4b8060ddbf800dc3a7182c158b1449105df1d2bd34ec91f431f614c283  build/hw0/enclave.signed.so
+4950fd16d181d724d5f4a69119fe380c7ef9d193118f673b0a0d1ea270be4f9c  build/hw0/ring_tests
+	linux-vdso.so.1 (0x00007fff724ee000)
+	libsgx_urts.so.2 => /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_urts.so.2 (0x00007f659228b000)
+	libbpf.so.0 => /lib/x86_64-linux-gnu/libbpf.so.0 (0x00007f6592235000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f6592009000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f6591fe9000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6591dbe000)
+	libsgx_enclave_common.so.1 => /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_enclave_common.so.1 (0x00007f6591daf000)
+	libelf.so.1 => /lib/x86_64-linux-gnu/libelf.so.1 (0x00007f6591d91000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f6591d75000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f6591c8e000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f6592596000)
+REPORT flags=0x5 DEBUG=0 MRENCLAVE=aab933c50af607cc3770072abf50cb5c17a4cb8666cbef86391e2dd4a7c65684 MRSIGNER=8b6e105b4d52fdc2d25e204695d768a1ecfe49b3472728fa99243be58dbc3fa0
+PASS: SIM parser, wrap, BUSY, DISCARD, malformed input, descriptor bounds, replay, tail batch, stop/drain
+AUTHENTICATION GAP: a well-formed event in anonymous memory was accepted; no kernel-origin authentication is claimed.
+signed MRENCLAVE=aab933c50af607cc3770072abf50cb5c17a4cb8666cbef86391e2dd4a7c65684 MRSIGNER=8b6e105b4d52fdc2d25e204695d768a1ecfe49b3472728fa99243be58dbc3fa0 attribute mask=0xff00ffffffffffff
+GETPID_identity_matches

@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-host-low-r03-warmup",
+  "experiment": "warmup",
+  "mode": "host",
+  "workload": "getpid",
+  "load_level": "low",
+  "repeat": 3,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 2.000698443,
+  "raw_path": "raw/getpid-host-low-r03-warmup/",
+  "start_utc": "2026-11-23T10:09:10.196384+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "host",
+    "--seconds",
+    "2",
+    "--interval-us",
+    "1000",
+    "--allow-drops"
+  ]
+}

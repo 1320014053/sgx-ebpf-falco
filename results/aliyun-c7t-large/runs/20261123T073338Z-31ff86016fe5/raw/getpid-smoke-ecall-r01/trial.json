@@ -1,0 +1,22 @@
+{
+  "trial_id": "getpid-smoke-ecall-r01",
+  "experiment": "smoke",
+  "mode": "ecall",
+  "workload": "getpid",
+  "load_level": "low",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 10.543302919,
+  "raw_path": "raw/getpid-smoke-ecall-r01/",
+  "start_utc": "2026-11-23T07:49:21.059376+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "ecall",
+    "--count",
+    "10003",
+    "--interval-us",
+    "1000"
+  ]
+}

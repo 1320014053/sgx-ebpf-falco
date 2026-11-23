@@ -1,6 +1,7 @@
 enclave {
     include "event.h"
     trusted {
+        public void ecall_identity([out] uint64_t *flags, [out, size=32] uint8_t *measurement, [out, size=32] uint8_t *signer);
         public void ecall_config(uint32_t target_tgid);
         public int ecall_register([in] const struct poc_ring_desc *desc);
         public void ecall_event([in] const struct poc_event *event);

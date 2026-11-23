@@ -1,0 +1,17 @@
+raven-native-repeat-100000-r01 {'alerts': 10, 'max_alert_bytes': 1485650, 'max_payload_bytes': 429110, 'alert_sha256': 'ac32e6bffacbf54fb199676c855de7ff174465e2f3d9654c162c7dacbb57f010', 'mode': 'native', 'case': 'repeat', 'process_peak': 84316160, 'baseline_span_bytes': 286720, 'post_gc_seconds': [28.763999938964844, 28.765000104904175], 'warm_seconds': [30.802000045776367, 32.831000089645386]}
+raven-native-repeat-100000-r01 0
+raven-sgx-repeat-100000-r01 {'alerts': 10, 'max_alert_bytes': 1485650, 'max_payload_bytes': 429110, 'alert_sha256': 'ac32e6bffacbf54fb199676c855de7ff174465e2f3d9654c162c7dacbb57f010', 'mode': 'sgx', 'case': 'repeat', 'process_peak': 151527424, 'baseline_span_bytes': 52960, 'post_gc_seconds': [28.763999938964844, 28.765000104904175], 'warm_seconds': [30.802000045776367, 32.831000089645386], 'heap_peak': 28766208}
+raven-sgx-repeat-100000-r01 0
+raven-native-churn-100000-r01 {'alerts': 10, 'max_alert_bytes': 8519, 'max_payload_bytes': 2395, 'alert_sha256': '0f974fb7673239e94dacec5084bfb32c9b57cd41a3637259fcd803392c749258', 'mode': 'native', 'case': 'churn', 'process_peak': 121102336, 'baseline_span_bytes': 278528, 'post_gc_seconds': [17.014999866485596, 17.01699995994568], 'warm_seconds': [17.806999921798706, 22.009000062942505]}
+raven-native-churn-100000-r01 0
+raven-sgx-churn-100000-r01 {'alerts': 10, 'max_alert_bytes': 8519, 'max_payload_bytes': 2395, 'alert_sha256': '0f974fb7673239e94dacec5084bfb32c9b57cd41a3637259fcd803392c749258', 'mode': 'sgx', 'case': 'churn', 'process_peak': 151613440, 'baseline_span_bytes': 225936, 'post_gc_seconds': [17.014999866485596, 17.01699995994568], 'warm_seconds': [17.806999921798706, 22.009000062942505], 'heap_peak': 82055168}
+raven-sgx-churn-100000-r01 0
+raven-native-repeat-1000000-r01 {'alerts': 100, 'max_alert_bytes': 1842110, 'max_payload_bytes': 537182, 'alert_sha256': '2fd14a2e8c97971bd7900145a4e7099847c469413e61d4ed03962713bdd9d3e8', 'mode': 'native', 'case': 'repeat', 'process_peak': 95227904, 'baseline_span_bytes': 3543040, 'post_gc_seconds': [28.729999780654907, 28.731000185012817], 'warm_seconds': [28.992000102996826, 38.174999952316284]}
+raven-native-repeat-1000000-r01 0
+raven-sgx-repeat-1000000-r01 {'alerts': 100, 'max_alert_bytes': 1842110, 'max_payload_bytes': 537182, 'alert_sha256': '2fd14a2e8c97971bd7900145a4e7099847c469413e61d4ed03962713bdd9d3e8', 'mode': 'sgx', 'case': 'repeat', 'process_peak': 151597056, 'baseline_span_bytes': 165248, 'post_gc_seconds': [28.729999780654907, 28.731000185012817], 'warm_seconds': [28.992000102996826, 38.174999952316284], 'heap_peak': 35258368}
+raven-sgx-repeat-1000000-r01 0
+raven-native-churn-1000000-r01 {'alerts': 100, 'max_alert_bytes': 8570, 'max_payload_bytes': 2412, 'alert_sha256': '49df10b233d3c6a73ed2da116602e2f8ab63cff722807f6063b4d7cf7dff10d9', 'mode': 'native', 'case': 'churn', 'process_peak': 121212928, 'baseline_span_bytes': 249856, 'post_gc_seconds': [16.990999937057495, 16.993000030517578], 'warm_seconds': [17.436000108718872, 22.759000062942505]}
+raven-native-churn-1000000-r01 0
+raven-sgx-churn-1000000-r01 {'alerts': 100, 'max_alert_bytes': 8570, 'max_payload_bytes': 2412, 'alert_sha256': '49df10b233d3c6a73ed2da116602e2f8ab63cff722807f6063b4d7cf7dff10d9', 'mode': 'sgx', 'case': 'churn', 'process_peak': 151592960, 'baseline_span_bytes': 21168, 'post_gc_seconds': [16.990999937057495, 16.993000030517578], 'warm_seconds': [17.436000108718872, 22.759000062942505], 'heap_peak': 82444288}
+raven-sgx-churn-1000000-r01 0
+MEMORY_MATRIX_FINISHED

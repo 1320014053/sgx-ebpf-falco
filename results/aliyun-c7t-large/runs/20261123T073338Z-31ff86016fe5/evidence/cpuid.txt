@@ -1,0 +1,5 @@
+leaf1 ecx=fefa320b PCID=1
+leaf7.0 ebx=f1bf07af ecx=40405f5a SGX=1 INVPCID=1 PKS=0 SGX_LC=1
+leaf12.0 eax=00000003 SGX1=1 SGX2=1
+/usr/sbin/runuser
+/usr/bin/sudo

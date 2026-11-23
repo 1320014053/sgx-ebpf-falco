@@ -1,0 +1,15 @@
+{
+  "trial_id": "http-baseline-r05",
+  "experiment": "http",
+  "mode": "baseline",
+  "workload": "http-loopback-1KiB",
+  "load_level": "2-connections",
+  "repeat": 5,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.048593592,
+  "raw_path": "raw/http-baseline-r05/",
+  "start_utc": "2026-11-23T08:54:43.195937+00:00",
+  "collector_command": [],
+  "duration": 60
+}

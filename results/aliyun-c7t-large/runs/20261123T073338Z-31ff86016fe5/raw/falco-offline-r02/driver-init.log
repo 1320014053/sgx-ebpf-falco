@@ -1,0 +1,1 @@
+4107  ioctl(3, SGX_IOC_ENCLAVE_INIT, 0x7ffe24dedba0) = 0

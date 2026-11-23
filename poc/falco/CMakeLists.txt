@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 project(sgx_falco LANGUAGES C CXX)
+option(FALCO_SGX_HARDWARE "Build for non-debug SGX hardware" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,7 +23,7 @@ add_custom_target(falco-edges DEPENDS Falco_t.c Falco_u.c)
 add_executable(falco-sgx host.cpp replay_host.cpp "${CMAKE_CURRENT_BINARY_DIR}/Falco_u.c")
 set_target_properties(falco-sgx PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 target_include_directories(falco-sgx PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
-target_compile_definitions(falco-sgx PRIVATE OE_API_VERSION=2)
+target_compile_definitions(falco-sgx PRIVATE OE_API_VERSION=2 FALCO_SGX_HARDWARE=$<BOOL:${FALCO_SGX_HARDWARE}>)
 target_link_libraries(falco-sgx PRIVATE openenclave::oehost)
 
 set(detector_sources "${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.cpp"

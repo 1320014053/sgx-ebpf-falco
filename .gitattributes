@@ -6,3 +6,9 @@
 *.png binary
 *.xz binary
 *.gz binary
+# Preserve the original bytes used for hardware-run checksums across Windows and Linux.
+results/aliyun-c7t-large/runs/*/evidence/** -text -whitespace
+results/aliyun-c7t-large/runs/*/raw/** -text -whitespace
+results/aliyun-c7t-large/runs/*/bulk/** -text -whitespace
+results/aliyun-c7t-large/runs/*/summary/** -text -whitespace
+results/aliyun-c7t-large/runs/*/trials.csv -text -whitespace

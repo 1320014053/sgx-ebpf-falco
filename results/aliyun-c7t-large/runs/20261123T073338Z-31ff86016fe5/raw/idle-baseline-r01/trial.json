@@ -1,0 +1,15 @@
+{
+  "trial_id": "idle-baseline-r01",
+  "experiment": "idle",
+  "mode": "baseline",
+  "workload": "idle",
+  "load_level": "idle",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 15.013942212,
+  "raw_path": "raw/idle-baseline-r01/",
+  "start_utc": "2026-11-23T08:22:27.640669+00:00",
+  "collector_command": [],
+  "duration": 15
+}

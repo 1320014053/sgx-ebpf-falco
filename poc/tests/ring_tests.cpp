@@ -88,9 +88,20 @@ int main(int argc, char **argv)
 {
     check(argc == 2, "provide signed enclave path");
     sgx_enclave_id_t enclave;
-    sgx_status_t status = sgx_create_enclave(argv[1], SGX_DEBUG_FLAG, nullptr, nullptr, &enclave, nullptr);
+    sgx_status_t status = sgx_create_enclave(argv[1], POC_CREATE_DEBUG, nullptr, nullptr, &enclave, nullptr);
     if (status != SGX_SUCCESS) fprintf(stderr, "create enclave: 0x%08x\n", status);
-    check(status == SGX_SUCCESS, "create SIM enclave");
+    check(status == SGX_SUCCESS, "create enclave");
+#if POC_HW
+    uint64_t flags;
+    uint8_t measurement[32], signer[32];
+    check(ecall_identity(enclave, &flags, measurement, signer) == SGX_SUCCESS, "read enclave REPORT");
+    printf("REPORT flags=0x%llx DEBUG=%d MRENCLAVE=", (unsigned long long)flags, !!(flags & SGX_FLAGS_DEBUG));
+    for (auto byte : measurement) printf("%02x", byte);
+    printf(" MRSIGNER=");
+    for (auto byte : signer) printf("%02x", byte);
+    putchar('\n');
+    check(!(flags & SGX_FLAGS_DEBUG), "hardware enclave debug disabled");
+#endif
     {
         Fixture ring(enclave);
         poc_stats stats = {};
@@ -165,7 +176,7 @@ int main(int argc, char **argv)
         ring.append(&value, sizeof(value));
         __atomic_store_n(&ring.control->stop, 1, __ATOMIC_RELEASE);
         check(ecall_run(enclave, &result, &stats) == SGX_SUCCESS && result == 0 && stats.processed == 1, "stop drains and returns");
-        puts("PASS: SIM parser, wrap, BUSY, DISCARD, malformed input, descriptor bounds, replay, tail batch, stop/drain");
+        puts("PASS: parser, wrap, BUSY, DISCARD, malformed input, descriptor bounds, replay, tail batch, stop/drain");
         puts("AUTHENTICATION GAP: a well-formed event in anonymous memory was accepted; no kernel-origin authentication is claimed.");
     }
     sgx_destroy_enclave(enclave);

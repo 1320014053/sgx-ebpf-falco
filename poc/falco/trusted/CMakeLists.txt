@@ -66,9 +66,15 @@ target_link_libraries(falco-enclave PRIVATE ${falco_enclave_libs})
 add_custom_command(
     OUTPUT test-key.pem
     COMMAND openssl genrsa -3 -out test-key.pem 3072)
+if(FALCO_SGX_HARDWARE)
+    set(FALCO_ENCLAVE_DEBUG 0)
+else()
+    set(FALCO_ENCLAVE_DEBUG 1)
+endif()
+configure_file(enclave.conf "${CMAKE_CURRENT_BINARY_DIR}/enclave.conf" @ONLY)
 add_custom_command(
     OUTPUT "${CMAKE_BINARY_DIR}/falco-enclave.signed"
-    COMMAND openenclave::oesign sign -e $<TARGET_FILE:falco-enclave> -c "${CMAKE_CURRENT_SOURCE_DIR}/enclave.conf" -k test-key.pem
+    COMMAND openenclave::oesign sign -e $<TARGET_FILE:falco-enclave> -c "${CMAKE_CURRENT_BINARY_DIR}/enclave.conf" -k test-key.pem
     COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:falco-enclave>.signed" "${CMAKE_BINARY_DIR}/falco-enclave.signed"
-    DEPENDS falco-enclave enclave.conf test-key.pem)
+    DEPENDS falco-enclave "${CMAKE_CURRENT_BINARY_DIR}/enclave.conf" test-key.pem)
 add_custom_target(sign-falco ALL DEPENDS "${CMAKE_BINARY_DIR}/falco-enclave.signed")

@@ -1,0 +1,25 @@
+{
+  "trial_id": "falco-capacity-hw-official-100k-warmup-r01",
+  "experiment": "capacity-100k-warmup",
+  "mode": "hw-official",
+  "workload": "open-close-dev-null",
+  "load_level": "34724",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 2.000000146,
+  "raw_path": "raw/falco-capacity-hw-official-100k-warmup-r01/",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-live/falco-live",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/data/http-hw-official-r00/falco.yaml",
+    "8192",
+    "-",
+    "falco_rules.yaml",
+    "--",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-load",
+    "34724",
+    "2",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/data/falco-capacity-hw-official-100k-warmup-r01/producer.json"
+  ]
+}

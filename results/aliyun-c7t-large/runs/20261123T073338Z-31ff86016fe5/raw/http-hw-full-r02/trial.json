@@ -1,0 +1,23 @@
+{
+  "trial_id": "http-hw-full-r02",
+  "experiment": "http",
+  "mode": "hw-full",
+  "workload": "http-loopback-1KiB",
+  "load_level": "2-connections",
+  "repeat": 2,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.067204188,
+  "raw_path": "raw/http-hw-full-r02/",
+  "start_utc": "2026-11-23T08:33:41.721376+00:00",
+  "collector_command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-live/falco-live",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "falco.yaml",
+    "8192",
+    "-",
+    "falco_rules.yaml",
+    "raven_zeek_rules.yaml"
+  ],
+  "duration": 60
+}

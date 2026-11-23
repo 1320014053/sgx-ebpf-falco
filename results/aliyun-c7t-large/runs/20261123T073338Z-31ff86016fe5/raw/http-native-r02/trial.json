@@ -1,0 +1,19 @@
+{
+  "trial_id": "http-native-r02",
+  "experiment": "http",
+  "mode": "native",
+  "workload": "http-loopback-1KiB",
+  "load_level": "2-connections",
+  "repeat": 2,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.050061105,
+  "raw_path": "raw/http-native-r02/",
+  "start_utc": "2026-11-23T08:31:27.757188+00:00",
+  "collector_command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/deps/package/usr/bin/falco",
+    "-c",
+    "falco.yaml"
+  ],
+  "duration": 60
+}

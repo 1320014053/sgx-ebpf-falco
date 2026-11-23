@@ -1,0 +1,7 @@
+proc_vmstat SGX/EPC matches
+not exposed: /sys/devices/system/node/node0/x86
+not exposed: /sys/kernel/debug/x86/sgx
+not exposed: /sys/kernel/mm/sgx
+not exposed: /sys/kernel/tracing/events/sgx
+root CPU affinity
+Cpus_allowed_list:	0-1

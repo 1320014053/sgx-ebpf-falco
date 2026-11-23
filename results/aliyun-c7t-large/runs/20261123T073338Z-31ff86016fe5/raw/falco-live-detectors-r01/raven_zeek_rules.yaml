@@ -1,0 +1,31 @@
+- required_plugin_versions:
+    - name: raven_zeek
+      version: 1.0.0
+
+- rule: RAVEN active detection
+  desc: A full-tier RAVEN chain remained active after context settlement
+  source: raven_zeek
+  condition: rz.state = active
+  output: "RAVEN %rz.rule %rz.result"
+  priority: WARNING
+
+- rule: RAVEN context review
+  desc: A matching RAVEN chain was classified as benign maintenance
+  source: raven_zeek
+  condition: rz.state = context_filtered
+  output: "RAVEN %rz.rule %rz.result"
+  priority: INFORMATIONAL
+
+- rule: Zeek address scan
+  desc: Failed TCP connections to distinct hosts crossed the address threshold
+  source: raven_zeek
+  condition: rz.rule = "Scan::Address_Scan"
+  output: "Zeek %rz.rule %rz.result"
+  priority: WARNING
+
+- rule: Zeek port scan
+  desc: Failed TCP connections to distinct ports crossed the port threshold
+  source: raven_zeek
+  condition: rz.rule = "Scan::Port_Scan"
+  output: "Zeek %rz.rule %rz.result"
+  priority: WARNING

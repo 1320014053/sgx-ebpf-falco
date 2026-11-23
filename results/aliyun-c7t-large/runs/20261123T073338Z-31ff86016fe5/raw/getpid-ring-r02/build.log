@@ -1,0 +1,3 @@
+make: Entering directory '/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc'
+g++ -DPOC_CREATE_DEBUG=0 -DPOC_HW=1 -m64 -O2 -Wall -Wextra -Iinclude -Ibuild/hw0 -I/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/include -fPIC -std=c++11 tests/ring_tests.cpp build/hw0/Enclave_u.o -o build/hw0/ring_tests -L/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/lib64 -Wl,-rpath,/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/intel/sgxsdk/lib64 -lsgx_urts
+make: Leaving directory '/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc'

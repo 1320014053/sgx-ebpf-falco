@@ -1,0 +1,3 @@
+REPORT flags=0x5 DEBUG=0 MRENCLAVE=aab933c50af607cc3770072abf50cb5c17a4cb8666cbef86391e2dd4a7c65684 MRSIGNER=8b6e105b4d52fdc2d25e204695d768a1ecfe49b3472728fa99243be58dbc3fa0
+PASS: parser, wrap, BUSY, DISCARD, malformed input, descriptor bounds, replay, tail batch, stop/drain
+AUTHENTICATION GAP: a well-formed event in anonymous memory was accepted; no kernel-origin authentication is claimed.

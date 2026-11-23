@@ -1,0 +1,44 @@
+
+remote_utc=2026-11-23T07:24:05Z
+0
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.5 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+Linux 6.8.0-147-generic x86_64 GNU/Linux
+4096
+CPU CORE SOCKET ONLINE
+  0    0      0    yes
+  1    0      0    yes
+MemTotal:        1850312 kB
+MemAvailable:    1423392 kB
+SwapTotal:             0 kB
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda3        30G  2.3G   26G   9% /
+/dev/vda3        30G  2.3G   26G   9% /
+0.00 0.00 0.00 1/205 2053
+crw-rw---- 1 root sgx 10, 258 Nov 23 15:18 /dev/sgx_enclave
+crw------- 1 root root 10, 257 Nov 23 15:18 /dev/sgx_provision
+-r--r--r-- 1 root root 6103569 Nov 23 15:18 /sys/kernel/btf/vmlinux
+-r--r--r-- 1 root root 4096 Nov 23 15:24 /sys/devices/system/node/node0/x86/sgx_
+_total_bytes
+2080374784
+cpu_feature=pcid
+cpu_feature=sgx
+cpu_feature=invpcid
+cpu_feature=sgx_lc
+[    0.435378] sgx: EPC section 0x100000000-0x17bffffff
+[    0.441875] sgx: [Firmware Bug]: Unable to map EPC section to online node. Fa
+allback to the NUMA node 0.
+/usr/sbin/bpftool
+/usr/bin/gcc
+/usr/bin/openssl

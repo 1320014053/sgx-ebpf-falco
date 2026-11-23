@@ -1,0 +1,14 @@
+{
+  "seconds": 0.206610409,
+  "normalized_events": 287,
+  "packets": 92,
+  "inputs": {
+    "events.jsonl": "d14450af4b3347a3bc2111794df93437d781a7131729cb9d053a94715cb4ef4a",
+    "packets.pcap": "26166bb5e631aba6cda9fcad13d5ce3b758ed85d0d40fd63eedfb512f42b7396",
+    "reference.scap": "82743e14d837f330e65e278add35944358eba08ccce06f69d2abfa994e47aa87"
+  },
+  "cpu_user_s": 0.16,
+  "cpu_sys_s": 0.0,
+  "peak_rss_kib": 53304,
+  "matches_live": true
+}

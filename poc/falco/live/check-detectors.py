@@ -68,13 +68,13 @@ def check(package, build, live, out):
     shutil.copy2(here.parent / "plugin/live.yaml", out / "live.yaml")
     shutil.copy2(here.parent / "plugin/rules.yaml", out / "raven_zeek_rules.yaml")
     shutil.copy2(package / "etc/falco/falco_rules.yaml", out)
-    summary = {"kernel": os.uname().release, "enclave_mode": "SGX Simulation"}
+    summary = {"kernel": os.uname().release}
     for name, record in (("ring-only", False), ("recorded", True)):
         cwd = out / name
         cwd.mkdir()
         for path in ("live.yaml", "falco_rules.yaml", "raven_zeek_rules.yaml"):
             (cwd / path).symlink_to(out / path)
-        cmd = ["sudo", "-n", "env", "TZ=UTC", "FALCO_HOSTNAME=falco-rz-live",
+        cmd = ([] if os.geteuid() == 0 else ["sudo", "-n"]) + ["env", "TZ=UTC", "FALCO_HOSTNAME=falco-rz-live", "FALCO_SGX_REPORT=1",
                live / "falco-live", build / "falco-enclave.signed", "live.yaml", "4096",
                "reference.scap" if record else "-"]
         if record:
@@ -126,7 +126,9 @@ def check(package, build, live, out):
                         raise RuntimeError("external workload failed")
                 if proc.wait(timeout=45) != 0:
                     raise RuntimeError(f"{name}: live consumer failed")
-        logs = [json.loads(s) for s in (cwd / "live.log").read_text().splitlines() if s.startswith("{")]
+        lines = (cwd / "live.log").read_text().splitlines()
+        summary["enclave_mode"] = "SGX hardware DEBUG=0" if any(s.startswith("REPORT DEBUG=0 ") for s in lines) else "SGX Simulation"
+        logs = [json.loads(s) for s in lines if s.startswith("{")]
         ring = next(r for r in logs if r.get("mode") == "live")
         driver = next(r for r in logs if r.get("mode") == "modern_ebpf")
         assert ring["raven_events"] > 0 and ring["packet_records"] == driver["packet_submitted"] > 0

@@ -1,0 +1,10 @@
+{
+  "seconds": 0.736479207,
+  "events": 30000,
+  "alerts": 1000,
+  "alerts_sha256": "49b02125e9cbf4fb96b3040f6d0d9f4ff7a1130edbd19a6e54178be3a558f5b2",
+  "input_sha256": "45e4b7a2a3232d5c23cc3120ba4038781375ed0e583dbae2c7da8b856897d0a1",
+  "user_s": 0.45,
+  "sys_s": 0.21,
+  "peak_rss_kib": 50580
+}

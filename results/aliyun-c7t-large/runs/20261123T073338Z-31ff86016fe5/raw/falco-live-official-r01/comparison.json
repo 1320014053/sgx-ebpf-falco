@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "matched_alerts": 4,
+  "loaded_rules": 25,
+  "enabled_rules": 25,
+  "alerts_by_rule": {
+    "System user interactive": 3,
+    "Run shell untrusted": 1
+  }
+}

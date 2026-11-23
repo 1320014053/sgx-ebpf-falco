@@ -1,0 +1,483 @@
+diff --git a/poc/Makefile b/poc/Makefile
+index 1d25c5d..21f5436 100644
+--- a/poc/Makefile
++++ b/poc/Makefile
+@@ -5,19 +5,28 @@ CLANG ?= clang
+ CC := gcc
+ CXX := g++
+ 
+-ifneq ($(SGX_MODE),SIM)
+-$(error This POC only supports SGX_MODE=SIM)
++ifeq ($(SGX_MODE),HW)
++ifneq ($(SGX_DEBUG),0)
++$(error Hardware benchmarks require SGX_DEBUG=0)
++endif
++BUILD := build/hw0
++CREATE_DEBUG := 0
++else ifeq ($(SGX_MODE),SIM)
++BUILD := build/sim$(SGX_DEBUG)
++SGX_SUFFIX := _sim
++CREATE_DEBUG := SGX_DEBUG_FLAG
++else
++$(error SGX_MODE must be HW or SIM)
+ endif
+ ifneq ($(filter $(SGX_DEBUG),0 1),$(SGX_DEBUG))
+ $(error SGX_DEBUG must be 0 or 1)
+ endif
+ 
+-BUILD := build/sim$(SGX_DEBUG)
+ SDK_BIN := $(SGX_SDK)/bin/x64
+ SDK_LIB := $(SGX_SDK)/lib64
+ OPT := $(if $(filter 1,$(SGX_DEBUG)),-O0 -g,-O2)
+ COMMON := -m64 $(OPT) -Wall -Wextra -Iinclude
+-HOST_FLAGS := $(COMMON) -I$(BUILD) -I$(SGX_SDK)/include -fPIC
++HOST_FLAGS := -DPOC_CREATE_DEBUG=$(CREATE_DEBUG) -DPOC_HW=$(if $(filter HW,$(SGX_MODE)),1,0) $(COMMON) -I$(BUILD) -I$(SGX_SDK)/include -fPIC
+ TRUST_FLAGS := $(COMMON) -I$(BUILD) -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc \
+                -nostdinc -fvisibility=hidden -fpie -fstack-protector-strong \
+                -ffunction-sections -fdata-sections
+@@ -41,7 +50,7 @@ $(BUILD)/main.o: host/main.cpp $(BUILD)/Enclave_u.h include/event.h include/even
+ 	$(CXX) $(HOST_FLAGS) -std=c++11 $(shell pkg-config --cflags libbpf) -c $< -o $@
+ 
+ $(BUILD)/poc: $(BUILD)/main.o $(BUILD)/Enclave_u.o
+-	$(CXX) $^ -o $@ -L$(SDK_LIB) -Wl,-rpath,$(SDK_LIB) -lsgx_urts_sim -lpthread $(shell pkg-config --libs libbpf) -lelf -lz
++	$(CXX) $^ -o $@ -L$(SDK_LIB) -Wl,-rpath,$(SDK_LIB) -lsgx_urts$(SGX_SUFFIX) -lpthread $(shell pkg-config --libs libbpf) -lelf -lz
+ 
+ $(BUILD)/Enclave_t.o: $(BUILD)/Enclave_t.c $(BUILD)/Enclave_t.h
+ 	$(CC) $(TRUST_FLAGS) -c $< -o $@
+@@ -51,8 +60,8 @@ $(BUILD)/Enclave.o: enclave/Enclave.cpp $(BUILD)/Enclave_t.h include/event.h inc
+ 
+ $(BUILD)/enclave.so: $(BUILD)/Enclave.o $(BUILD)/Enclave_t.o enclave/Enclave.lds
+ 	$(CXX) $(filter %.o,$^) -o $@ -m64 -nostdlib -nodefaultlibs -nostartfiles -L$(SDK_LIB) \
+-	  -Wl,--no-undefined -Wl,--whole-archive -lsgx_trts_sim -Wl,--no-whole-archive \
+-	  -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto -lsgx_tservice_sim -Wl,--end-group \
++	  -Wl,--no-undefined -Wl,--whole-archive -lsgx_trts$(SGX_SUFFIX) -Wl,--no-whole-archive \
++	  -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto -lsgx_tservice$(SGX_SUFFIX) -Wl,--end-group \
+ 	  -Wl,-Bstatic -Wl,-Bsymbolic -Wl,-pie,-eenclave_entry -Wl,--export-dynamic \
+ 	  -Wl,--defsym,__ImageBase=0 -Wl,--gc-sections -Wl,--version-script=enclave/Enclave.lds \
+ 	  -Wl,-z,relro,-z,now,-z,noexecstack
+@@ -60,8 +69,11 @@ $(BUILD)/enclave.so: $(BUILD)/Enclave.o $(BUILD)/Enclave_t.o enclave/Enclave.lds
+ $(BUILD)/test-key.pem: | $(BUILD)
+ 	openssl genrsa -3 -out $@ 3072
+ 
+-$(BUILD)/enclave.signed.so: $(BUILD)/enclave.so $(BUILD)/test-key.pem enclave/Enclave.config.xml
+-	$(SDK_BIN)/sgx_sign sign -key $(BUILD)/test-key.pem -enclave $< -out $@ -config enclave/Enclave.config.xml
++$(BUILD)/Enclave.config.xml: enclave/Enclave.config.xml Makefile | $(BUILD)
++	sed 's/<DisableDebug>0</<DisableDebug>$(if $(filter HW,$(SGX_MODE)),1,0)</' $< > $@
++
++$(BUILD)/enclave.signed.so: $(BUILD)/enclave.so $(BUILD)/test-key.pem $(BUILD)/Enclave.config.xml
++	$(SDK_BIN)/sgx_sign sign -key $(BUILD)/test-key.pem -enclave $< -out $@ -config $(BUILD)/Enclave.config.xml
+ 
+ $(BUILD)/probe.bpf.o: bpf/probe.bpf.c include/event.h | $(BUILD)
+ 	$(CLANG) -g -O2 -target bpf -D__BPF__ -D__TARGET_ARCH_x86 -Iinclude -I/usr/include/$(shell $(CC) -dumpmachine) -c $< -o $@
+@@ -70,7 +82,7 @@ $(BUILD)/generator: tests/generator.c include/event.h | $(BUILD)
+ 	$(CC) $(COMMON) -std=c11 $< -o $@
+ 
+ $(BUILD)/ring_tests: tests/ring_tests.cpp $(BUILD)/Enclave_u.o $(BUILD)/Enclave_u.h include/event.h
+-	$(CXX) $(HOST_FLAGS) -std=c++11 $< $(BUILD)/Enclave_u.o -o $@ -L$(SDK_LIB) -Wl,-rpath,$(SDK_LIB) -lsgx_urts_sim
++	$(CXX) $(HOST_FLAGS) -std=c++11 $< $(BUILD)/Enclave_u.o -o $@ -L$(SDK_LIB) -Wl,-rpath,$(SDK_LIB) -lsgx_urts$(SGX_SUFFIX)
+ 
+ test: all
+ 	LD_LIBRARY_PATH="$(SDK_LIB)$${LD_LIBRARY_PATH:+:$$LD_LIBRARY_PATH}" $(BUILD)/ring_tests $(BUILD)/enclave.signed.so
+diff --git a/poc/enclave/Enclave.cpp b/poc/enclave/Enclave.cpp
+index 54d0a7d..c333743 100644
+--- a/poc/enclave/Enclave.cpp
++++ b/poc/enclave/Enclave.cpp
+@@ -1,6 +1,7 @@
+ #include "Enclave_t.h"
+ #include "event_logic.h"
+ #include <sgx_trts.h>
++#include <sgx_utils.h>
+ #include <string.h>
+ #include <stdint.h>
+ 
+@@ -22,6 +23,14 @@ static bool overlap(poc_u64 a, poc_u64 an, poc_u64 b, poc_u64 bn)
+     return a < b + bn && b < a + an;
+ }
+ 
++void ecall_identity(uint64_t *flags, uint8_t *measurement, uint8_t *signer)
++{
++    const sgx_report_body_t &body = sgx_self_report()->body;
++    *flags = body.attributes.flags;
++    memcpy(measurement, body.mr_enclave.m, sizeof(body.mr_enclave.m));
++    memcpy(signer, body.mr_signer.m, sizeof(body.mr_signer.m));
++}
++
+ void ecall_config(uint32_t target_tgid)
+ {
+     target = target_tgid;
+diff --git a/poc/enclave/Enclave.edl b/poc/enclave/Enclave.edl
+index 0c68988..3756ef5 100644
+--- a/poc/enclave/Enclave.edl
++++ b/poc/enclave/Enclave.edl
+@@ -1,6 +1,7 @@
+ enclave {
+     include "event.h"
+     trusted {
++        public void ecall_identity([out] uint64_t *flags, [out, size=32] uint8_t *measurement, [out, size=32] uint8_t *signer);
+         public void ecall_config(uint32_t target_tgid);
+         public int ecall_register([in] const struct poc_ring_desc *desc);
+         public void ecall_event([in] const struct poc_event *event);
+diff --git a/poc/falco/CMakeLists.txt b/poc/falco/CMakeLists.txt
+index c831105..b4e28d8 100644
+--- a/poc/falco/CMakeLists.txt
++++ b/poc/falco/CMakeLists.txt
+@@ -1,5 +1,6 @@
+ cmake_minimum_required(VERSION 3.22)
+ project(sgx_falco LANGUAGES C CXX)
++option(FALCO_SGX_HARDWARE "Build for non-debug SGX hardware" OFF)
+ 
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+@@ -22,7 +23,7 @@ add_custom_target(falco-edges DEPENDS Falco_t.c Falco_u.c)
+ add_executable(falco-sgx host.cpp replay_host.cpp "${CMAKE_CURRENT_BINARY_DIR}/Falco_u.c")
+ set_target_properties(falco-sgx PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+ target_include_directories(falco-sgx PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+-target_compile_definitions(falco-sgx PRIVATE OE_API_VERSION=2)
++target_compile_definitions(falco-sgx PRIVATE OE_API_VERSION=2 FALCO_SGX_HARDWARE=$<BOOL:${FALCO_SGX_HARDWARE}>)
+ target_link_libraries(falco-sgx PRIVATE openenclave::oehost)
+ 
+ set(detector_sources "${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.cpp"
+diff --git a/poc/falco/host.cpp b/poc/falco/host.cpp
+index ccefe75..0a8b5e7 100644
+--- a/poc/falco/host.cpp
++++ b/poc/falco/host.cpp
+@@ -123,10 +123,27 @@ Enclave load_enclave(const char* image, const char* config_path, char* const* ru
+     }
+     const char* host = std::getenv("FALCO_HOSTNAME");
+     oe_enclave_t* handle = nullptr;
+-    check(oe_create_Falco_enclave(image, OE_ENCLAVE_TYPE_SGX,
+-                                OE_ENCLAVE_FLAG_SIMULATE | OE_ENCLAVE_FLAG_DEBUG,
+-                                nullptr, 0, &handle), 0, "create Falco SIM enclave");
++    const uint32_t flags = FALCO_SGX_HARDWARE ? 0 : OE_ENCLAVE_FLAG_SIMULATE | OE_ENCLAVE_FLAG_DEBUG;
++    check(oe_create_Falco_enclave(image, OE_ENCLAVE_TYPE_SGX, flags, nullptr, 0, &handle), 0, "create Falco enclave");
+     Enclave enclave(handle, oe_terminate_enclave);
++#if FALCO_SGX_HARDWARE
++    if (std::getenv("FALCO_SGX_REPORT")) {
++        uint8_t* report = nullptr;
++        size_t length = 0;
++        check(oe_get_report(handle, 0, nullptr, 0, &report, &length), 0, "get Falco local REPORT");
++        oe_report_t parsed{};
++        const auto status = oe_parse_report(report, length, &parsed);
++        oe_free_report(report);
++        check(status, 0, "parse Falco local REPORT");
++        const bool debug = (parsed.identity.attributes & OE_REPORT_ATTRIBUTES_DEBUG) != 0;
++        std::fprintf(stderr, "REPORT DEBUG=%d MRENCLAVE=", debug);
++        for (auto byte : parsed.identity.unique_id) std::fprintf(stderr, "%02x", byte);
++        std::fprintf(stderr, " MRSIGNER=");
++        for (auto byte : parsed.identity.signer_id) std::fprintf(stderr, "%02x", byte);
++        std::fputc('\n', stderr);
++        if (debug) throw std::runtime_error("Falco enclave DEBUG bit set");
++    }
++#endif
+     int result = -1;
+     auto status = falco_config(handle, &result, config.c_str(), host ? host : hostname, live);
+     check(status, result, "load configuration");
+diff --git a/poc/falco/live/CMakeLists.txt b/poc/falco/live/CMakeLists.txt
+index fc4b6b7..335eac1 100644
+--- a/poc/falco/live/CMakeLists.txt
++++ b/poc/falco/live/CMakeLists.txt
+@@ -1,5 +1,6 @@
+ cmake_minimum_required(VERSION 3.22)
+ project(falco_live LANGUAGES C CXX)
++option(FALCO_SGX_HARDWARE "Build for non-debug SGX hardware" OFF)
+ 
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+@@ -41,7 +42,7 @@ add_custom_command(
+     DEPENDS ../Falco.edl)
+ add_library(falco_live_host STATIC ../host.cpp "${CMAKE_CURRENT_BINARY_DIR}/Falco_u.c")
+ target_include_directories(falco_live_host PUBLIC "${CMAKE_CURRENT_BINARY_DIR}" ..)
+-target_compile_definitions(falco_live_host PUBLIC OE_API_VERSION=2)
++target_compile_definitions(falco_live_host PUBLIC OE_API_VERSION=2 PRIVATE FALCO_SGX_HARDWARE=$<BOOL:${FALCO_SGX_HARDWARE}>)
+ target_link_libraries(falco_live_host PUBLIC openenclave::oehost Threads::Threads)
+ add_executable(falco-live live_host.cpp)
+ get_target_property(libbpf_headers lbpf INTERFACE_INCLUDE_DIRECTORIES)
+diff --git a/poc/falco/live/check-detectors.py b/poc/falco/live/check-detectors.py
+index fc64172..1162b71 100644
+--- a/poc/falco/live/check-detectors.py
++++ b/poc/falco/live/check-detectors.py
+@@ -68,13 +68,13 @@ def check(package, build, live, out):
+     shutil.copy2(here.parent / "plugin/live.yaml", out / "live.yaml")
+     shutil.copy2(here.parent / "plugin/rules.yaml", out / "raven_zeek_rules.yaml")
+     shutil.copy2(package / "etc/falco/falco_rules.yaml", out)
+-    summary = {"kernel": os.uname().release, "enclave_mode": "SGX Simulation"}
++    summary = {"kernel": os.uname().release}
+     for name, record in (("ring-only", False), ("recorded", True)):
+         cwd = out / name
+         cwd.mkdir()
+         for path in ("live.yaml", "falco_rules.yaml", "raven_zeek_rules.yaml"):
+             (cwd / path).symlink_to(out / path)
+-        cmd = ["sudo", "-n", "env", "TZ=UTC", "FALCO_HOSTNAME=falco-rz-live",
++        cmd = ([] if os.geteuid() == 0 else ["sudo", "-n"]) + ["env", "TZ=UTC", "FALCO_HOSTNAME=falco-rz-live", "FALCO_SGX_REPORT=1",
+                live / "falco-live", build / "falco-enclave.signed", "live.yaml", "4096",
+                "reference.scap" if record else "-"]
+         if record:
+@@ -126,7 +126,9 @@ def check(package, build, live, out):
+                         raise RuntimeError("external workload failed")
+                 if proc.wait(timeout=45) != 0:
+                     raise RuntimeError(f"{name}: live consumer failed")
+-        logs = [json.loads(s) for s in (cwd / "live.log").read_text().splitlines() if s.startswith("{")]
++        lines = (cwd / "live.log").read_text().splitlines()
++        summary["enclave_mode"] = "SGX hardware DEBUG=0" if any(s.startswith("REPORT DEBUG=0 ") for s in lines) else "SGX Simulation"
++        logs = [json.loads(s) for s in lines if s.startswith("{")]
+         ring = next(r for r in logs if r.get("mode") == "live")
+         driver = next(r for r in logs if r.get("mode") == "modern_ebpf")
+         assert ring["raven_events"] > 0 and ring["packet_records"] == driver["packet_submitted"] > 0
+diff --git a/poc/falco/live/check.sh b/poc/falco/live/check.sh
+index f21fd39..fbe3ec6 100755
+--- a/poc/falco/live/check.sh
++++ b/poc/falco/live/check.sh
+@@ -10,12 +10,16 @@ export TZ=UTC FALCO_HOSTNAME=falco-sgx-live
+ cp "$here/reference.yaml" "$package/etc/falco/falco_rules.yaml" .
+ ln -s "$package/usr/share/falco/plugins/libcontainer.so" .
+ work=$(mktemp -d /tmp/falco-sgx.XXXXXX)
+-trap 'rm -f -- "$work/worker"; rmdir -- "$work"' EXIT
++trap 'rm -f -- "$work/httpd" "$work/worker"; rmdir -- "$work"' EXIT
++if [[ -n ${FALCO_WORKLOAD_USER:-} ]]; then chmod 755 "$work"; fi
+ cp "$live/httpd" "$work/worker"
++cp "$live/httpd" "$work/httpd"
+ 
+-sudo -n env TZ="$TZ" FALCO_HOSTNAME="$FALCO_HOSTNAME" \
++as_root=()
++if (( EUID != 0 )); then as_root=(sudo -n); fi
++"${as_root[@]}" env TZ="$TZ" FALCO_HOSTNAME="$FALCO_HOSTNAME" \
+     "$live/falco-live" "$build/falco-enclave.signed" reference.yaml 1024 reference.scap falco_rules.yaml \
+-    -- runuser -u "$(id -un)" -- "$live/httpd" "$work/worker" >sgx-alerts.jsonl 2>sgx.log
++    -- runuser -u "${FALCO_WORKLOAD_USER:-$(id -un)}" -- "$work/httpd" "$work/worker" >sgx-alerts.jsonl 2>sgx.log
+ sha256sum falco_rules.yaml reference.yaml reference.scap >inputs.sha256
+ "$package/usr/bin/falco" --version >versions.txt
+ "$package/usr/bin/falco" -c reference.yaml -L >native-rules.json 2>native-rules.log
+diff --git a/poc/falco/trusted/CMakeLists.txt b/poc/falco/trusted/CMakeLists.txt
+index 42fd937..ad25e51 100644
+--- a/poc/falco/trusted/CMakeLists.txt
++++ b/poc/falco/trusted/CMakeLists.txt
+@@ -66,9 +66,15 @@ target_link_libraries(falco-enclave PRIVATE ${falco_enclave_libs})
+ add_custom_command(
+     OUTPUT test-key.pem
+     COMMAND openssl genrsa -3 -out test-key.pem 3072)
++if(FALCO_SGX_HARDWARE)
++    set(FALCO_ENCLAVE_DEBUG 0)
++else()
++    set(FALCO_ENCLAVE_DEBUG 1)
++endif()
++configure_file(enclave.conf "${CMAKE_CURRENT_BINARY_DIR}/enclave.conf" @ONLY)
+ add_custom_command(
+     OUTPUT "${CMAKE_BINARY_DIR}/falco-enclave.signed"
+-    COMMAND openenclave::oesign sign -e $<TARGET_FILE:falco-enclave> -c "${CMAKE_CURRENT_SOURCE_DIR}/enclave.conf" -k test-key.pem
++    COMMAND openenclave::oesign sign -e $<TARGET_FILE:falco-enclave> -c "${CMAKE_CURRENT_BINARY_DIR}/enclave.conf" -k test-key.pem
+     COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:falco-enclave>.signed" "${CMAKE_BINARY_DIR}/falco-enclave.signed"
+-    DEPENDS falco-enclave enclave.conf test-key.pem)
++    DEPENDS falco-enclave "${CMAKE_CURRENT_BINARY_DIR}/enclave.conf" test-key.pem)
+ add_custom_target(sign-falco ALL DEPENDS "${CMAKE_BINARY_DIR}/falco-enclave.signed")
+diff --git a/poc/falco/trusted/enclave.conf b/poc/falco/trusted/enclave.conf
+index 0a81c8a..d49d732 100644
+--- a/poc/falco/trusted/enclave.conf
++++ b/poc/falco/trusted/enclave.conf
+@@ -1,4 +1,4 @@
+-Debug=1
++Debug=@FALCO_ENCLAVE_DEBUG@
+ NumHeapPages=131072
+ NumStackPages=1024
+ NumTCS=32
+diff --git a/poc/host/main.cpp b/poc/host/main.cpp
+index 8d65125..fe754f7 100644
+--- a/poc/host/main.cpp
++++ b/poc/host/main.cpp
+@@ -125,12 +125,13 @@ static uint64_t number(const char *value)
+ static int run(int argc, char **argv)
+ {
+     std::string mode = "direct";
+-    uint64_t count = 10000, interval = 1000, seconds = 0, pause_ms = 0;
++    uint64_t count = 10000, interval = 1000, seconds = 0, pause_ms = 0, rate = 0;
+     bool allow_drops = false;
+     const option options[] = {
+         {"mode", required_argument, nullptr, 'm'},
+         {"count", required_argument, nullptr, 'n'},
+         {"interval-us", required_argument, nullptr, 'i'},
++        {"rate", required_argument, nullptr, 'r'},
+         {"seconds", required_argument, nullptr, 's'},
+         {"pause-ms", required_argument, nullptr, 'p'},
+         {"allow-drops", no_argument, nullptr, 'd'},
+@@ -142,11 +143,12 @@ static int run(int argc, char **argv)
+         case 'm': mode = optarg; break;
+         case 'n': count = number(optarg); break;
+         case 'i': interval = number(optarg); break;
++        case 'r': rate = number(optarg); interval = 0; break;
+         case 's': seconds = number(optarg); break;
+         case 'p': pause_ms = number(optarg); break;
+         case 'd': allow_drops = true; break;
+         case 'h':
+-            puts("poc --mode baseline|host|ecall|batch|step|direct [--count 10000] [--interval-us 1000] [--seconds 60] [--pause-ms 200] [--allow-drops]");
++            puts("poc --mode baseline|host|ecall|batch|step|direct [--count 10000] [--interval-us 1000 | --rate EVENTS_PER_SECOND] [--seconds 60] [--pause-ms 200] [--allow-drops]");
+             return 0;
+         default: return 2;
+         }
+@@ -154,6 +156,7 @@ static int run(int argc, char **argv)
+     require(optind == argc, "unexpected positional argument");
+     require(mode == "baseline" || mode == "host" || mode == "ecall" || mode == "batch" || mode == "step" || mode == "direct", "unknown mode");
+     require((count || seconds) && seconds <= 86400 && interval <= 10000000 && pause_ms <= 60000, "arguments exceed experiment limits");
++    require(rate <= 1000000000 && !(rate && interval), "invalid pacing");
+     require(mode == "baseline" || geteuid() == 0, "run as root to load and attach eBPF");
+     char executable[4096];
+     ssize_t path_bytes = readlink("/proc/self/exe", executable, sizeof(executable) - 1);
+@@ -166,13 +169,13 @@ static int run(int argc, char **argv)
+     require(pipe(start_pipe) == 0 && pipe(report_pipe) == 0, "pipe failed");
+     std::string count_arg = std::to_string(count), interval_arg = std::to_string(interval);
+     std::string ready_arg = std::to_string(start_pipe[0]), report_arg = std::to_string(report_pipe[1]);
+-    std::string seconds_arg = std::to_string(seconds), generator = directory + "/generator";
++    std::string seconds_arg = std::to_string(seconds), rate_arg = std::to_string(rate), generator = directory + "/generator";
+     pid_t child = fork();
+     require(child >= 0, "fork failed");
+     if (!child) {
+         close(start_pipe[1]);
+         close(report_pipe[0]);
+-        execl(generator.c_str(), generator.c_str(), count_arg.c_str(), interval_arg.c_str(), ready_arg.c_str(), report_arg.c_str(), seconds_arg.c_str(), nullptr);
++        execl(generator.c_str(), generator.c_str(), count_arg.c_str(), interval_arg.c_str(), ready_arg.c_str(), report_arg.c_str(), seconds_arg.c_str(), rate_arg.c_str(), nullptr);
+         _exit(127);
+     }
+     close(start_pipe[0]);
+@@ -211,7 +214,7 @@ static int run(int argc, char **argv)
+         if (error) resources.link = nullptr;
+         require(resources.link, "attaching sys_enter_getpid failed");
+         if (enclave_mode) {
+-            sgx_ok(sgx_create_enclave((directory + "/enclave.signed.so").c_str(), SGX_DEBUG_FLAG, nullptr, nullptr, &resources.enclave, nullptr));
++            sgx_ok(sgx_create_enclave((directory + "/enclave.signed.so").c_str(), POC_CREATE_DEBUG, nullptr, nullptr, &resources.enclave, nullptr));
+             context.enclave = resources.enclave;
+             sgx_ok(ecall_config(resources.enclave, child));
+             ++setup_ecalls;
+@@ -323,7 +326,7 @@ static int run(int argc, char **argv)
+     if (direct)
+         ok = ok && context.stats.consumer_pos == context.stats.producer_pos &&
+              context.stats.payload_copy_bytes == context.stats.processed * POC_EVENT_BYTES;
+-    printf("{\"environment\":\"QEMU TCG + SGX SIM\",\"mode\":\"%s\",\"ok\":%s,"
++    printf("{\"environment\":\"%s\",\"mode\":\"%s\",\"ok\":%s,"
+            "\"generator_calls\":%llu,\"attempted\":%llu,\"submitted\":%llu,\"reserve_failed\":%llu,"
+            "\"processed\":%llu,\"matched\":%llu,\"format_rejected\":%llu,\"last_seq\":%llu,"
+            "\"data_ecalls\":%llu,\"total_ecalls\":%llu,\"ocalls\":0,"
+@@ -332,7 +335,7 @@ static int run(int argc, char **argv)
+            "\"batch_events\":%llu,\"batches\":%llu,\"worker_result\":%d,"
+            "\"wall_ns\":%llu,\"generation_wall_ns\":%llu,\"generator_wall_ns\":%llu,\"drain_ns\":%llu,"
+            "\"host_cpu_ns\":%llu,\"consumer_cpu_ns\":%llu,\"generator_cpu_ns\":%llu}\n",
+-           mode.c_str(), ok ? "true" : "false",
++           POC_HW ? "SGX HW non-debug build" : "QEMU TCG + SGX SIM", mode.c_str(), ok ? "true" : "false",
+            (unsigned long long)report.calls, (unsigned long long)bpf_stats.attempted,
+            (unsigned long long)bpf_stats.submitted, (unsigned long long)bpf_stats.reserve_failed,
+            (unsigned long long)context.stats.processed, (unsigned long long)context.stats.matched,
+diff --git a/poc/scripts/build.sh b/poc/scripts/build.sh
+index 28e6135..1b0935a 100755
+--- a/poc/scripts/build.sh
++++ b/poc/scripts/build.sh
+@@ -2,4 +2,4 @@
+ set -euo pipefail
+ cd "$(dirname "$0")/.."
+ export SGX_SDK=${SGX_SDK:-/opt/intel/sgxsdk}
+-make -j2 SGX_MODE=SIM SGX_DEBUG="${SGX_DEBUG:-1}"
++make -j2 SGX_MODE="${SGX_MODE:-SIM}" SGX_DEBUG="${SGX_DEBUG:-1}"
+diff --git a/poc/scripts/compare.py b/poc/scripts/compare.py
+index 26c7239..885e61e 100755
+--- a/poc/scripts/compare.py
++++ b/poc/scripts/compare.py
+@@ -5,7 +5,7 @@ import json
+ from pathlib import Path
+ import subprocess
+ 
+-parser = argparse.ArgumentParser(description="Record QEMU TCG + SGX SIM runs; timings are not hardware SGX performance.")
++parser = argparse.ArgumentParser(description="Record GETPID runs with the selected SGX_MODE and SGX_DEBUG.")
+ parser.add_argument("--repeats", type=int, default=5)
+ parser.add_argument("--count", type=int, default=10000)
+ parser.add_argument("--interval-us", type=int, default=1000)
+diff --git a/poc/scripts/run.sh b/poc/scripts/run.sh
+index ec10d34..c4ce775 100755
+--- a/poc/scripts/run.sh
++++ b/poc/scripts/run.sh
+@@ -3,4 +3,5 @@ set -euo pipefail
+ cd "$(dirname "$0")/.."
+ export SGX_SDK=${SGX_SDK:-/opt/intel/sgxsdk}
+ export LD_LIBRARY_PATH="$SGX_SDK/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+-exec "build/sim${SGX_DEBUG:-1}/poc" "$@"
++mode=${SGX_MODE:-SIM}
++exec "build/${mode,,}${SGX_DEBUG:-1}/poc" "$@"
+diff --git a/poc/scripts/smoke.sh b/poc/scripts/smoke.sh
+index d1043f8..3e7853c 100755
+--- a/poc/scripts/smoke.sh
++++ b/poc/scripts/smoke.sh
+@@ -3,7 +3,8 @@ set -euo pipefail
+ cd "$(dirname "$0")/.."
+ export SGX_SDK=${SGX_SDK:-/opt/intel/sgxsdk}
+ export LD_LIBRARY_PATH="$SGX_SDK/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+-build="build/sim${SGX_DEBUG:-1}"
++mode=${SGX_MODE:-SIM}
++build="build/${mode,,}${SGX_DEBUG:-1}"
+ "$build/ring_tests" "$build/enclave.signed.so"
+ for mode in host ecall batch step direct; do
+     timeout 180 "$build/poc" --mode "$mode" --count 10003 --interval-us 1000
+diff --git a/poc/tests/generator.c b/poc/tests/generator.c
+index e076e17..b9408fc 100644
+--- a/poc/tests/generator.c
++++ b/poc/tests/generator.c
+@@ -17,14 +17,15 @@ static poc_u64 now_ns(clockid_t clock)
+ 
+ int main(int argc, char **argv)
+ {
+-    if (argc != 6) {
+-        fprintf(stderr, "usage: generator COUNT INTERVAL_US START_FD REPORT_FD SECONDS\n");
++    if (argc != 6 && argc != 7) {
++        fprintf(stderr, "usage: generator COUNT INTERVAL_US START_FD REPORT_FD SECONDS [RATE]\n");
+         return 2;
+     }
+     poc_u64 count = strtoull(argv[1], NULL, 10);
+     poc_u64 interval = strtoull(argv[2], NULL, 10);
+     int start_fd = atoi(argv[3]), report_fd = atoi(argv[4]);
+     poc_u64 duration = strtoull(argv[5], NULL, 10) * 1000000000ULL;
++    poc_u64 rate = argc == 7 ? strtoull(argv[6], NULL, 10) : 0;
+     prctl(PR_SET_NAME, "poc-generator", 0, 0, 0);
+     char start;
+     if (read(start_fd, &start, 1) != 1)
+@@ -37,7 +38,10 @@ int main(int argc, char **argv)
+     while (duration ? now_ns(CLOCK_MONOTONIC) - start_wall < duration : report.calls < count) {
+         syscall(SYS_getpid);
+         ++report.calls;
+-        if (interval) {
++        if (rate) {
++            poc_u64 due = start_wall + (report.calls / rate) * 1000000000ULL + (report.calls % rate) * 1000000000ULL / rate;
++            while (now_ns(CLOCK_MONOTONIC) < due) __asm__ __volatile__("pause");
++        } else if (interval) {
+             struct timespec remaining = delay;
+             while (nanosleep(&remaining, &remaining) && errno == EINTR) {}
+         }
+diff --git a/poc/tests/ring_tests.cpp b/poc/tests/ring_tests.cpp
+index 7f38c48..b38d759 100644
+--- a/poc/tests/ring_tests.cpp
++++ b/poc/tests/ring_tests.cpp
+@@ -88,9 +88,20 @@ int main(int argc, char **argv)
+ {
+     check(argc == 2, "provide signed enclave path");
+     sgx_enclave_id_t enclave;
+-    sgx_status_t status = sgx_create_enclave(argv[1], SGX_DEBUG_FLAG, nullptr, nullptr, &enclave, nullptr);
++    sgx_status_t status = sgx_create_enclave(argv[1], POC_CREATE_DEBUG, nullptr, nullptr, &enclave, nullptr);
+     if (status != SGX_SUCCESS) fprintf(stderr, "create enclave: 0x%08x\n", status);
+-    check(status == SGX_SUCCESS, "create SIM enclave");
++    check(status == SGX_SUCCESS, "create enclave");
++#if POC_HW
++    uint64_t flags;
++    uint8_t measurement[32], signer[32];
++    check(ecall_identity(enclave, &flags, measurement, signer) == SGX_SUCCESS, "read enclave REPORT");
++    printf("REPORT flags=0x%llx DEBUG=%d MRENCLAVE=", (unsigned long long)flags, !!(flags & SGX_FLAGS_DEBUG));
++    for (auto byte : measurement) printf("%02x", byte);
++    printf(" MRSIGNER=");
++    for (auto byte : signer) printf("%02x", byte);
++    putchar('\n');
++    check(!(flags & SGX_FLAGS_DEBUG), "hardware enclave debug disabled");
++#endif
+     {
+         Fixture ring(enclave);
+         poc_stats stats = {};
+@@ -165,7 +176,7 @@ int main(int argc, char **argv)
+         ring.append(&value, sizeof(value));
+         __atomic_store_n(&ring.control->stop, 1, __ATOMIC_RELEASE);
+         check(ecall_run(enclave, &result, &stats) == SGX_SUCCESS && result == 0 && stats.processed == 1, "stop drains and returns");
+-        puts("PASS: SIM parser, wrap, BUSY, DISCARD, malformed input, descriptor bounds, replay, tail batch, stop/drain");
++        puts("PASS: parser, wrap, BUSY, DISCARD, malformed input, descriptor bounds, replay, tail batch, stop/drain");
+         puts("AUTHENTICATION GAP: a well-formed event in anonymous memory was accepted; no kernel-origin authentication is claimed.");
+     }
+     sgx_destroy_enclave(enclave);

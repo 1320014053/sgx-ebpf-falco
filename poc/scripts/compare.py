@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 
-parser = argparse.ArgumentParser(description="Record QEMU TCG + SGX SIM runs; timings are not hardware SGX performance.")
+parser = argparse.ArgumentParser(description="Record GETPID runs with the selected SGX_MODE and SGX_DEBUG.")
 parser.add_argument("--repeats", type=int, default=5)
 parser.add_argument("--count", type=int, default=10000)
 parser.add_argument("--interval-us", type=int, default=1000)

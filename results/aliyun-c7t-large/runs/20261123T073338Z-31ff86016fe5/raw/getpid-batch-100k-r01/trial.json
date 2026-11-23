@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-batch-100k-r01",
+  "experiment": "getpid",
+  "mode": "batch",
+  "workload": "getpid",
+  "load_level": "100k",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.00000011,
+  "raw_path": "raw/getpid-batch-100k-r01/",
+  "start_utc": "2026-11-23T07:57:23.673772+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "batch",
+    "--seconds",
+    "60",
+    "--rate",
+    "100000",
+    "--allow-drops"
+  ]
+}

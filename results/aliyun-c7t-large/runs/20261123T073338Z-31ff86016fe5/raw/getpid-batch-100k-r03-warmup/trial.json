@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-batch-100k-r03-warmup",
+  "experiment": "warmup",
+  "mode": "batch",
+  "workload": "getpid",
+  "load_level": "100k",
+  "repeat": 3,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 2.000000098,
+  "raw_path": "raw/getpid-batch-100k-r03-warmup/",
+  "start_utc": "2026-11-23T10:10:12.344749+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "batch",
+    "--seconds",
+    "2",
+    "--rate",
+    "100000",
+    "--allow-drops"
+  ]
+}

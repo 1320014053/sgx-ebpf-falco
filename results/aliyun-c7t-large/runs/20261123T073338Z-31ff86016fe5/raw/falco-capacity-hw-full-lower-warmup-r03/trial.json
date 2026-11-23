@@ -1,0 +1,26 @@
+{
+  "trial_id": "falco-capacity-hw-full-lower-warmup-r03",
+  "experiment": "capacity-lower-warmup",
+  "mode": "hw-full",
+  "workload": "open-close-dev-null",
+  "load_level": "12000",
+  "repeat": 3,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 2.000000124,
+  "raw_path": "raw/falco-capacity-hw-full-lower-warmup-r03/",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-live/falco-live",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/data/http-hw-full-r00-retry2/falco.yaml",
+    "8192",
+    "-",
+    "falco_rules.yaml",
+    "raven_zeek_rules.yaml",
+    "--",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-load",
+    "12000",
+    "2",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/data/falco-capacity-hw-full-lower-warmup-r03/producer.json"
+  ]
+}

@@ -1,0 +1,5 @@
+2026-11-23T08:02:07+0000.445317Z [(H)ERROR] tid(0x7f2252811780) | sgxquoteexprovider: failed to load libsgx_quote_ex.so.1: libsgx_quote_ex.so.1: cannot open shared object file: No such file or directory
+ [/build/3rdparty/openenclave/openenclave-src/host/sgx/linux/sgxquoteexloader.c:oe_sgx_load_quote_ex_library:118]
+2026-11-23T08:02:07+0000.445335Z [(H)ERROR] tid(0x7f2252811780) | Failed to use SGX quote-ex library
+ (oe_result_t=OE_QUOTE_LIBRARY_LOAD_ERROR) [/build/3rdparty/openenclave/openenclave-src/host/sgx/sgxquote.c:oe_sgx_get_supported_attester_format_ids:1216]
+2026-11-23T08:02:07+0000.445370Z [(H)ERROR] tid(0x7f2252811780) | :OE_QUOTE_LIBRARY_LOAD_ERROR [/build/3rdparty/openenclave/openenclave-src/host/sgx/report.c:oe_get_report_v2:84]

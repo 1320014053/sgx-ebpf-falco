@@ -1,0 +1,30 @@
+{
+  "evidence/transfer.sha256": 1530,
+  "SHA256SUMS": 1552,
+  "bulk.sha256": 48,
+  "getpid": 75,
+  "warmup": 75,
+  "raven-memory": 8,
+  "falco-replay": 30,
+  "plugin-replay": 10,
+  "falco-capacity": 10,
+  "capacity-calibration": 8,
+  "capacity-warmup": 10,
+  "capacity-100k": 10,
+  "capacity-100k-warmup": 10,
+  "capacity-lower": 5,
+  "capacity-lower-warmup": 5,
+  "capacity-floor": 5,
+  "capacity-floor-warmup": 5,
+  "alert-latency": 15,
+  "idle": 4,
+  "replay-heap": 3,
+  "http_formal": 20,
+  "getpid_runtime_report_matches": true,
+  "falco_runtime_report_matches": 4,
+  "rows": 326,
+  "superseded_failures": [
+    "falco-offline-r01",
+    "http-hw-full-r00"
+  ]
+}

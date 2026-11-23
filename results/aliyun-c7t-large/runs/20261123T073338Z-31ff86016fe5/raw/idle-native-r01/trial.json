@@ -1,0 +1,19 @@
+{
+  "trial_id": "idle-native-r01",
+  "experiment": "idle",
+  "mode": "native",
+  "workload": "idle",
+  "load_level": "idle",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 15.012486668,
+  "raw_path": "raw/idle-native-r01/",
+  "start_utc": "2026-11-23T08:22:42.655356+00:00",
+  "collector_command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/deps/package/usr/bin/falco",
+    "-c",
+    "falco.yaml"
+  ],
+  "duration": 15
+}

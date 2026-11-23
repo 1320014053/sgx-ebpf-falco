@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-baseline-max-r04-warmup",
+  "experiment": "warmup",
+  "mode": "baseline",
+  "workload": "getpid",
+  "load_level": "max",
+  "repeat": 4,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 2.000000056,
+  "raw_path": "raw/getpid-baseline-max-r04-warmup/",
+  "start_utc": "2026-11-23T10:30:54.968979+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "baseline",
+    "--seconds",
+    "2",
+    "--interval-us",
+    "0",
+    "--allow-drops"
+  ]
+}

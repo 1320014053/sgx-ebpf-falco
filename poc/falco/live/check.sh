@@ -10,12 +10,16 @@ export TZ=UTC FALCO_HOSTNAME=falco-sgx-live
 cp "$here/reference.yaml" "$package/etc/falco/falco_rules.yaml" .
 ln -s "$package/usr/share/falco/plugins/libcontainer.so" .
 work=$(mktemp -d /tmp/falco-sgx.XXXXXX)
-trap 'rm -f -- "$work/worker"; rmdir -- "$work"' EXIT
+trap 'rm -f -- "$work/httpd" "$work/worker"; rmdir -- "$work"' EXIT
+if [[ -n ${FALCO_WORKLOAD_USER:-} ]]; then chmod 755 "$work"; fi
 cp "$live/httpd" "$work/worker"
+cp "$live/httpd" "$work/httpd"
 
-sudo -n env TZ="$TZ" FALCO_HOSTNAME="$FALCO_HOSTNAME" \
+as_root=()
+if (( EUID != 0 )); then as_root=(sudo -n); fi
+"${as_root[@]}" env TZ="$TZ" FALCO_HOSTNAME="$FALCO_HOSTNAME" \
     "$live/falco-live" "$build/falco-enclave.signed" reference.yaml 1024 reference.scap falco_rules.yaml \
-    -- runuser -u "$(id -un)" -- "$live/httpd" "$work/worker" >sgx-alerts.jsonl 2>sgx.log
+    -- runuser -u "${FALCO_WORKLOAD_USER:-$(id -un)}" -- "$work/httpd" "$work/worker" >sgx-alerts.jsonl 2>sgx.log
 sha256sum falco_rules.yaml reference.yaml reference.scap >inputs.sha256
 "$package/usr/bin/falco" --version >versions.txt
 "$package/usr/bin/falco" -c reference.yaml -L >native-rules.json 2>native-rules.log

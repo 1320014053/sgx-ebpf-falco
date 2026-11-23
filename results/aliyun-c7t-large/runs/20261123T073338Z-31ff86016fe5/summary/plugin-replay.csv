@@ -1,0 +1,11 @@
+trial,mode,repeat,load,seconds,events,packets,alerts,cold_to_ready_s,ready_to_summary_s,ready_to_exit_s,user_s,sys_s,peak_rss_kib
+plugin-replay-hw-r01,hw,1,captured,3.877881388,287,92,,,,,0.82,3.19,148652
+plugin-replay-hw-r02,hw,2,captured,3.821207203,287,92,,,,,0.73,3.21,148732
+plugin-replay-hw-r03,hw,3,captured,3.824521047,287,92,,,,,0.81,3.14,148936
+plugin-replay-hw-r04,hw,4,captured,3.822945961,287,92,,,,,0.77,3.17,148996
+plugin-replay-hw-r05,hw,5,captured,3.792342302,287,92,,,,,0.83,3.07,149056
+plugin-replay-native-r01,native,1,captured,0.208683306,287,92,,,,,0.16,0.0,53276
+plugin-replay-native-r02,native,2,captured,0.211751817,287,92,,,,,0.16,0.01,53648
+plugin-replay-native-r03,native,3,captured,0.206610409,287,92,,,,,0.16,0.0,53304
+plugin-replay-native-r04,native,4,captured,0.211389494,287,92,,,,,0.16,0.02,53660
+plugin-replay-native-r05,native,5,captured,0.208935392,287,92,,,,,0.17,0.0,53624

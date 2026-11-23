@@ -125,12 +125,13 @@ static uint64_t number(const char *value)
 static int run(int argc, char **argv)
 {
     std::string mode = "direct";
-    uint64_t count = 10000, interval = 1000, seconds = 0, pause_ms = 0;
+    uint64_t count = 10000, interval = 1000, seconds = 0, pause_ms = 0, rate = 0;
     bool allow_drops = false;
     const option options[] = {
         {"mode", required_argument, nullptr, 'm'},
         {"count", required_argument, nullptr, 'n'},
         {"interval-us", required_argument, nullptr, 'i'},
+        {"rate", required_argument, nullptr, 'r'},
         {"seconds", required_argument, nullptr, 's'},
         {"pause-ms", required_argument, nullptr, 'p'},
         {"allow-drops", no_argument, nullptr, 'd'},
@@ -142,11 +143,12 @@ static int run(int argc, char **argv)
         case 'm': mode = optarg; break;
         case 'n': count = number(optarg); break;
         case 'i': interval = number(optarg); break;
+        case 'r': rate = number(optarg); interval = 0; break;
         case 's': seconds = number(optarg); break;
         case 'p': pause_ms = number(optarg); break;
         case 'd': allow_drops = true; break;
         case 'h':
-            puts("poc --mode baseline|host|ecall|batch|step|direct [--count 10000] [--interval-us 1000] [--seconds 60] [--pause-ms 200] [--allow-drops]");
+            puts("poc --mode baseline|host|ecall|batch|step|direct [--count 10000] [--interval-us 1000 | --rate EVENTS_PER_SECOND] [--seconds 60] [--pause-ms 200] [--allow-drops]");
             return 0;
         default: return 2;
         }
@@ -154,6 +156,7 @@ static int run(int argc, char **argv)
     require(optind == argc, "unexpected positional argument");
     require(mode == "baseline" || mode == "host" || mode == "ecall" || mode == "batch" || mode == "step" || mode == "direct", "unknown mode");
     require((count || seconds) && seconds <= 86400 && interval <= 10000000 && pause_ms <= 60000, "arguments exceed experiment limits");
+    require(rate <= 1000000000 && !(rate && interval), "invalid pacing");
     require(mode == "baseline" || geteuid() == 0, "run as root to load and attach eBPF");
     char executable[4096];
     ssize_t path_bytes = readlink("/proc/self/exe", executable, sizeof(executable) - 1);
@@ -166,13 +169,13 @@ static int run(int argc, char **argv)
     require(pipe(start_pipe) == 0 && pipe(report_pipe) == 0, "pipe failed");
     std::string count_arg = std::to_string(count), interval_arg = std::to_string(interval);
     std::string ready_arg = std::to_string(start_pipe[0]), report_arg = std::to_string(report_pipe[1]);
-    std::string seconds_arg = std::to_string(seconds), generator = directory + "/generator";
+    std::string seconds_arg = std::to_string(seconds), rate_arg = std::to_string(rate), generator = directory + "/generator";
     pid_t child = fork();
     require(child >= 0, "fork failed");
     if (!child) {
         close(start_pipe[1]);
         close(report_pipe[0]);
-        execl(generator.c_str(), generator.c_str(), count_arg.c_str(), interval_arg.c_str(), ready_arg.c_str(), report_arg.c_str(), seconds_arg.c_str(), nullptr);
+        execl(generator.c_str(), generator.c_str(), count_arg.c_str(), interval_arg.c_str(), ready_arg.c_str(), report_arg.c_str(), seconds_arg.c_str(), rate_arg.c_str(), nullptr);
         _exit(127);
     }
     close(start_pipe[0]);
@@ -211,7 +214,7 @@ static int run(int argc, char **argv)
         if (error) resources.link = nullptr;
         require(resources.link, "attaching sys_enter_getpid failed");
         if (enclave_mode) {
-            sgx_ok(sgx_create_enclave((directory + "/enclave.signed.so").c_str(), SGX_DEBUG_FLAG, nullptr, nullptr, &resources.enclave, nullptr));
+            sgx_ok(sgx_create_enclave((directory + "/enclave.signed.so").c_str(), POC_CREATE_DEBUG, nullptr, nullptr, &resources.enclave, nullptr));
             context.enclave = resources.enclave;
             sgx_ok(ecall_config(resources.enclave, child));
             ++setup_ecalls;
@@ -323,7 +326,7 @@ static int run(int argc, char **argv)
     if (direct)
         ok = ok && context.stats.consumer_pos == context.stats.producer_pos &&
              context.stats.payload_copy_bytes == context.stats.processed * POC_EVENT_BYTES;
-    printf("{\"environment\":\"QEMU TCG + SGX SIM\",\"mode\":\"%s\",\"ok\":%s,"
+    printf("{\"environment\":\"%s\",\"mode\":\"%s\",\"ok\":%s,"
            "\"generator_calls\":%llu,\"attempted\":%llu,\"submitted\":%llu,\"reserve_failed\":%llu,"
            "\"processed\":%llu,\"matched\":%llu,\"format_rejected\":%llu,\"last_seq\":%llu,"
            "\"data_ecalls\":%llu,\"total_ecalls\":%llu,\"ocalls\":0,"
@@ -332,7 +335,7 @@ static int run(int argc, char **argv)
            "\"batch_events\":%llu,\"batches\":%llu,\"worker_result\":%d,"
            "\"wall_ns\":%llu,\"generation_wall_ns\":%llu,\"generator_wall_ns\":%llu,\"drain_ns\":%llu,"
            "\"host_cpu_ns\":%llu,\"consumer_cpu_ns\":%llu,\"generator_cpu_ns\":%llu}\n",
-           mode.c_str(), ok ? "true" : "false",
+           POC_HW ? "SGX HW non-debug build" : "QEMU TCG + SGX SIM", mode.c_str(), ok ? "true" : "false",
            (unsigned long long)report.calls, (unsigned long long)bpf_stats.attempted,
            (unsigned long long)bpf_stats.submitted, (unsigned long long)bpf_stats.reserve_failed,
            (unsigned long long)context.stats.processed, (unsigned long long)context.stats.matched,

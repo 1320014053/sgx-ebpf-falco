@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 project(falco_live LANGUAGES C CXX)
+option(FALCO_SGX_HARDWARE "Build for non-debug SGX hardware" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -41,7 +42,7 @@ add_custom_command(
     DEPENDS ../Falco.edl)
 add_library(falco_live_host STATIC ../host.cpp "${CMAKE_CURRENT_BINARY_DIR}/Falco_u.c")
 target_include_directories(falco_live_host PUBLIC "${CMAKE_CURRENT_BINARY_DIR}" ..)
-target_compile_definitions(falco_live_host PUBLIC OE_API_VERSION=2)
+target_compile_definitions(falco_live_host PUBLIC OE_API_VERSION=2 PRIVATE FALCO_SGX_HARDWARE=$<BOOL:${FALCO_SGX_HARDWARE}>)
 target_link_libraries(falco_live_host PUBLIC openenclave::oehost Threads::Threads)
 add_executable(falco-live live_host.cpp)
 get_target_property(libbpf_headers lbpf INTERFACE_INCLUDE_DIRECTORIES)

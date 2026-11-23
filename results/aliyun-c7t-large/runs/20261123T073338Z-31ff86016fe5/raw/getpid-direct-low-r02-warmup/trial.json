@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-direct-low-r02-warmup",
+  "experiment": "warmup",
+  "mode": "direct",
+  "workload": "getpid",
+  "load_level": "low",
+  "repeat": 2,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 2.000216602,
+  "raw_path": "raw/getpid-direct-low-r02-warmup/",
+  "start_utc": "2026-11-23T09:52:36.195494+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "direct",
+    "--seconds",
+    "2",
+    "--interval-us",
+    "1000",
+    "--allow-drops"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "seconds": 5.487427424,
+  "cold_to_ready_s": 3.575109422,
+  "ready_to_summary_s": 1.555242748,
+  "ready_to_exit_s": 1.912318002,
+  "events": 300000,
+  "alerts": 10000,
+  "alerts_sha256": "ca085b448ee6bb3c683f75e1453c607edbdbf2006270f0dc81ac73965a14ecb6",
+  "input_sha256": "fd33638faf166a687e646b377ca9f1005961a98e7e12bb24e3c1f40adcef1f7e",
+  "user_s": 2.33,
+  "sys_s": 3.26,
+  "peak_rss_kib": 177356
+}

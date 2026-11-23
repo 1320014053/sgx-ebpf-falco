@@ -1,0 +1,22 @@
+{
+  "trial_id": "getpid-smoke-step-r01",
+  "experiment": "smoke",
+  "mode": "step",
+  "workload": "getpid",
+  "load_level": "low",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 10.598663431,
+  "raw_path": "raw/getpid-smoke-step-r01/",
+  "start_utc": "2026-11-23T07:49:42.312605+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "step",
+    "--count",
+    "10003",
+    "--interval-us",
+    "1000"
+  ]
+}

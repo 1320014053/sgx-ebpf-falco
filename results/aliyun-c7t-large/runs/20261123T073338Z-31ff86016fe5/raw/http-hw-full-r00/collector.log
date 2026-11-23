@@ -1,0 +1,14 @@
+falco_rules.yaml | schema validation: ok
+raven_zeek_rules.yaml | schema validation: ok
+raven_zeek_rules.yaml: Invalid
+1 Errors:
+In rules content: (raven_zeek_rules.yaml:0:0)
+    rule 'RAVEN active detection': (raven_zeek_rules.yaml:4:2)
+    rule output: (raven_zeek_rules.yaml:8:10)
+------
+  output: "RAVEN %rz.rule %rz.result"
+          ^
+------
+LOAD_ERR_COMPILE_OUTPUT (Error compiling output): unknown filter: unexpected token after '
+
+raven_zeek_rules.yaml: OE_OK, enclave return 1

@@ -1,0 +1,28 @@
+Package: libsgx-dcap-ql
+Version: 1.22.100.3-jammy1
+Package: libsgx-qe3-logic
+Version: 1.22.100.3-jammy1
+Package: libsgx-pce-logic
+Version: 1.22.100.3-jammy1
+Package: libsgx-ae-qe3
+Version: 1.22.100.3-jammy1
+Package: libsgx-ae-pce
+Version: 2.25.100.3-jammy1
+Package: libsgx-quote-ex
+Version: 2.25.100.3-jammy1
+Package: libsgx-uae-service
+Version: 2.25.100.3-jammy1
+Package: libsgx-ae-id-enclave
+Version: 1.22.100.3-jammy1
+lrwxrwxrwx 1 root root    28 Sep 13  2024 /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_dcap_ql.so.1 -> libsgx_dcap_ql.so.1.11.109.3
+-rw-r--r-- 1 root root 18424 Sep 13  2024 /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_dcap_ql.so.1.11.109.3
+	linux-vdso.so.1 (0x00007ffcf1f9a000)
+	libsgx_qe3_logic.so => /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_qe3_logic.so (0x00007fbf4f61e000)
+	libsgx_pce_logic.so.1 => /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_pce_logic.so.1 (0x00007fbf4f613000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fbf4f3e3000)
+	libsgx_urts.so.2 => /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_urts.so.2 (0x00007fbf4f0e4000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fbf4eeb6000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fbf4f634000)
+	libsgx_enclave_common.so.1 => /var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/deps/runtime/usr/lib/x86_64-linux-gnu/libsgx_enclave_common.so.1 (0x00007fbf4eea7000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fbf4ee87000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fbf4eda0000)

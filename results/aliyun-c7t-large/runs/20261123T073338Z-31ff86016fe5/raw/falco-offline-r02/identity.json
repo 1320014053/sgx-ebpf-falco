@@ -1,0 +1,8 @@
+{
+  "debug": 0,
+  "mrenclave": "d47242afecc6f5aa13e6e96d0ecb23f126e8137d8c70a7c707ce091fd0421795",
+  "mrsigner": "c9d59532070d43829d3bad6e757477951bfff7645a09a9ec17701c811f2aacd5",
+  "sigstruct_flags": 4,
+  "sigstruct_mask": 18446744073709551483,
+  "image_sha256": "f74df854e85462862359c9849c754a2d4a76679f45d1a073f742e0c3b726df8f"
+}

@@ -1,0 +1,23 @@
+{
+  "trial_id": "plugin-replay-hw-r01",
+  "experiment": "plugin-replay",
+  "mode": "hw",
+  "workload": "fixed-jsonl-pcap",
+  "load_level": "captured",
+  "repeat": 1,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 3.877881388,
+  "raw_path": "raw/plugin-replay-hw-r01/",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/bin/falco-sgx",
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/falco-poc/build-ert/falco-enclave.signed",
+    "live.yaml",
+    "reference.scap",
+    "--plugin-host",
+    "events.jsonl",
+    "packets.pcap",
+    "falco_rules.yaml",
+    "raven_zeek_rules.yaml"
+  ]
+}

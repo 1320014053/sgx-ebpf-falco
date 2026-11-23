@@ -1,0 +1,23 @@
+{
+  "trial_id": "getpid-baseline-low-r02",
+  "experiment": "getpid",
+  "mode": "baseline",
+  "workload": "getpid",
+  "load_level": "low",
+  "repeat": 2,
+  "status": "ok",
+  "exit_code": 0,
+  "measurement_s": 60.000244656,
+  "raw_path": "raw/getpid-baseline-low-r02/",
+  "start_utc": "2026-11-23T09:53:40.367532+00:00",
+  "command": [
+    "/var/tmp/sgx-bench-20261123T073338Z-31ff86016fe5/poc/build/hw0/poc",
+    "--mode",
+    "baseline",
+    "--seconds",
+    "60",
+    "--interval-us",
+    "1000",
+    "--allow-drops"
+  ]
+}

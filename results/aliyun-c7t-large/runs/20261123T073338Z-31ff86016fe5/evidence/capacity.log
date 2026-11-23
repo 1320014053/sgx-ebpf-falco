@@ -1,0 +1,30 @@
+falco-capacity-hw-official-calibration-r01 0
+falco-capacity-hw-official-calibration-r02 0
+falco-capacity-hw-official-calibration-r03 0
+falco-capacity-hw-official-calibration-r04 0
+falco-capacity-hw-full-calibration-r01 0
+falco-capacity-hw-full-calibration-r02 0
+falco-capacity-hw-full-calibration-r03 0
+falco-capacity-hw-full-calibration-r04 0
+target pairs per second {'hw-official': 25594, 'hw-full': 25155}
+falco-capacity-hw-official-warmup-r01 0
+falco-capacity-hw-official-target-r01 0
+falco-capacity-hw-full-warmup-r01 0
+falco-capacity-hw-full-target-r01 0
+falco-capacity-hw-full-warmup-r02 0
+falco-capacity-hw-full-target-r02 0
+falco-capacity-hw-official-warmup-r02 0
+falco-capacity-hw-official-target-r02 0
+falco-capacity-hw-official-warmup-r03 0
+falco-capacity-hw-official-target-r03 0
+falco-capacity-hw-full-warmup-r03 0
+falco-capacity-hw-full-target-r03 0
+falco-capacity-hw-full-warmup-r04 0
+falco-capacity-hw-full-target-r04 0
+falco-capacity-hw-official-warmup-r04 0
+falco-capacity-hw-official-target-r04 0
+falco-capacity-hw-official-warmup-r05 0
+falco-capacity-hw-official-target-r05 0
+falco-capacity-hw-full-warmup-r05 0
+falco-capacity-hw-full-target-r05 0
+CAPACITY_MATRIX_COMPLETE
