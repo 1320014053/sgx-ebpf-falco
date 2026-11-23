@@ -6,6 +6,22 @@
     "verified_files": 144,
     "verified_executable_files": 19
   },
+  "environments": {
+    "falco_build": {
+      "guest": "Ubuntu 22.04.5 x86-64, SGX Simulation",
+      "accelerator": "WHPX",
+      "vcpus": 6,
+      "memory_mib": 6144,
+      "disk": "temporary qcow2 overlay over the existing Ubuntu guest"
+    },
+    "acceptance": {
+      "accelerator": "TCG",
+      "vcpus": 2,
+      "memory_mib": 4096,
+      "generic_kernel": "5.15.0-198-generic",
+      "moat_kernel": "6.1.38-moat-falco2"
+    }
+  },
   "verified_falco_binaries_sha256": {
     "build-falco/falco-enclave.signed": "9ac575b0f54519545173f301c36e446128ac3b210b5aefa1b15f77bcf345ef99",
     "build-falco/bin/falco-sgx": "618f3451138c7c18bc7bf36a761e43839b86170747ec06d9a95dc10ddf338a5c",
@@ -167,8 +183,44 @@
   },
   "moat": {
     "actions_run": "https://github.com/1320014053/sgx-ebpf-falco/actions/runs/45074567779",
-    "kernel": "6.1.38-moat-falco2",
+    "build_recipe_commit": "da4bfd5ed8753b3848c059fe2e0243d994ddc5da",
+    "artifact_id": 14774724531,
+    "asset": "moat-linux-6.1.38-falco2-amd64",
+    "zip_sha256": "70bb00f324554c28fe349346d7bcab3fc09044786afa48f69f29504120d0b300",
     "vmlinuz_sha256": "0def220b8799afe791b23c969c0c1b2e0d9124866673a581446afc418e7470f3",
-    "state": "Initial guest stopped before root was mounted. Awaiting boot with the recorded MOAT validation configuration."
+    "verified_manifest_entries": 4,
+    "kernel": "6.1.38-moat-falco2",
+    "guest_taint": 0,
+    "qemu_cpu": "max,la57=off",
+    "kernel_cmdline": "root=/dev/vda2 rootfstype=ext4 ro rootwait console=ttyS0,115200n8 nokaslr panic=3",
+    "initial_boot": {
+      "qemu_cpu": "max",
+      "nokaslr": false,
+      "reached_root_mount": false
+    },
+    "online_cpus": "0-1",
+    "native_smoke": {
+      "exit": 0,
+      "ring_id": 20,
+      "ring_bytes": 8388608,
+      "ring_released": true,
+      "marker_events": [
+        "openat",
+        "readv"
+      ]
+    },
+    "signed_live": {
+      "exit": 0,
+      "ring_id": 52,
+      "ring_bytes": 8388608,
+      "ring_released": true,
+      "accepted": 27017,
+      "alerts": 2,
+      "discarded": 0,
+      "format_rejected": 0,
+      "driver_drops": 0,
+      "matched_native_and_enclave_replay": true
+    },
+    "clean_guest_poweroff": true
   }
 }
