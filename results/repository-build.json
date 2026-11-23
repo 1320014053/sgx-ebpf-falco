@@ -1,0 +1,174 @@
+{
+  "date": "2026-11-22",
+  "source": {
+    "commit": "b55ebd3c4acf819c5dd38e50ba0aa163be3dcd79",
+    "git_archive_sha256": "f1a4151828120f99013e24d861c64a3f93292a8b61afd43fcea169f8ccfac1f4",
+    "verified_files": 144,
+    "verified_executable_files": 19
+  },
+  "verified_falco_binaries_sha256": {
+    "build-falco/falco-enclave.signed": "9ac575b0f54519545173f301c36e446128ac3b210b5aefa1b15f77bcf345ef99",
+    "build-falco/bin/falco-sgx": "618f3451138c7c18bc7bf36a761e43839b86170747ec06d9a95dc10ddf338a5c",
+    "build-falco/lib/libraven_zeek.so": "a1d84b3627bc6200bced47919d070dace35a7b53ab2856f8607b1346dcc4bb20",
+    "build-falco/bin/replay-detector": "9a2eca9ceae524f4ce9015720c0ece212ed962b097cd6e798bbb0fbc25f3641f",
+    "build-falco-live/falco-live": "96ec6abf8743d7e427bc520281c299f622889f6f60257dcd8390f393e5286bac",
+    "build-falco-live/falco-ring-test": "6334fe3465a70fab391aa7673a2c9803d05329ef799430fd8b0e67bfcf513309",
+    "build-falco-live/replay-ring": "c981e11da69f2d2f317e987c9148032efac6a320a1dcf4dbda36dd0c199e04f5"
+  },
+  "tcg": {
+    "getpid": {
+      "parser_exit": 0,
+      "smoke_exit": 0,
+      "modes": [
+        "host",
+        "ecall",
+        "batch",
+        "step",
+        "direct"
+      ],
+      "processed_per_mode": 10003,
+      "reserve_failures_per_mode": 0,
+      "saturation": {
+        "attempted": 20000,
+        "submitted": 3971,
+        "reserve_failed": 16029,
+        "processed": 3971,
+        "matched": 3971,
+        "format_rejected": 0
+      }
+    },
+    "falco_offline": {
+      "pass": true,
+      "matched_alerts": 2,
+      "loaded_rules": 25,
+      "enabled_rules": 25,
+      "alerts_by_rule": {
+        "Run shell untrusted": 2
+      }
+    },
+    "shared_ring": {
+      "records": 223,
+      "accepted": 220,
+      "alerts": 220,
+      "discarded": 1,
+      "format_rejected": 2,
+      "wrapped": 1,
+      "busy_waited": true,
+      "source_mutated_before_batch_finished": true
+    },
+    "falco_live": {
+      "accepted": 2874,
+      "alerts": 1,
+      "discarded": 0,
+      "format_rejected": 0,
+      "driver_drops": 0,
+      "data_ecalls": 1,
+      "matched_native_and_enclave_replay": true
+    },
+    "upstream_reference": {
+      "raven_scenarios": 8,
+      "zeek": {
+        "connections": 90,
+        "notices": [
+          "Scan::Address_Scan",
+          "Scan::Port_Scan"
+        ]
+      },
+      "verified_review_inputs": 10
+    },
+    "raven_zeek_live": {
+      "ring-only": {
+        "syscall_records": 7959,
+        "raven_events": 268,
+        "packets": 95,
+        "driver_drops": 0,
+        "packet_drops": 0,
+        "discarded": 0,
+        "format_rejected": 0,
+        "before_workload_exit": [
+          "Scan::Address_Scan",
+          "Scan::Port_Scan",
+          "server_spawns_shell"
+        ]
+      },
+      "recorded": {
+        "syscall_records": 7909,
+        "raven_events": 192,
+        "packets": 92,
+        "driver_drops": 0,
+        "packet_drops": 0,
+        "discarded": 0,
+        "format_rejected": 0,
+        "before_workload_exit": [
+          "Scan::Address_Scan",
+          "Scan::Port_Scan",
+          "server_spawns_shell"
+        ],
+        "matching_replay": [
+          "enclave",
+          "native"
+        ]
+      }
+    },
+    "raven_zeek_plugin": {
+      "entry_points": [
+        "native",
+        "signed_sgx_sim"
+      ],
+      "default_cases": 38,
+      "archived_cases_matching_project_expectations": {
+        "structure": 23,
+        "lifecycle": 19,
+        "behavior": 45,
+        "parity-audit": 8
+      },
+      "archived_cases_total": 95,
+      "completed_comparisons": {
+        "structure": 23,
+        "lifecycle": 22,
+        "behavior": 45,
+        "parity_audit": 27
+      },
+      "behavior_matches_pinned_upstream": {
+        "native": 44,
+        "sgx": 44
+      },
+      "behavior_known_difference": "duplicate-after-601s"
+    },
+    "historical_detector": {
+      "environments": [
+        "Ubuntu 24.04 WSL2",
+        "Ubuntu 22.04.5 QEMU TCG"
+      ],
+      "cmake_binary_runpath": "$ORIGIN/../lib",
+      "exit": 1,
+      "matched_upstream": 79,
+      "cases": 91,
+      "differences": [
+        "zeek/bsd-loop",
+        "zeek/ethernet-snap",
+        "raven/nullable-dst-ip",
+        "raven/nullable-file-path",
+        "raven/nullable-user",
+        "stream/stream-history-4000",
+        "zeek/tcp-half-close-reset-only",
+        "ip/tcp-half-close-reset-only",
+        "zeek/tcp-half-close-reset-peer-fin",
+        "ip/tcp-half-close-reset-peer-fin",
+        "zeek/udp-background-360",
+        "ip/udp-background-360"
+      ],
+      "same_difference_set_as": "results/verification.json"
+    },
+    "historical_signed_ring": {
+      "exit": 0,
+      "cases_passed": 8
+    }
+  },
+  "moat": {
+    "actions_run": "https://github.com/1320014053/sgx-ebpf-falco/actions/runs/45074567779",
+    "kernel": "6.1.38-moat-falco2",
+    "vmlinuz_sha256": "0def220b8799afe791b23c969c0c1b2e0d9124866673a581446afc418e7470f3",
+    "state": "Initial guest stopped before root was mounted. Awaiting boot with the recorded MOAT validation configuration."
+  }
+}

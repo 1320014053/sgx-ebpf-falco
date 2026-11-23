@@ -36,3 +36,23 @@ ssh -t @connection $guest "cd $guestDir && exec bash"
 ```
 
 此时客体的工作目录是该提交的仓库根目录，可直接执行[项目 README](../README.md) 中的命令。客体采用 TCG、2 个 vCPU 和 4 GiB 内存。`poc` 账号通过安装时生成的 SSH 密钥登录并可执行免密 sudo。结束实验后在客体内运行 `sudo poweroff`。
+
+## 用 Actions 内核启动同一客体
+
+先在通用内核下准备好要测的 Falco 和 bpftool。用 `findmnt -no SOURCE /` 确认客体根分区，下面的示例是 `/dev/vda2`。在客体内执行 `sudo poweroff`。下载本仓库的 MOAT Actions 产物，在 Linux 上执行 `sha256sum -c SHA256SUMS`，从 `linux-image-6.1.38-moat-falco2` 的 Debian 包中解出 `boot/vmlinuz-6.1.38-moat-falco2`，将镜像放到 Windows 数据目录。
+
+从仓库根目录运行下列 PowerShell 命令。MOAT 的 QEMU 配置使用四级分页 `la57=off`，内核命令行使用 `nokaslr`。`snapshot=on` 将本次写入保存在临时磁盘中。需要保存的验收结果应在客体关机前用 `scp` 取回。
+
+```powershell
+$dataRoot = '..'
+$disk = (Resolve-Path "$dataRoot\sgx-ebpf-sim.qcow2").Path
+$kernel = (Resolve-Path "$dataRoot\vmlinuz-6.1.38-moat-falco2").Path
+& 'C:\Program Files\qemu\qemu-system-x86_64.exe' `
+    -accel 'tcg,thread=multi' -machine q35 -cpu 'max,la57=off' -smp 2 -m 4096 `
+    -drive "file=$disk,format=qcow2,if=virtio,snapshot=on" `
+    -nic 'user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:2222-:22' `
+    -display none -serial stdio -monitor none -no-reboot -kernel $kernel `
+    -append 'root=/dev/vda2 rootfstype=ext4 ro rootwait console=ttyS0,115200n8 nokaslr panic=3'
+```
+
+在另一个终端用同一把 SSH 密钥登录。先用 `uname -r` 核对 `6.1.38-moat-falco2`，再从客体内的 Git 源码目录运行[项目的 MOAT 冒烟测试](../README.md#在-moat-上验证)。

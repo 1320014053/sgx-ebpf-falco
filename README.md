@@ -13,9 +13,7 @@
 
 ## 先运行 GETPID 测试
 
-Windows 主机从本仓库根目录按[虚拟机说明](vm/README.md)启动已有客体，将待测 Git 提交传入一个新目录。以下 Linux 命令从客体内该提交的仓库根目录开始。已安装依赖和 Intel SGX SDK 的客体可以直接执行构建和冒烟测试。
-
-在启用 eBPF 和 BTF 的 Ubuntu 22.04 x86-64 客体中，从仓库根目录执行。安装脚本准备 Intel SGX SDK 2.25 和编译依赖。
+在 Windows 上，从本仓库根目录按[虚拟机说明](vm/README.md)启动客体，并把待测 Git 提交传入新目录。下面的命令从客体内该提交的根目录运行。首次准备 Ubuntu 22.04 x86-64 客体时，安装脚本会配置 Intel SGX SDK 2.25 和编译依赖。已配置的客体可以跳过安装步骤。
 
 ```bash
 cd poc
@@ -24,19 +22,23 @@ bash scripts/build.sh
 sudo bash scripts/smoke.sh
 ```
 
-`smoke.sh` 在签名的 SIM enclave 内测试解析器，再加载真实内核探针，检查五种消费方式和满环恢复后的排空。只跑解析器时可执行 `make test`。Falco 的两套构建及运行顺序见 [Falco 使用说明](poc/falco/README.md)。
+`smoke.sh` 在签名的 SIM enclave 内测试解析器，再加载真实内核探针，检查五种消费方式和满环恢复后的排空。只跑解析器时可执行 `make test`。
+
+继续在同一份 `poc/` 源码中按 [Falco 构建说明](poc/falco/README.md)编译离线 enclave 和实时探针。`replay.sh` 生成 `build-falco/offline-run`，`upstream/check-reference.py` 生成 `build-falco/native-run`。两份结果供 `raven_zeek` 的普通 Falco 和签名 enclave 回归共用。各套件的命令和预期结果见[回归测试说明](poc/falco/tests/README.md)。
 
 ## 在 MOAT 上验证
 
-在 GitHub Actions 中运行 **Build MOAT Linux 6.1.38**，下载该次运行生成的 `moat-linux-6.1.38-falco2-amd64` 产物。解压后运行 `sha256sum -c SHA256SUMS`，将内核包装入测试客体并启动该内核。在客体内用 Falco 与 bpftool 的实际路径运行以下测试。
+在 GitHub Actions 中运行 **Build MOAT Linux 6.1.38**，下载该次运行生成的 `moat-linux-6.1.38-falco2-amd64` 产物。解压后运行 `sha256sum -c SHA256SUMS`。Windows 上可按[虚拟机说明](vm/README.md#用-actions-内核启动同一客体)直接引导包中的内核。进入客体后，从待测提交的根目录运行以下测试。
 
 ```bash
 sudo python3 moat-kernel-build/tests/falco-modern-smoke.py --default-buffer \
-    /path/to/falco /path/to/bpftool
+    "$PWD/poc/build-falco/deps/package/usr/bin/falco" "$PWD/poc/build-falco/deps/bpftool/bpftool"
 ```
 
 该测试核对标记文件的 `openat` 与 `readv` 告警、活动 ring 的容量和退出后的释放。工程使用 GitHub Actions 编译内核，本机可编译探针、用户态程序和 enclave。
 
 ## 验证记录
+
+从完整 Git 提交重新构建的结果见[独立构建验收记录](results/repository-build.json)，其中记录了源码提交、编译产物指纹、TCG 现场测试和历史回归的实际差异。
 
 已有验收涵盖 GETPID 通信、Falco 规则、检测器回放及 MOAT 上的 SGX Simulation。回放中仍有与固定上游不一致的用例，内存长测也保留了超过阈值的实测值。硬件 SGX 隔离和内核事件来源认证仍待验证。[验收摘要与原始记录](results/falco/acceptance.md)
