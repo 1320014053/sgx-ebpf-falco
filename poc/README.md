@@ -1,8 +1,10 @@
-# eBPF → SGX SDK Simulation 最小通信闭环
+# GETPID 前期实验：eBPF → SGX SDK 最小通信闭环
+
+本目录根下的 GETPID 是开发 Falco 之前的概念验证（POC），不是项目要交付的程序。项目开发的是 Falco，见 [Falco 构建与运行](falco/README.md)。
 
 在 x86-64 Linux 客体中，通过内核 eBPF 的 `syscalls:sys_enter_getpid` 采集事件，使用 Intel SGX SDK 2.25 的 SIM 库验证 enclave 的消费路径。
 
-Falco 原版规则与扩展使用独立的离线回放和 Modern eBPF 实时直读入口，见 [Falco SGX Simulation](falco/README.md)。
+GETPID 的 ring 解析用于独立测量通信开销，不随 Falco 的 ring 消费模块同步更新。
 
 ## 构建与运行
 
