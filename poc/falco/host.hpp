@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Falco_u.h"
+#include "live/ring.hpp"
+#include <atomic>
 #include <cstdio>
 #include <memory>
 #include <string>
@@ -25,5 +27,12 @@ struct PluginInputs {
 extern std::FILE* falco_trace_file;
 extern std::FILE* falco_events_file;
 extern std::FILE* falco_packets_file;
-extern uint64_t falco_output_ocalls;
-extern uint64_t falco_trace_ocalls;
+extern std::atomic<uint64_t> falco_output_ocalls;
+extern std::atomic<uint64_t> falco_trace_ocalls;
+extern uint64_t falco_sleep_ocalls;
+extern uint64_t falco_sleep_ns;
+extern uint64_t falco_consumer_cpu_ns;
+extern size_t falco_output_queue_peak;
+extern size_t falco_output_queue_peak_bytes;
+unsigned run_live(oe_enclave_t* enclave, uint8_t* snapshot, size_t bytes, uint64_t consumer, uint64_t producer,
+              uint64_t control, size_t page, size_t capacity, bool record, uint8_t inputs);

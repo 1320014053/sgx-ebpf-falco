@@ -81,7 +81,11 @@ bash falco/live/check-ring.sh build-falco/deps/package build-falco build-falco-l
 falco-live ENCLAVE CONFIG RING_KIB TRACE_OR_- RULES... [-- WORKLOAD [ARGS...]]
 ```
 
-Host 初始化固定版本驱动和 procfs 快照，核对所有 CPU 指向同一个真实 ring map。它保留失败的 syscall exit，并关闭 BPF 迭代器。Enclave 通过一次数据 ECALL 从 mmap 获取变长事件，每条载荷有界复制到私有内存，再交给共用的解析和检测链。工作负载结束后，Host 停用采集并等待排空。`TRACE_OR_-` 传新文件名时批量导出同一份输入，传 `-` 时仅输出告警和统计。队列容量为 16 至 65536 KiB 的二次幂，运行要求 4 KiB 页。
+Host 初始化固定版本驱动和 procfs 快照，核对所有 CPU 指向同一个真实 ring map。它保留失败的 syscall exit，并关闭 BPF 迭代器。宿主调用 `falco_live_setup` 校验映射和快照，再让采集线程与分析线程分别进入 `falco_live_run`。采集线程把载荷复制到 enclave 私有块后立即写回消费位置。分析线程运行 libsinsp 和官方规则。启用 raven_zeek 时，第三个宿主线程进入 enclave，按顺序接收分析线程交付的 RAVEN 行、报文和时钟更新。检测线程处理完一个私有块，采集线程才可复用它。官方规则和 raven_zeek 各自按来源顺序输出，两个来源的告警可以交错。两个线程并行匹配，但格式化告警时串行，因为固定版本 libsinsp 的时间格式化使用不可重入的 `gmtime()`。停止时依次排空 ring、私有块和宿主输出队列，再由 `falco_live_finish` 输出统计。`TRACE_OR_-` 传新文件名时批量导出同一份输入，传 `-` 时仅输出告警和统计。ring 容量为 16 至 65536 KiB 的二次幂，运行要求 4 KiB 页。
+
+实时配置默认 `buffered_outputs: false`，每个有告警的事件交付一次，由宿主线程写 stdout。设为 `true` 后按 64 KiB 刷新，停止时写出余量。ring 读空时按 libscap 的常量从 500 µs 退避到 30 ms，`idle: spin` 可用于忙等对照。`live_block_count` 默认 32，`live_block_bytes` 默认 262144。统计中的 `ingest_stalls` 是采集线程等待空闲块的次数，`peak_blocks` 与 `output_queue_peak` 分别记录在用块数和宿主待写块数的峰值。`output_queue_peak_bytes` 记录宿主队列同时待写的最大载荷字节数。驱动单独报告丢失。
+
+实时统计的 `errors` 按 raw-block 读取（`batch`）、官方规则的匹配和格式化（`match`、`format`）、raven_zeek 告警的匹配和格式化（`plugin_match`、`plugin_format`）、翻译（`translate`）、RAVEN 事件和时钟推进（`raven`、`raven_advance`）、Zeek 报文和时钟推进（`zeek`、`zeek_advance`）分项计数，两个来源各自计算错误预算。RAVEN 事件或时钟推进出错时以 `error` 缺口重置状态，Zeek 跳过出错的报文或时钟推进。可恢复错误默认继续，每类只打印前三条。某类连续失败 16 次，或从首次失败起的一秒采样窗口内至少尝试 64 次且超过半数失败，采集以非零状态结束。运行 `live/check.sh`、`live/check-ring.sh`、`live/check-detectors.py` 时可在首参数加 `--strict`，令任何恢复计数都使测试失败。`tests/check-history.py ring` 也接受此选项。
 
 ## 容器元数据与官方规则
 

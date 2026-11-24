@@ -10,11 +10,15 @@ enclave {
                                          [in, size=packets_size] uint8_t* packets, size_t packets_size,
                                          uint8_t have_pcap, uint8_t tetragon, uint8_t host_capture);
         public int falco_plugin_stream([in, size=bytes] uint8_t* lines, size_t bytes, uint8_t finish);
-        public int falco_live([in, size=bytes] uint8_t* snapshot, size_t bytes,
+        public int falco_live_setup([in, size=bytes] uint8_t* snapshot, size_t bytes,
                               uint64_t consumer, uint64_t producer, uint64_t control,
                               size_t page, size_t capacity, uint8_t record, uint8_t record_inputs);
+        public int falco_live_run(uint8_t role);
+        public void falco_live_cancel();
+        public int falco_live_finish();
     };
     untrusted {
+        void falco_sleep(uint32_t us);
         int falco_emit([in, size=bytes] const char* data, size_t bytes, int diagnostics);
         int falco_trace_append([in, size=bytes] const uint8_t* data, size_t bytes);
         int falco_record_input([in, size=bytes] const uint8_t* data, size_t bytes,

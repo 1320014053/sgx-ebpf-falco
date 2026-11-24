@@ -107,7 +107,7 @@ def check_marker():
     rings = json.loads(Path("kernel-rings.json").read_text())
     ring, = (r for r in rings if r["id"] == driver["map_id"])
     assert ring["max_entries"] == driver["ring_bytes"] == 8 * 1024 * 1024
-    assert driver["data_ecalls"] == 1 and driver["trace_ocalls"] > 0
+    assert driver["data_ecalls"] == 4 and driver["trace_ocalls"] > 0
     assert driver["driver_drops"] == consumer["discarded"] == consumer["format_rejected"] == 0
     assert driver["driver_events"] == consumer["records"] == consumer["accepted"] > 0
     assert driver["producer"] == driver["consumer"] == consumer["producer"] == consumer["consumer"]

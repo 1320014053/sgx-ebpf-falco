@@ -63,3 +63,43 @@ python3 -B falco/tests/check-history.py ring build-falco-live/replay-ring \
 ```
 
 历史用例以固定上游为预期。有差异时会列出用例名、运行入口和首项差异，最后返回非零。`previously differed` 表示该用例在原审查中也出现过差异。最近的实测计数见 [验收记录](../../../results/falco/acceptance.md)。
+
+## 实时 ring 与错误恢复
+
+在 `poc/` 下执行。单元测试使用 memfd 的双重映射。故障注入测试使用同一份规则和输入，逐条核对剩余告警、错误计数、诊断限速和错误预算。测试镜像使用独立的签名文件名。
+
+```bash
+cmake --build build-falco --target bpf-ring-test
+build-falco/bin/bpf-ring-test
+cmake -S falco -B build-falco -DFALCO_SGX_FAULT_INJECTION=ON
+cmake --build build-falco --target sign-falco-fault
+cmake --build build-falco-live --target falco-ring-test replay-ring
+python3 -B falco/tests/check-faults.py build-falco-live build-falco/falco-fault-enclave.signed \
+    build-falco/deps/package/etc/falco/falco_rules.yaml
+```
+
+RAVEN 微基准生成 0、10、100、1000 条可复核链。`--profile` 单独计时背景文件事件，并报告复核、判定和祖先查询次数。整轮吞吐还包括构造与匹配这些链的时间。
+
+```bash
+cmake --build build-falco --target replay-detector
+python3 -B falco/bench/review-throughput.py build-falco/bin/replay-detector --profile
+```
+
+双来源并发探针使用普通 Linux 进程和项目固定的引擎及 libs。它按实时分析线程和检测线程的分工运行两个线程，共用同一个引擎和格式化器。系统调用线程用 raw-block inspector 把 `fixture.py` 生成的事件块读 100 轮；raven_zeek 线程用静态链接的插件反复读取归档的 RAVEN 事件流，直到系统调用线程结束。两个线程都完成读取、匹配和格式化，探针要求每一轮都产生告警。
+
+```bash
+CC=clang CXX=clang++ cmake -S falco/tests/tsan -B build-tsan -G Ninja
+cmake --build build-tsan --target engine-concurrency
+mkdir -p build-tsan/input
+(cd build-tsan/input && python3 ../../falco/fixture.py)
+unzip -p falco/tests/fixtures/regression.zip history/inputs/live-recorded.jsonl > build-tsan/input/raven.jsonl
+TSAN_OPTIONS=halt_on_error=1 build-tsan/bin/engine-concurrency build-tsan/input/reference.scap \
+    build-tsan/input/raven.jsonl
+```
+
+混合来源测试把官方规则的进程快照、httpd 启动 shell 的系统调用和历史扫描报文放入同一个 ring。它使用单分析线程原版的完整告警摘要，核对每项内容的出现次数及两个来源各自的顺序，保留 RAVEN 检测 ID 的引用关系。
+
+```bash
+python3 -B falco/tests/check-source-order.py build-falco-live/replay-ring \
+    build-falco/falco-enclave.signed build-falco/deps/package/etc/falco/falco_rules.yaml
+```

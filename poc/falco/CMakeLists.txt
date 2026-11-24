@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
 project(sgx_falco LANGUAGES C CXX)
 option(FALCO_SGX_HARDWARE "Build for non-debug SGX hardware" OFF)
+option(FALCO_SGX_FAULT_INJECTION "Build a separate simulation image for live fault tests" OFF)
+if(FALCO_SGX_FAULT_INJECTION AND FALCO_SGX_HARDWARE)
+    message(FATAL_ERROR "Fault injection is available only in simulation")
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,6 +13,7 @@ set(LIBS_DIR "${DEPS}/libs")
 set(FALCO_DIR "${DEPS}/falco")
 set(OpenEnclave_DIR "${DEPS}/ert/opt/edgelessrt/lib/openenclave/cmake")
 find_package(OpenEnclave CONFIG REQUIRED NO_DEFAULT_PATH)
+find_package(Threads REQUIRED)
 
 set(edl "${CMAKE_CURRENT_SOURCE_DIR}/Falco.edl")
 add_custom_command(
@@ -24,7 +29,7 @@ add_executable(falco-sgx host.cpp replay_host.cpp "${CMAKE_CURRENT_BINARY_DIR}/F
 set_target_properties(falco-sgx PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 target_include_directories(falco-sgx PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_compile_definitions(falco-sgx PRIVATE OE_API_VERSION=2 FALCO_SGX_HARDWARE=$<BOOL:${FALCO_SGX_HARDWARE}>)
-target_link_libraries(falco-sgx PRIVATE openenclave::oehost)
+target_link_libraries(falco-sgx PRIVATE openenclave::oehost Threads::Threads)
 
 set(detector_sources "${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/plugin/raven.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/plugin/graph.cpp"

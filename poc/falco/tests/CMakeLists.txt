@@ -6,3 +6,5 @@ set_target_properties(replay-detector PROPERTIES
     BUILD_RPATH_USE_ORIGIN TRUE)
 target_include_directories(replay-detector PRIVATE ../plugin "${DEPS}/njson/single_include")
 target_link_libraries(replay-detector PRIVATE raven_zeek)
+
+add_executable(bpf-ring-test EXCLUDE_FROM_ALL bpf-ring-test.cpp)

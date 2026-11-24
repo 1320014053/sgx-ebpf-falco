@@ -62,7 +62,7 @@ def detector_results(path):
     return raven, notices
 
 
-def check(package, build, live, out):
+def check(package, build, live, out, strict=False):
     here = Path(__file__).resolve().parent
     out.mkdir()
     shutil.copy2(here.parent / "plugin/live.yaml", out / "live.yaml")
@@ -130,7 +130,10 @@ def check(package, build, live, out):
         summary["enclave_mode"] = "SGX hardware DEBUG=0" if any(s.startswith("REPORT DEBUG=0 ") for s in lines) else "SGX Simulation"
         logs = [json.loads(s) for s in lines if s.startswith("{")]
         ring = next(r for r in logs if r.get("mode") == "live")
+        if strict and any(ring["errors"].values()):
+            raise AssertionError(f"live errors: {ring['errors']}")
         driver = next(r for r in logs if r.get("mode") == "modern_ebpf")
+        assert driver["data_ecalls"] == 5
         assert ring["raven_events"] > 0 and ring["packet_records"] == driver["packet_submitted"] > 0
         assert driver["driver_events"] + ring["packet_records"] == ring["accepted"] == ring["records"]
         assert driver["consumer"] == driver["producer"] == ring["consumer"] == ring["producer"]
@@ -158,7 +161,13 @@ def check(package, build, live, out):
             cmd = [build / "bin/falco-sgx", build / "falco-enclave.signed", "live.yaml", "reference.scap",
                    "--plugin-host", "events.jsonl", "packets.pcap", "falco_rules.yaml", "raven_zeek_rules.yaml"]
             with (cwd / "replay.jsonl").open("xb") as output, (cwd / "replay.log").open("xb") as log:
-                subprocess.run(cmd, cwd=cwd, stdout=output, stderr=log, env=dict(os.environ, TZ="UTC"), check=True)
+                subprocess.run(cmd, cwd=cwd, stdout=output, stderr=log,
+                               env=dict(os.environ, TZ="UTC", FALCO_HOSTNAME="falco-rz-live"), check=True)
+            def official_alerts(name):
+                alerts = map(json.loads, (cwd / name).read_text().splitlines())
+                return [alert for alert in alerts if alert["source"] == "syscall"]
+
+            assert official_alerts("alerts.jsonl") == official_alerts("replay.jsonl"), "ordered syscall alerts differ"
             replay_config = (here.parent / "plugin/replay.yaml").read_text().replace(
                 '"format":"replay"', '"format":"replay","host_capture":true')
             (cwd / "native.yaml").write_text(replay_config)
@@ -181,6 +190,9 @@ if __name__ == "__main__":
     if sys.argv[1] == "--workload":
         workload(Path(sys.argv[2]), Path(sys.argv[3]))
     else:
+        strict = sys.argv[1] == "--strict"
+        if strict:
+            del sys.argv[1]
         if len(sys.argv) != 5:
             sys.exit("usage: check-detectors.py FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY")
-        print(json.dumps(check(*(Path(p).resolve() for p in sys.argv[1:])), indent=2))
+        print(json.dumps(check(*(Path(p).resolve() for p in sys.argv[1:]), strict=strict), indent=2))

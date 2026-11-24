@@ -5,11 +5,14 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 #include <string_view>
 
 namespace rz {
 using Json = nlohmann::json;
 using Publish = std::function<void(const Json&)>;
+
+struct RetentionReportError : std::runtime_error { using std::runtime_error::runtime_error; };
 
 struct RavenOptions {
     size_t high = 128ULL * 1024 * 1024;
@@ -39,6 +42,8 @@ public:
     explicit RavenStream(Publish publish, RavenOptions options = {});
     ~RavenStream();
     void event(const Json& row);
+    uint64_t seen() const;
+    void error_gap(uint64_t failed_sequence, size_t discarded_outputs);
     void line(std::string_view line);
     void advance(double ts, bool finish = false);
 };

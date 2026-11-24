@@ -7,6 +7,7 @@
 #include <cstring>
 #include <ctime>
 #include <deque>
+#include <list>
 #include <memory>
 #include <unistd.h>
 #ifdef RZ_ENCLAVE
@@ -30,12 +31,12 @@ void retention_report(const Json& sample) {
     Json out = sample;
 #ifdef RZ_ENCLAVE
     oe_mallinfo_t info{};
-    if (oe_allocator_mallinfo(&info) != OE_OK) throw std::runtime_error("cannot sample trusted heap");
+    if (oe_allocator_mallinfo(&info) != OE_OK) throw RetentionReportError("cannot sample trusted heap");
     out["heap"] = info.current_allocated_heap_size;
     out["heap_peak"] = info.peak_allocated_heap_size;
     auto line = "RZRET " + out.dump() + "\n";
     int result = -1;
-    if (falco_emit(&result,line.data(),line.size(),1) != OE_OK || result) throw std::runtime_error("cannot publish retention metrics");
+    if (falco_emit(&result,line.data(),line.size(),1) != OE_OK || result) throw RetentionReportError("cannot publish retention metrics");
 #else
     FILE* file = std::fopen("/proc/self/smaps_rollup", "r");
     if (file) {
@@ -322,7 +323,8 @@ const Rule rules[] = {
 };
 using Chain = std::vector<std::shared_ptr<Event>>;
 
-std::vector<int64_t> lineage(const Tree& tree, int64_t pid) {
+std::vector<int64_t> lineage(const Tree& tree, int64_t pid, uint64_t& calls) {
+    ++calls;
     std::vector<int64_t> out;
     std::set<int64_t> visited;
     while (tree.count(pid) && visited.insert(pid).second) {
@@ -334,7 +336,7 @@ std::vector<int64_t> lineage(const Tree& tree, int64_t pid) {
     return out;
 }
 
-bool matches(const Step& step, const Event& e, const Event* prev, const Tree& tree) {
+bool matches(const Step& step, const Event& e, const Event* prev, const Tree& tree, uint64_t& lineage_calls) {
     std::string_view type(step.type), signal(step.signal), rel(step.relation);
     if (type == "sensitive_access") { if (e.type != "file_access" || !e.tag("is_sensitive")) return false; }
     else if (type == "executable_create") {
@@ -347,7 +349,7 @@ bool matches(const Step& step, const Event& e, const Event* prev, const Tree& tr
     if (prev->id == e.id) return false;
     if (rel == "same") return prev->pid == e.pid;
     auto ancestor = [&](int64_t pid) {
-        auto parents = lineage(tree, pid);
+        auto parents = lineage(tree, pid, lineage_calls);
         return std::find(parents.begin(), parents.end(), prev->pid) != parents.end();
     };
     if (rel == "child") {
@@ -388,7 +390,21 @@ struct Engine {
     Publish publish;
     Tree tree;
     Graph graph;
-    std::map<int64_t, std::deque<std::shared_ptr<Event>>> ledger;
+    struct History {
+        std::deque<std::shared_ptr<Event>> events;
+        size_t nonbenign = 0, network = 0;
+    };
+    std::map<int64_t, History> ledger;
+    size_t ledger_network = 0;
+    struct Review {
+        Json* detection;
+        double end;
+        std::vector<int64_t> roots;
+        bool network;
+    };
+    std::list<Review> active;
+    size_t active_network = 0;
+    uint64_t reviews = 0, settles = 0, lineage_calls = 0;
     std::deque<int64_t> pid_order;
     std::array<std::vector<Chain>, std::size(rules)> partials;
     using MatchKey = std::pair<std::string,std::set<std::string>>;
@@ -410,7 +426,7 @@ struct Engine {
     }
     double coverage() const { return std::max({start_time,now-history_seconds,cutoff}); }
     void sample(const char* phase) const {
-        retention_report({{"phase",phase},{"seen",seen},{"published",delivered},{"hash",std::to_string(input_hash)},
+        retention_report({{"phase",phase},{"review_calls",reviews},{"settle_calls",settles},{"lineage_calls",lineage_calls},{"seen",seen},{"published",delivered},{"hash",std::to_string(input_hash)},
                           {"now",now},{"start",coverage()},{"seconds",std::max(0.0,now-coverage())},
                           {"oldest_retained",graph.observations() ? Json(graph.earliest(now)) : Json(nullptr)},
                           {"time_evicted",time_evicted},{"budget_evicted",budget_evicted},{"ordinal_ids",ordinal_ids},
@@ -444,6 +460,10 @@ struct Engine {
     void drop_snapshot() {
         snapshot_bytes -= snapshots.front().cost;
         snapshots.pop_front();
+        if (!active.empty() && active.front().detection == &detections.front()) {
+            active_network -= active.front().network;
+            active.pop_front();
+        }
         detections.pop_front();
     }
     bool collect(size_t reserve, const Chain* completing = nullptr) {
@@ -475,10 +495,15 @@ struct Engine {
             else ++budget_evicted;
             release_reviews();
             auto l = ledger.find(pid);
-            if (l != ledger.end() && !l->second.empty() && l->second.front()->sequence <= key.second) {
-                auto& list = l->second;
+            if (l != ledger.end() && !l->second.events.empty() && l->second.events.front()->sequence <= key.second) {
+                auto& list = l->second.events;
                 auto p = std::find_if(list.begin(),list.end(),[&](const auto& e){return e->sequence == key.second;});
-                if (p != list.end()) list.erase(p);
+                if (p != list.end()) {
+                    l->second.nonbenign -= (*p)->nonbenign;
+                    l->second.network -= (*p)->network;
+                    ledger_network -= (*p)->network;
+                    list.erase(p);
+                }
                 if (list.empty()) {
                     ledger.erase(l);
                     auto p = std::find(pid_order.begin(),pid_order.end(),pid);
@@ -497,14 +522,15 @@ struct Engine {
         return reserve <= high && charged() <= high-reserve;
     }
     struct SegmentFull {};
-    void end_segment() {
-        retention_report({{"phase","gap"},{"first",segment_start},{"last",seen},{"reason","protected_budget"},
+    void end_segment(const char* cause = "protected_budget") {
+        retention_report({{"phase","gap"},{"first",segment_start},{"last",seen},{"reason",cause},
                           {"unpublished",publish ? 0 : detections.size()},{"retained",graph.observations()}});
         for (auto& v : partials) std::vector<Chain>().swap(v);
         emitted.clear(); by_finish.clear(); detections.clear(); snapshots.clear();
+        active.clear(); active_network = ledger_network = 0;
         tree.clear(); ledger.clear(); pid_order.clear(); graph = Graph{};
         tree_bytes = match_bytes = snapshot_bytes = 0;
-        cutoff=now; cutoff_seq=seen; reason="protected_budget"; segment_start=seen+1; ++resets; ++skipped;
+        cutoff=now; cutoff_seq=seen; reason=cause; segment_start=seen+1; ++resets; ++skipped;
     }
 
     void finish_match(const Rule& rule, const Chain& chain) {
@@ -543,9 +569,9 @@ struct Engine {
                 {"args",args},{"user",e.user},{"file_path",e.path},{"dst_ip",e.ip},{"dst_port",e.port},{"tags",tags}});
         }
         int64_t root = pids.empty() ? -1 : pids.front();
-        for (auto candidate : lineage(tree, root)) {
+        for (auto candidate : lineage(tree, root, lineage_calls)) {
             if (std::all_of(pids.begin(), pids.end(), [&](int64_t pid) {
-                auto a = lineage(tree, pid);
+                auto a = lineage(tree, pid, lineage_calls);
                 return a.empty() || std::find(a.begin(), a.end(), candidate) != a.end();
             })) { root = candidate; break; }
         }
@@ -570,15 +596,17 @@ struct Engine {
             {"reconstruction",{{"root_process",{{"pid",root},{"exe",root_name}}},{"pattern",pattern_text},{"timeline",timeline},
                                {"narrative",story},{"graph",graph.subgraph(ids)}}},
             {"scenario_run",""},{"meta",{{"chain",true}}},{"events",events}};
-        settle(d);
+        std::sort(pids.begin(), pids.end());
+        pids.erase(std::unique(pids.begin(), pids.end()), pids.end());
+        Review review{&d, end, std::move(pids), std::any_of(chain.begin(), chain.end(),
+                      [](const auto& e) { return e->network; })};
+        bool reviewable = std::none_of(chain.begin(), chain.end(), [](const auto& e) { return e->nonbenign; });
+        if (reviewable) {
+            std::optional<EvidenceIndex> index;
+            reviewable = !settle(review, index);
+        }
         size_t key_cost = 224 + match.first.size();
         for (const auto& x : ids) key_cost += 96 + x.size();
-        // A directly sensitive, privileged or external event can never become a benign review.
-        const bool reviewable = d.at("state") == "active" && std::none_of(chain.begin(),chain.end(),[](const auto& e) {
-            return e->tag("is_sensitive") || e->type == "privilege_change" ||
-                   (e->type=="process_exec" && (e->tag("is_unknown_exec") || e->tag("is_staged"))) ||
-                   (e->type=="net_connect" && !e->tag("net_private"));
-        });
         const bool retain = !publish || reviewable;
         size_t cost = retain ? 128 + json_charge(d) : 0;
         if (!collect(key_cost+cost,&chain)) throw SegmentFull{};
@@ -588,35 +616,50 @@ struct Engine {
         if (publish) { publish(materialize(d)); ++delivered; }
         if (retain) {
             detections.push_back(std::move(d));
+            if (reviewable) {
+                review.detection = &detections.back();
+                active_network += review.network;
+                active.push_back(std::move(review));
+            }
             snapshots.push_back({cost,end,seen});
             snapshot_bytes += cost;
             if (detections.size() > 4000) drop_snapshot();
         }
     }
 
-    void settle(Json& d) const {
-        if (d["state"] != "active") return;
-        bool net = false;
-        auto benign = [&](const std::string& type, const Json& tags) {
-            if (type == "net_connect") { net = true; if (!tags.at("net_private").get<bool>()) return false; }
-            return !(type == "process_exec" && (tags.at("is_unknown_exec").get<bool>() || tags.at("is_staged").get<bool>())) &&
-                !tags.at("is_sensitive").get<bool>() && type != "privilege_change";
-        };
-        std::set<int64_t> roots;
-        for (const auto& e : d.at("events")) {
-            if (!benign(e.at("type"), e.at("tags"))) return;
-            if (e.at("pid") > 0) roots.insert(e.at("pid").get<int64_t>());
+    // Each root needs only the disjunction of its related histories' two predicates.
+    struct Evidence { bool nonbenign = false, network = false; };
+    using EvidenceIndex = std::map<int64_t, Evidence>;
+    bool settle(const Review& review, std::optional<EvidenceIndex>& index) {
+        ++settles;
+        if (!review.network && !ledger_network) return false;
+        if (!index) {
+            index.emplace();
+            for (const auto& item : ledger) {
+                const auto pid = item.first;
+                const auto& history = item.second;
+                if (!history.nonbenign && !history.network) continue;
+                auto add = [&](int64_t root) {
+                    auto& evidence = (*index)[root];
+                    evidence.nonbenign |= history.nonbenign != 0;
+                    evidence.network |= history.network != 0;
+                };
+                add(pid);
+                auto parents = lineage(tree, pid, lineage_calls);
+                for (size_t i = 0; i < std::min<size_t>(4, parents.size()); ++i) add(parents[i]);
+            }
         }
-        for (const auto& [pid, recent] : ledger) {
-            auto parents = lineage(tree, pid);
-            auto end = parents.begin() + std::min<size_t>(4, parents.size());
-            if (!roots.count(pid) && std::none_of(parents.begin(), end, [&](int64_t p){ return roots.count(p); })) continue;
-            for (const auto& e : recent) if (!benign(e->type,e->tags)) return;
+        bool network = review.network;
+        for (auto root : review.roots) {
+            auto it = index->find(root);
+            if (it == index->end()) continue;
+            if (it->second.nonbenign) return false;
+            network |= it->second.network;
         }
-        if (net) {
-            d["state"] = "context_filtered";
-            d["reason_note"] = "context-filtered as benign: behavior-graph context shows internal-only network, no unknown/staged executables, no sensitive access, no privilege change";
-        }
+        if (!network) return false;
+        (*review.detection)["state"] = "context_filtered";
+        (*review.detection)["reason_note"] = "context-filtered as benign: behavior-graph context shows internal-only network, no unknown/staged executables, no sensitive access, no privilege change";
+        return true;
     }
 
     void feed(const Json& raw) try {
@@ -661,20 +704,37 @@ struct Engine {
         graph.observe(*e,event_cost);
         if (!ledger.count(e->pid)) pid_order.push_back(e->pid);
         auto& history = ledger[e->pid];
-        history.push_back(e);
-        if (history.size() > 400) history.pop_front();
-        if (pid_order.size() > 2048) { ledger.erase(pid_order.front()); pid_order.pop_front(); }
+        e->network = e->type == "net_connect";
+        e->nonbenign = e->tag("is_sensitive") || e->type == "privilege_change" ||
+                       (e->type == "process_exec" && (e->tag("is_unknown_exec") || e->tag("is_staged"))) ||
+                       (e->network && !e->tag("net_private"));
+        history.events.push_back(e);
+        history.nonbenign += e->nonbenign;
+        history.network += e->network;
+        ledger_network += e->network;
+        if (history.events.size() > 400) {
+            const auto& oldest = history.events.front();
+            history.nonbenign -= oldest->nonbenign;
+            history.network -= oldest->network;
+            ledger_network -= oldest->network;
+            history.events.pop_front();
+        }
+        if (pid_order.size() > 2048) {
+            ledger_network -= ledger.at(pid_order.front()).network;
+            ledger.erase(pid_order.front());
+            pid_order.pop_front();
+        }
         for (size_t i = 0; i < std::size(rules); ++i) {
             const auto& r = rules[i];
             auto& open = partials[i];
             open.erase(std::remove_if(open.begin(), open.end(), [&](Chain& c) {
-                if (!matches(r.steps[c.size()], *e, c.back().get(), tree)) return false;
+                if (!matches(r.steps[c.size()], *e, c.back().get(), tree, lineage_calls)) return false;
                 c.push_back(e);
                 if (c.size() < r.steps.size()) return false;
                 finish_match(r, c);
                 return true;
             }), open.end());
-            if (matches(r.steps[0], *e, nullptr, tree)) {
+            if (matches(r.steps[0], *e, nullptr, tree, lineage_calls)) {
                 if (r.steps.size() == 1) finish_match(r, {e});
                 // Only start a new multi-event chain inside the retained time range.
                 else if (e->ts >= std::max(now - history_seconds, cutoff)) open.push_back({e});
@@ -708,19 +768,23 @@ struct Engine {
         }
     }
     void review(bool finish) {
-        for (auto& d : detections) {
-            if (d.at("state") != "active") continue;
-            const auto& evidence = d.at("events");
-            if (finish || latest_event - d.at("end_ts").get<double>() >= 60 || std::all_of(evidence.begin(), evidence.end(), [&](const Json& x) {
-                int64_t pid = x.at("pid"); return pid <= 0 || (tree.count(pid) && tree.at(pid).exited);
-            })) {
-                settle(d);
-                if (publish && d.at("state") == "context_filtered") {
-                    publish(materialize(d)); ++delivered;
-                }
+        ++reviews;
+        // Without network evidence anywhere, no active review can transition at this event.
+        if (ledger_network || active_network) {
+            std::optional<EvidenceIndex> index;
+            for (auto it = active.begin(); it != active.end();) {
+                bool due = finish || latest_event - it->end >= 60 ||
+                    std::all_of(it->roots.begin(), it->roots.end(), [&](int64_t pid) {
+                        auto node = tree.find(pid);
+                        return node != tree.end() && node->second.exited;
+                    });
+                if (due && settle(*it, index)) {
+                    if (publish) { publish(materialize(*it->detection)); ++delivered; }
+                    active_network -= it->network;
+                    it = active.erase(it);
+                } else ++it;
             }
         }
-        if (finish && options.metrics) sample("finish");
     }
 };
 }
@@ -733,6 +797,12 @@ RavenStream::RavenStream(Publish publish,RavenOptions options) : state(std::make
 }
 RavenStream::~RavenStream() = default;
 void RavenStream::event(const Json& row) { state->feed(row); }
+uint64_t RavenStream::seen() const { return state->seen; }
+void RavenStream::error_gap(uint64_t failed_sequence, size_t discarded_outputs) {
+    state->seen = failed_sequence;
+    state->delivered -= discarded_outputs;
+    state->end_segment("error");
+}
 void RavenStream::line(std::string_view line) {
     if (line.find_first_not_of(" \t\r") == line.npos) return;
     auto row = Json::parse(line.begin(),line.end());
@@ -742,7 +812,10 @@ void RavenStream::line(std::string_view line) {
 }
 void RavenStream::advance(double ts, bool finish) {
     state->advance_history(ts);
-    if (finish) state->review(true);
+    if (finish) {
+        state->review(true);
+        if (state->options.metrics) state->sample("finish");
+    }
 }
 
 Json raven(std::string_view text, bool tetragon,RavenOptions options) {
@@ -766,8 +839,8 @@ Json raven(std::string_view text, bool tetragon,RavenOptions options) {
             throw std::runtime_error("RAVEN line " + std::to_string(line_number) + ": " + error.what());
         }
     }
+    engine.review(true);
     for (auto& d : engine.detections) {
-        engine.settle(d);
         d = engine.materialize(d);
     }
     return engine.detections;

@@ -196,7 +196,8 @@ public:
 };
 }
 
-#ifdef RZ_ENCLAVE
+// The enclave and the native concurrency probe link the plugin statically beside libsinsp.
+#if defined(RZ_ENCLAVE) || defined(RZ_STATIC_API)
 #undef FALCOSECURITY_EXPORT
 #define FALCOSECURITY_EXPORT static
 #endif
@@ -204,7 +205,7 @@ FALCOSECURITY_PLUGIN(Plugin)
 FALCOSECURITY_PLUGIN_EVENT_SOURCING(Plugin, Replay)
 FALCOSECURITY_PLUGIN_FIELD_EXTRACTION(Plugin)
 
-#ifdef RZ_ENCLAVE
+#if defined(RZ_ENCLAVE) || defined(RZ_STATIC_API)
 extern "C" const void* raven_zeek_api() {
     using namespace falcosecurity::_internal;
     static const plugin_api api = [] {

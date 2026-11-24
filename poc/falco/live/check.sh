@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+strict=0
+if [[ ${1:-} == --strict ]]; then strict=1; shift; fi
 here=$(cd "$(dirname "$0")/.." && pwd)
 package=$(realpath "${1:?usage: bash check.sh FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY}")
 build=$(realpath "${2:?missing enclave build directory}")
@@ -32,12 +34,15 @@ ln -s ../native-alerts.jsonl ../native-rules.json ../versions.txt replayed/
     >replayed/sgx-alerts.jsonl 2>replayed/sgx.log
 python3 "$here/compare.py" replayed --captured | tee replayed/comparison.json
 
-python3 - <<'PY' | tee live-check.json
+python3 - "$strict" <<'PY' | tee live-check.json
 import json
+import sys
 from pathlib import Path
 
 diagnostics = [json.loads(line) for line in Path("sgx.log").read_text().splitlines() if line.startswith("{")]
 consumer = next(row for row in diagnostics if row.get("mode") == "live")
+if int(sys.argv[1]) and any(consumer["errors"].values()):
+    raise SystemExit(f"live errors: {consumer['errors']}")
 driver = next(row for row in diagnostics if row.get("mode") == "modern_ebpf")
 replayed = [json.loads(line) for line in Path("replayed/sgx.log").read_text().splitlines() if line.startswith("{")][-1]
 alerts = [json.loads(line) for line in Path("sgx-alerts.jsonl").read_text().splitlines()]
@@ -46,7 +51,7 @@ assert not driver["driver_drops"] and not consumer["format_rejected"] and not co
 assert driver["driver_events"] == consumer["records"] == consumer["accepted"]
 assert 0 < consumer["events"] == replayed["events"] <= consumer["accepted"]
 assert driver["consumer"] == driver["producer"] == consumer["consumer"] == consumer["producer"]
-assert driver["data_ecalls"] == 1 and driver["trace_ocalls"] > 0
+assert driver["data_ecalls"] == 4 and driver["trace_ocalls"] > 0
 assert {"execve", "openat", "connect", "procexit"} <= consumer["event_types"].keys()
 assert consumer["min_event_bytes"] < consumer["max_event_bytes"]
 assert consumer["snapshot_bytes"] + consumer["trace_bytes"] == Path("reference.scap").stat().st_size

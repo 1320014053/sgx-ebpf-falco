@@ -43,6 +43,11 @@ def run_case(case, archive, args, cwd):
     actual = rows(proc.stdout)
     if mode == "ring":
         capture = cwd / "events.jsonl"
+        if args.strict:
+            stats = next(json.loads(line) for line in proc.stderr.splitlines()
+                         if line.startswith(b"{") and json.loads(line).get("mode") == "live")
+            if any(stats["errors"].values()):
+                raise AssertionError(f"live errors: {stats['errors']}")
         translated = rows(archive.read(case["translated"])) if case["translated"] else []
         checks["compare"]("translated events", rows(capture.read_bytes()), translated)
         actual = [json.loads(a["output_fields"]["rz.result"]) for a in actual if a["source"] == "raven_zeek"]
@@ -60,6 +65,7 @@ def main():
     detector = modes.add_parser("detector", help="test the C++ file, event stream and IP packet interfaces")
     detector.add_argument("binary", type=Path, help="replay-detector")
     ring = modes.add_parser("ring", help="test a signed SGX Simulation enclave with saved ring records")
+    ring.add_argument("--strict", action="store_true", help="fail on recovered live processing errors")
     ring.add_argument("binary", type=Path, help="replay-ring")
     ring.add_argument("enclave", type=Path, help="falco-enclave.signed")
     ring.add_argument("rules", type=Path, help="official falco_rules.yaml")

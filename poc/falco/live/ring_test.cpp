@@ -1,6 +1,7 @@
 #include "host.hpp"
 #include "ring.hpp"
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstring>
 #include <driver/ppm_events_public.h>
@@ -22,9 +23,11 @@ constexpr uint32_t discard = 1U << 30;
 constexpr int expected_alerts = 220;
 
 uint64_t* head;
+uint64_t published;
 uint8_t* source;
-size_t source_size;
-size_t alerts_before_mutation;
+size_t source_size, formatted;
+bool mutated;
+std::atomic<bool> first_alert{false};
 
 uint8_t* map(size_t size, int protection, int flags, int fd, off_t offset, void* address = nullptr) {
     auto* result = mmap(address, size, protection, flags, fd, offset);
@@ -34,7 +37,7 @@ uint8_t* map(size_t size, int protection, int flags, int fd, off_t offset, void*
     return static_cast<uint8_t*>(result);
 }
 
-void run(char** args) {
+void run(char** args, bool sparse) {
     auto fixture = read(args[3]);
     size_t snapshot_size = 0;
     block_header block{};
@@ -94,6 +97,7 @@ void run(char** args) {
         return slot + 8;
     };
     auto* first = append(payload, event.len, busy);
+    const auto first_end = position;
     append(nullptr, 16, discard);
     append(nullptr, 12, 0);
     auto malformed = frame;
@@ -114,16 +118,16 @@ void run(char** args) {
     if (!reference || position - initial_position >= capacity) {
         throw std::runtime_error("could not construct the test capture");
     }
+    auto* producer_position = reinterpret_cast<uint64_t*>(writer);
+    *producer_position = sparse ? first_end : position;
+    published = position;
     source_size = event.len;
-    *reinterpret_cast<uint64_t*>(writer) = position;
 
     auto enclave = load_enclave(args[1], args[2], args + 4, 1, true);
     auto worker = std::async(std::launch::async, [&] {
-        int result = -1;
-        const auto status = falco_live(enclave.get(), &result, reinterpret_cast<uint8_t*>(fixture.data()), snapshot_size,
-                                       reinterpret_cast<uint64_t>(head), reinterpret_cast<uint64_t>(producer),
-                                       reinterpret_cast<uint64_t>(flags), ring_page_bytes, capacity, false, false);
-        check(status, result, "Falco ring test");
+        run_live(enclave.get(), reinterpret_cast<uint8_t*>(fixture.data()), snapshot_size,
+                 reinterpret_cast<uint64_t>(head), reinterpret_cast<uint64_t>(producer),
+                 reinterpret_cast<uint64_t>(flags), ring_page_bytes, capacity, false, false);
     });
     while (!(__atomic_load_n(flags, __ATOMIC_ACQUIRE) & ring_ready)) {
         if (worker.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
@@ -133,40 +137,59 @@ void run(char** args) {
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     const bool waited = __atomic_load_n(head, __ATOMIC_ACQUIRE) == initial_position;
+    auto start = std::chrono::steady_clock::now();
     __atomic_store_n(reinterpret_cast<uint32_t*>(first - 8), event.len, __ATOMIC_RELEASE);
+    if (sparse) {
+        while (!first_alert && std::chrono::steady_clock::now() - start < std::chrono::seconds(5)) {
+            if (worker.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) break;
+        }
+    }
+    const auto first_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+    const bool before_stop = first_alert;
+    __atomic_store_n(producer_position, position, __ATOMIC_RELEASE);
     __atomic_fetch_or(flags, ring_stop, __ATOMIC_RELEASE);
     worker.get();
-    if (!waited || *head != position || source) {
-        throw std::runtime_error("BUSY, drain or private copy assertion failed");
-    }
-    std::cerr << "{\"busy_waited\":true,\"source_mutated_before_batch_finished\":true,"
-              << "\"alerts_formatted_before_mutation\":" << alerts_before_mutation << "}\n";
+    if (!waited || *head != position || !mutated) throw std::runtime_error("BUSY, drain or private copy assertion failed");
+    if (sparse && !before_stop) throw std::runtime_error("single official alert was held until later input or stop");
+    std::cerr << "{\"busy_waited\":true,\"source_mutated_after_release\":true,"
+              << "\"alerts_formatted_before_mutation\":" << formatted
+              << ",\"single_alert_ms\":" << first_ms.count()
+              << ",\"sleep_ocalls\":" << falco_sleep_ocalls << ",\"sleep_ns\":" << falco_sleep_ns
+              << ",\"consumer_cpu_ns\":" << falco_consumer_cpu_ns
+              << ",\"output_queue_peak\":" << falco_output_queue_peak
+              << ",\"output_queue_peak_bytes\":" << falco_output_queue_peak_bytes << "}\n";
 }
 
 } // namespace
 
-extern "C" size_t __real_fwrite(const void*, size_t, size_t, std::FILE*);
-
-extern "C" size_t __wrap_fwrite(const void* data, size_t size, size_t count, std::FILE* stream) {
-    // The first alert batch arrives after the whole ring batch was copied, while matching is still in progress.
-    if (stream == stdout && source && __atomic_load_n(head, __ATOMIC_ACQUIRE) == initial_position) {
-        const auto* begin = static_cast<const char*>(data);
-        alerts_before_mutation = std::count(begin, begin + size * count, '\n');
-        if (alerts_before_mutation < expected_alerts) {
+extern "C" int __real_falco_emit(const char*, size_t, int);
+extern "C" int __wrap_falco_emit(const char* data, size_t bytes, int diagnostics) {
+    // Synchronize with formatting on the analyzer, independently of the host writer's scheduling.
+    if (!diagnostics && !mutated) {
+        formatted += std::count(data, data + bytes, '\n');
+        if (__atomic_load_n(head, __ATOMIC_ACQUIRE) == published && formatted < expected_alerts) {
             std::memset(source, 0, source_size);
-            source = nullptr;
+            mutated = true;
         }
     }
-    return __real_fwrite(data, size, count, stream);
+    return __real_falco_emit(data, bytes, diagnostics);
+}
+
+extern "C" int __real_fflush(std::FILE*);
+extern "C" int __wrap_fflush(std::FILE* stream) {
+    const int result = __real_fflush(stream);
+    if (stream == stdout && !result) first_alert = true;
+    return result;
 }
 
 int main(int argc, char** argv) {
-    if (argc != 6) {
-        std::cerr << "usage: falco-ring-test ENCLAVE CONFIG FIXTURE RULES EXPECTED_SCAP\n";
+    const bool sparse = argc == 7 && std::string_view(argv[6]) == "--sparse";
+    if (argc != 6 && !sparse) {
+        std::cerr << "usage: falco-ring-test ENCLAVE CONFIG FIXTURE RULES EXPECTED_SCAP [--sparse]\n";
         return 2;
     }
     try {
-        run(argv);
+        run(argv, sparse);
     } catch (const std::exception& error) {
         std::cerr << error.what() << '\n';
         return 1;

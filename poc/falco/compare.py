@@ -22,6 +22,17 @@ enclave = alerts(run / "sgx-alerts.jsonl")
 if len(native) != len(enclave) or not native:
     sys.exit(f"alert counts: native={len(native)}, enclave={len(enclave)}")
 
+diagnostics = [json.loads(line) for line in (run / "sgx.log").read_text().splitlines() if line.startswith("{")]
+if captured and any(row.get("mode") == "live" for row in diagnostics):
+    def contents(rows):
+        return Counter(json.dumps(row, sort_keys=True) for row in rows)
+
+    if contents(native) != contents(enclave):
+        sys.exit("captured alert contents or multiplicities differ")
+    # Python's stable sort preserves order within each event source.
+    native.sort(key=lambda row: row["source"])
+    enclave.sort(key=lambda row: row["source"])
+
 for i, (left, right) in enumerate(zip(native, enclave), 1):
     if left != right:
         for key in sorted(left.keys() | right.keys()):
@@ -29,12 +40,12 @@ for i, (left, right) in enumerate(zip(native, enclave), 1):
                 print(f"alert {i} ({left['rule']}), {key}: {left.get(key)!r} != {right.get(key)!r}",
                       file=sys.stderr)
         sys.exit(1)
-    if any(left["output_fields"].get(field) is None for field in ("evt.num", "evt.type", "thread.tid")):
+    if left["source"] == "syscall" and any(left["output_fields"].get(field) is None
+                                           for field in ("evt.num", "evt.type", "thread.tid")):
         sys.exit(f"alert {i} has no complete triggering event identity")
 
 described = json.loads((run / "native-rules.json").read_text())
 expected = [rule["info"]["name"] for rule in described["rules"] if rule["info"]["enabled"]]
-diagnostics = [json.loads(line) for line in (run / "sgx.log").read_text().splitlines() if line.startswith("{")]
 loaded = next(row for row in diagnostics if "enabled" in row)
 versions = dict(tuple(part.strip() for part in line.split(":", 1))
                 for line in (run / "versions.txt").read_text().splitlines() if ":" in line)

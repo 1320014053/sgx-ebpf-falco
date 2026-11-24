@@ -241,12 +241,9 @@ int run(int argc, char** argv) {
     }
     __atomic_store_n(&control_page->realtime_ns, clock_ns(CLOCK_REALTIME), __ATOMIC_RELEASE);
     auto worker = std::async(std::launch::async, [&]() {
-        int result = -1;
-        const auto status = falco_live(enclave.get(), &result, snapshot.data(), snapshot.size(),
-                                       reinterpret_cast<uint64_t>(consumer.addr),
-                                       reinterpret_cast<uint64_t>(producer.addr),
-                                       reinterpret_cast<uint64_t>(control.addr), ring_page_bytes, capacity, record, record_inputs);
-        check(status, result, "Falco ring consumer");
+        return run_live(enclave.get(), snapshot.data(), snapshot.size(), reinterpret_cast<uint64_t>(consumer.addr),
+                 reinterpret_cast<uint64_t>(producer.addr), reinterpret_cast<uint64_t>(control.addr),
+                 ring_page_bytes, capacity, record, record_inputs);
     });
 
     int exit_status = 0;
@@ -279,7 +276,8 @@ int run(int argc, char** argv) {
                 if (waited == child) break;
                 if (waited < 0 && errno != EINTR)
                     throw std::runtime_error(std::string("wait for workload: ") + std::strerror(errno));
-            } else if (worker.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
+            }
+            if (worker.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
                 worker.get();
                 throw std::runtime_error("ring consumer exited before capture stopped");
             }
@@ -306,7 +304,7 @@ int run(int argc, char** argv) {
         throw;
     }
     __atomic_fetch_or(flags, ring_stop, __ATOMIC_RELEASE);
-    worker.get();
+    const auto data_ecalls = worker.get();
     const auto drained = std::chrono::steady_clock::now();
     check_driver(scap_get_stats(driver.get(), &after), "read final driver counters");
     if (trace && std::fflush(trace.get()) != 0) {
@@ -329,7 +327,11 @@ int run(int argc, char** argv) {
               << ",\"driver_preemptions\":" << after.n_preemptions - before.n_preemptions
               << ",\"consumer\":" << head << ",\"producer\":" << tail
               << ",\"capture_ms\":" << millis(stopped - started) << ",\"drain_ms\":" << millis(drained - stopped)
-              << ",\"progress_samples\":" << progress << ",\"data_ecalls\":1,\"output_ocalls\":" << falco_output_ocalls
+              << ",\"progress_samples\":" << progress << ",\"data_ecalls\":" << data_ecalls << ",\"output_ocalls\":" << falco_output_ocalls
+              << ",\"sleep_ocalls\":" << falco_sleep_ocalls << ",\"sleep_ns\":" << falco_sleep_ns
+              << ",\"consumer_cpu_ns\":" << falco_consumer_cpu_ns
+              << ",\"output_queue_peak\":" << falco_output_queue_peak
+              << ",\"output_queue_peak_bytes\":" << falco_output_queue_peak_bytes
               << ",\"trace_ocalls\":" << falco_trace_ocalls << "}\n";
     if (head != tail || !WIFEXITED(exit_status) || WEXITSTATUS(exit_status) != 0) {
         throw std::runtime_error("the queue did not drain or the workload failed");

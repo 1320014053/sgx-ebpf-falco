@@ -29,13 +29,11 @@ int main(int argc, char** argv) try {
     auto enclave = load_enclave(argv[1], "live.yaml", argv + 4, 2, true);
     falco_events_file = std::fopen("events.jsonl", "wb");
     if (!falco_events_file) throw std::runtime_error("cannot open translated event log");
-    int result = -1;
-    auto status = falco_live(enclave.get(), &result, reinterpret_cast<uint8_t*>(snapshot.data()), snapshot.size(),
-                             reinterpret_cast<uintptr_t>(consumer), reinterpret_cast<uintptr_t>(&producer),
-                             reinterpret_cast<uintptr_t>(&control), ring_page_bytes, capacity, 0, record_host_events);
+    run_live(enclave.get(), reinterpret_cast<uint8_t*>(snapshot.data()), snapshot.size(),
+             reinterpret_cast<uintptr_t>(consumer), reinterpret_cast<uintptr_t>(&producer),
+             reinterpret_cast<uintptr_t>(&control), ring_page_bytes, capacity, false, record_host_events);
     std::fclose(falco_events_file);
     falco_events_file = nullptr;
-    check(status, result, "replay ring fixture");
     return consumer[0] == records.size() ? 0 : 1;
 } catch (const std::exception& error) {
     std::cerr << error.what() << '\n';

@@ -15,6 +15,7 @@ struct Event {
     std::optional<std::string> container;
     double ts;
     uint64_t sequence = 0;
+    bool nonbenign = false, network = false;
     int64_t pid, ppid, uid, euid, port;
     Json args, tags, meta;
     bool tag(const char* key) const;

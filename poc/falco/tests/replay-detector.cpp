@@ -1,5 +1,6 @@
 #include "detectors.hpp"
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -28,7 +29,7 @@ static void replay_ip(std::ifstream& input, rz::Publish publish) {
 }
 
 int main(int argc, char** argv) try {
-    if (argc != 3) return 2;
+    if (argc != 3 && !(argc == 4 && std::string_view(argv[1]) == "stream")) return 2;
     const std::string mode = argv[1];
     std::ifstream input(argv[2], std::ios::binary);
     if (!input) return 2;
@@ -36,9 +37,22 @@ int main(int argc, char** argv) try {
     if (mode == "ip") {
         replay_ip(input, publish);
     } else if (mode == "stream") {
-        rz::RavenStream detector(publish);
+        const bool measure = argc == 4;
+        const auto warmup = measure ? std::stoull(argv[3]) : 0;
+        rz::RavenOptions options;
+        options.metrics = measure;
+        rz::RavenStream detector(publish, options);
         std::string line;
-        while (std::getline(input, line)) detector.line(line);
+        uint64_t seen = 0;
+        auto start = std::chrono::steady_clock::now();
+        while (std::getline(input, line)) {
+            detector.line(line);
+            if (measure && ++seen == warmup) start = std::chrono::steady_clock::now();
+        }
+        if (measure) {
+            const std::chrono::duration<double> elapsed = std::chrono::steady_clock::now() - start;
+            std::cerr << "REVIEW " << rz::Json{{"background", seen-warmup}, {"seconds", elapsed.count()}} << '\n';
+        }
         detector.advance(0, true);
     } else {
         const std::string data{std::istreambuf_iterator<char>(input), {}};

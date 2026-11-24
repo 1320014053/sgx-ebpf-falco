@@ -1,17 +1,130 @@
 #include "host.hpp"
 #include "capture.hpp"
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <condition_variable>
 #include <cstdlib>
+#include <deque>
 #include <fstream>
 #include <iterator>
+#include <mutex>
+#include <signal.h>
 #include <stdexcept>
 #include <string_view>
+#include <thread>
 #include <unistd.h>
 
 std::FILE* falco_trace_file = nullptr;
 std::FILE* falco_events_file = nullptr;
 std::FILE* falco_packets_file = nullptr;
-uint64_t falco_output_ocalls = 0;
-uint64_t falco_trace_ocalls = 0;
+std::atomic<uint64_t> falco_output_ocalls{0}, falco_trace_ocalls{0};
+uint64_t falco_sleep_ocalls = 0;
+uint64_t falco_sleep_ns = 0;
+uint64_t falco_consumer_cpu_ns = 0;
+size_t falco_output_queue_peak = 0;
+size_t falco_output_queue_peak_bytes = 0;
+
+namespace {
+struct OutputQueue {
+    std::deque<std::string> chunks;
+    std::mutex mutex;
+    std::condition_variable changed;
+    bool done = false, failed = false;
+    size_t queued_bytes = 0;
+
+    void write(RingControl* control) {
+        sigset_t blocked;
+        sigemptyset(&blocked);
+        sigaddset(&blocked, SIGPIPE);
+        pthread_sigmask(SIG_BLOCK, &blocked, nullptr);
+        std::unique_lock<std::mutex> lock(mutex);
+        for (;;) {
+            changed.wait(lock, [&] { return done || !chunks.empty(); });
+            if (chunks.empty()) return;
+            auto chunk = std::move(chunks.front());
+            chunks.pop_front();
+            queued_bytes -= chunk.size();
+            lock.unlock();
+            const bool ok = std::fwrite(chunk.data(), 1, chunk.size(), stdout) == chunk.size() &&
+                            std::fflush(stdout) == 0;
+            lock.lock();
+            if (!ok) {
+                failed = true;
+                __atomic_fetch_or(&control->flags, ring_abort, __ATOMIC_RELEASE);
+                return;
+            }
+        }
+    }
+};
+OutputQueue* active_output;
+}
+
+unsigned run_live(oe_enclave_t* enclave, uint8_t* snapshot, size_t bytes, uint64_t consumer, uint64_t producer,
+              uint64_t control, size_t page, size_t capacity, bool record, uint8_t inputs) {
+    auto* ctl = reinterpret_cast<RingControl*>(control);
+    int result = -1;
+    auto status = falco_live_setup(enclave, &result, snapshot, bytes, consumer, producer, control, page,
+                                   capacity, record, inputs);
+    check(status, result, "set up live capture");
+    OutputQueue output;
+    const unsigned peers = (__atomic_load_n(&ctl->flags, __ATOMIC_ACQUIRE) & ring_detectors) ? 2 : 1;
+    std::thread writer;
+    std::array<std::thread, 2> workers;
+    std::exception_ptr error;
+    std::array<oe_result_t, 2> statuses{OE_FAILURE, OE_FAILURE};
+    std::array<int, 2> results{-1, -1};
+    bool entered_ingest = false;
+    active_output = &output;
+    try {
+        writer = std::thread([&] { output.write(ctl); });
+        for (unsigned i = 0; i < peers; ++i) {
+            workers[i] = std::thread([&, i] {
+                const auto role = i == 0 ? analysis_role : detection_role;
+                statuses[i] = falco_live_run(enclave, &results[i], role);
+                if (statuses[i] != OE_OK || results[i]) __atomic_fetch_or(&ctl->flags, ring_abort, __ATOMIC_RELEASE);
+                // A role whose ECALL failed never ran, so it cannot wake its peers itself.
+                if (statuses[i] != OE_OK) falco_live_cancel(enclave);
+            });
+        }
+        entered_ingest = true;
+        timespec begin{}, end{};
+        clock_gettime(CLOCK_THREAD_CPUTIME_ID, &begin);
+        status = falco_live_run(enclave, &result, ingest_role);
+        clock_gettime(CLOCK_THREAD_CPUTIME_ID, &end);
+        falco_consumer_cpu_ns = (end.tv_sec - begin.tv_sec) * 1000000000LL + end.tv_nsec - begin.tv_nsec;
+        check(status, result, "run live ingest");
+    } catch (...) {
+        error = std::current_exception();
+        __atomic_fetch_or(&ctl->flags, ring_abort, __ATOMIC_RELEASE);
+        // A failed transport may never have entered the ingest role to wake its peers.
+        if (!entered_ingest || status != OE_OK) falco_live_cancel(enclave);
+    }
+    for (auto& worker : workers) if (worker.joinable()) worker.join();
+    {
+        std::lock_guard<std::mutex> lock(output.mutex);
+        output.done = true;
+        output.changed.notify_one();
+    }
+    if (writer.joinable()) writer.join();
+    active_output = nullptr;
+    status = falco_live_finish(enclave, &result);
+    if (error) std::rethrow_exception(error);
+    for (unsigned i = 0; i < peers; ++i) {
+        check(statuses[i], results[i], i == 0 ? "run live analysis" : "run live detection");
+    }
+    check(status, result, "finish live capture");
+    if (output.failed) throw std::runtime_error("failed to write live alerts");
+    return 3 + peers; // Setup, ingest, peer roles, finish.
+}
+
+void falco_sleep(uint32_t us) {
+    const auto start = std::chrono::steady_clock::now();
+    usleep(us);
+    ++falco_sleep_ocalls;
+    falco_sleep_ns += std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - start).count();
+}
 
 std::string read(const char* path) {
     std::ifstream file(path, std::ios::binary);
@@ -89,6 +202,19 @@ void PluginInputs::replay(oe_enclave_t* enclave) const {
 
 int falco_emit(const char* data, size_t bytes, int diagnostics) {
     ++falco_output_ocalls;
+    if (!diagnostics && active_output) {
+        auto& output = *active_output;
+        std::lock_guard<std::mutex> lock(output.mutex);
+        if (output.failed) return 1;
+        try {
+            output.chunks.emplace_back(data, bytes);
+        } catch (const std::bad_alloc&) { return 1; }
+        falco_output_queue_peak = std::max(falco_output_queue_peak, output.chunks.size());
+        output.queued_bytes += bytes;
+        falco_output_queue_peak_bytes = std::max(falco_output_queue_peak_bytes, output.queued_bytes);
+        output.changed.notify_one();
+        return 0;
+    }
     auto* stream = diagnostics ? stderr : stdout;
     return std::fwrite(data, 1, bytes, stream) == bytes && std::fflush(stream) == 0 ? 0 : 1;
 }

@@ -57,7 +57,7 @@ add_executable(httpd workload.c)
 
 add_executable(falco-ring-test ring_test.cpp)
 target_link_libraries(falco-ring-test PRIVATE falco_live_host)
-target_link_options(falco-ring-test PRIVATE -Wl,--wrap=fwrite)
+target_link_options(falco-ring-test PRIVATE -Wl,--wrap=falco_emit -Wl,--wrap=fflush)
 
 add_executable(replay-ring EXCLUDE_FROM_ALL ../tests/replay-ring.cpp)
 target_link_libraries(replay-ring PRIVATE falco_live_host)
