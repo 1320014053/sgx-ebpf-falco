@@ -241,3 +241,9 @@ DNS 首次失败的原因：刷新阶段固定等待 17 秒，原版采集器第
 未运行的项目：重新生成上游结果的 behavior-review 和 parity-audit 套件（客体缺固定的 RAVEN checkout 和 Zeek 镜像）、TSAN、硬件 SGX 和性能测试。缩小订阅后 RAVEN 输入与全量订阅一致，目前依据代码分析和十类输入标记，尚无同一轨迹的差分测试。
 
 逐项命令输出和比较文件保存在宿主仓库外的 `tmp/event-selection-verify`，约 600 KiB。收尾时删除了客体测试目录（1.7 GiB），并删除测试从 `falco-poc` 和 `moby` 命名空间导入的固定镜像。K3s 集群原有的 `k8s.io` 镜像保留。客体执行 `sudo -n poweroff`，串口末尾记录 `reboot: Power down`。宿主确认 QEMU 已退出，2222 端口无监听。
+
+## 实时线程名称与周期统计
+
+2026-11-25，在 Ubuntu 22.04.5、5.15.0-198-generic、WHPX 4 vCPU、5120 MiB 的 SGX Simulation 客体重新构建。清除 `FALCO_LIVE_STATS_MS` 后依次运行 `check.sh --strict`、`check-ring.sh --strict`、`check-detectors.py --strict`，三项均退出 0，日志中没有 `live_tick`。
+
+在双检测器配置中设置 `FALCO_LIVE_STATS_MS=1000`，停止前从 `/proc/<pid>/task/*/comm` 读到 `fl-ingest`、`fl-analysis`、`fl-detect` 和 `fl-writer`。连续周期样本间隔 0.999 至 1.000 秒，停采时额外输出末条。该次末条的驱动事件、驱动丢失、报文提交、报文丢失依次为 55104、0、0、0，四项与 `modern_ebpf` 相等。命令和报文负载短测见[本批模拟验收](../../../results/aliyun-c7t-xlarge/sim-verification.md)。

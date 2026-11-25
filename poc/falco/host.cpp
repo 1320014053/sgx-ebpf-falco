@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iterator>
 #include <mutex>
+#include <pthread.h>
 #include <signal.h>
 #include <stdexcept>
 #include <string_view>
@@ -34,6 +35,7 @@ struct OutputQueue {
     size_t queued_bytes = 0;
 
     void write(RingControl* control) {
+        pthread_setname_np(pthread_self(), "fl-writer");
         sigset_t blocked;
         sigemptyset(&blocked);
         sigaddset(&blocked, SIGPIPE);
@@ -81,6 +83,7 @@ unsigned run_live(oe_enclave_t* enclave, uint8_t* snapshot, size_t bytes, uint64
         for (unsigned i = 0; i < peers; ++i) {
             workers[i] = std::thread([&, i] {
                 const auto role = i == 0 ? analysis_role : detection_role;
+                pthread_setname_np(pthread_self(), role == analysis_role ? "fl-analysis" : "fl-detect");
                 statuses[i] = falco_live_run(enclave, &results[i], role);
                 if (statuses[i] != OE_OK || results[i]) __atomic_fetch_or(&ctl->flags, ring_abort, __ATOMIC_RELEASE);
                 // A role whose ECALL failed never ran, so it cannot wake its peers itself.
@@ -88,6 +91,7 @@ unsigned run_live(oe_enclave_t* enclave, uint8_t* snapshot, size_t bytes, uint64
             });
         }
         entered_ingest = true;
+        if (gettid() != getpid()) pthread_setname_np(pthread_self(), "fl-ingest");
         timespec begin{}, end{};
         clock_gettime(CLOCK_THREAD_CPUTIME_ID, &begin);
         status = falco_live_run(enclave, &result, ingest_role);

@@ -108,7 +108,11 @@ falco-live ENCLAVE CONFIG RING_KIB TRACE_OR_- [--record-inputs EVENTS_OR_- PACKE
 
 Host 初始化固定版本驱动和 procfs 快照，核对所有 CPU 指向同一个真实 ring map。它保留失败的 syscall exit，并关闭 BPF 迭代器。宿主调用 `falco_live_setup` 校验映射和快照，再让采集线程与分析线程分别进入 `falco_live_run`。采集线程把载荷复制到 enclave 私有块后立即写回消费位置。分析线程运行 libsinsp 和官方规则。启用任一检测器时，第三个宿主线程进入 enclave，按顺序处理对应的输入与时钟更新。检测线程处理完一个私有块，采集线程才可复用它。官方规则和 raven_zeek 各自按来源顺序输出，两个来源的告警可以交错。两个线程并行匹配，但格式化告警时串行，因为固定版本 libsinsp 的时间格式化使用不可重入的 `gmtime()`。停止时依次排空 ring、私有块和宿主输出队列，再由 `falco_live_finish` 输出统计。`TRACE_OR_-` 传新文件名时批量导出同一份 syscall 轨迹。ring 容量为 16 至 65536 KiB 的二次幂，运行要求 4 KiB 页。
 
+可从 `/proc/<pid>/task/*/comm` 识别实时线程。采集、分析和告警写出线程分别名为 `fl-ingest`、`fl-analysis` 和 `fl-writer`。启用任一检测器时还有 `fl-detect`。
+
 实时配置默认 `buffered_outputs: false`，每个有告警的事件交付一次，由宿主线程写 stdout。设为 `true` 后按 64 KiB 刷新，停止时写出余量。ring 读空时按 libscap 的常量从 500 µs 退避到 30 ms，`idle: spin` 可用于忙等对照。`live_block_count` 默认 32，`live_block_bytes` 默认 262144。统计中的 `ingest_stalls` 是采集线程等待空闲块的次数，`peak_blocks` 与 `output_queue_peak` 分别记录在用块数和宿主待写块数的峰值。`output_queue_peak_bytes` 记录宿主队列同时待写的最大载荷字节数。驱动单独报告丢失。
+
+设置 `FALCO_LIVE_STATS_MS=N` 后，宿主从采集开始每 N 毫秒向 stderr 写一行 `"mode":"live_tick"` JSON，停止驱动后再写最后一行。N 必须是正整数，默认关闭。`mono_ns` 是 `CLOCK_MONOTONIC` 纳秒时间戳。`driver_events`、`driver_drops`、`packet_submitted`、`packet_dropped` 均为本次采集的累计计数。关闭报文探针时后两项为零。最后一行的 `packet_dropped` 对应 `modern_ebpf` 汇总的 `packet_drops`。`ring_backlog_bytes` 是生产位置与消费位置的字节差，读取期间消费位置发生变化时省略。
 
 `"mode":"live"` 统计行的 `detectors` 对象用布尔字段 `raven` 和 `zeek` 标明实际启用的检测器。关闭 RAVEN 时 `raven_events` 为零。关闭 Zeek 时 `packet_records` 和宿主 `"mode":"modern_ebpf"` 统计行的 `packet_submitted` 都为零。
 

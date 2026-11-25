@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cerrno>
+#include <charconv>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -22,6 +23,7 @@
 #include <libscap/scap_engines.h>
 #include <libscap/scap_platform.h>
 #include <libscap/scap_savefile_api.h>
+#include <sstream>
 #include <spawn.h>
 #include <signal.h>
 #include <stdexcept>
@@ -96,8 +98,8 @@ public:
         }
     }
     ~PacketTap() { stop(); }
-    uint64_t submitted() const { return program ? program->bss->submitted : 0; }
-    uint64_t dropped() const { return program ? program->bss->dropped : 0; }
+    uint64_t submitted() const { return program ? __atomic_load_n(&program->bss->submitted, __ATOMIC_RELAXED) : 0; }
+    uint64_t dropped() const { return program ? __atomic_load_n(&program->bss->dropped, __ATOMIC_RELAXED) : 0; }
 };
 
 int run(int argc, char** argv) {
@@ -110,6 +112,13 @@ int run(int argc, char** argv) {
         std::cerr << "usage: falco-live ENCLAVE CONFIG RING_KIB TRACE_OR_- "
                      "[--record-inputs EVENTS.jsonl PACKETS.pcap] RULES... [-- WORKLOAD [ARGS...]]\n";
         return 2;
+    }
+    uint64_t stats_ms = 0;
+    if (const char* value = std::getenv("FALCO_LIVE_STATS_MS")) {
+        const auto* end = value + std::strlen(value);
+        const auto parsed = std::from_chars(value, end, stats_ms);
+        if (parsed.ec != std::errc{} || parsed.ptr != end || stats_ms == 0)
+            throw std::runtime_error("FALCO_LIVE_STATS_MS must be a positive integer in milliseconds");
     }
     if (!with_workload) {
         struct sigaction action{};
@@ -222,6 +231,21 @@ int run(int argc, char** argv) {
     const auto schema = scap_get_driver_schema_version(driver.get());
     const auto api = scap_get_driver_api_version(driver.get());
     PacketTap tap;
+    auto emit_tick = [&](const scap_stats& stats, uint64_t submitted, uint64_t dropped) {
+        const auto mono_ns = clock_ns(CLOCK_MONOTONIC);
+        const auto head = __atomic_load_n(consumed, __ATOMIC_ACQUIRE);
+        const auto tail = __atomic_load_n(published, __ATOMIC_ACQUIRE);
+        const bool stable = head == __atomic_load_n(consumed, __ATOMIC_ACQUIRE);
+        std::ostringstream line;
+        line << "{\"mode\":\"live_tick\",\"mono_ns\":" << mono_ns
+             << ",\"driver_events\":" << stats.n_evts - before.n_evts
+             << ",\"driver_drops\":" << stats.n_drops - before.n_drops
+             << ",\"packet_submitted\":" << submitted << ",\"packet_dropped\":" << dropped;
+        if (stable) line << ",\"ring_backlog_bytes\":" << tail - head;
+        line << "}\n";
+        std::fputs(line.str().c_str(), stderr);
+    };
+    uint64_t final_submitted = 0, final_dropped = 0;
     std::future<unsigned> worker;
     int exit_status = 0;
     uint64_t progress = 0;
@@ -272,6 +296,7 @@ int run(int argc, char** argv) {
         } else {
             std::cerr << "{\"mode\":\"capture_ready\",\"pid\":" << getpid() << ",\"map_id\":" << map.id << "}\n";
         }
+        uint64_t last_interval = 0;
         while (!stop_requested.load(std::memory_order_relaxed)) {
             __atomic_store_n(&control_page->realtime_ns, clock_ns(CLOCK_REALTIME), __ATOMIC_RELEASE);
             if (with_workload) {
@@ -289,12 +314,32 @@ int run(int argc, char** argv) {
                 ++progress;
                 position = next;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if (stats_ms) {
+                using std::chrono::milliseconds;
+                const auto elapsed = std::chrono::duration_cast<milliseconds>(std::chrono::steady_clock::now() - started);
+                const uint64_t interval = elapsed.count() / stats_ms;
+                if (interval != last_interval) {
+                    scap_stats stats{};
+                    check_driver(scap_get_stats(driver.get(), &stats), "read interval driver counters");
+                    emit_tick(stats, tap.submitted(), tap.dropped());
+                    last_interval = interval;
+                }
+                const auto wait_ms = std::min<uint64_t>(100, stats_ms - elapsed.count() % stats_ms);
+                std::this_thread::sleep_until(started + elapsed + milliseconds(wait_ms));
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
         }
         tap.stop();
         check_driver(scap_stop_capture(driver.get()), "stop Modern eBPF capture");
         stopped = std::chrono::steady_clock::now();
         capturing = false;
+        if (stats_ms) {
+            check_driver(scap_get_stats(driver.get(), &after), "read final driver counters");
+            final_submitted = tap.submitted();
+            final_dropped = tap.dropped();
+            emit_tick(after, final_submitted, final_dropped);
+        }
     } catch (...) {
         tap.stop();
         if (capturing && scap_stop_capture(driver.get()) != SCAP_SUCCESS) {
@@ -314,7 +359,11 @@ int run(int argc, char** argv) {
     __atomic_fetch_or(flags, ring_stop, __ATOMIC_RELEASE);
     const auto data_ecalls = worker.get();
     const auto drained = std::chrono::steady_clock::now();
-    check_driver(scap_get_stats(driver.get(), &after), "read final driver counters");
+    if (!stats_ms) {
+        check_driver(scap_get_stats(driver.get(), &after), "read final driver counters");
+        final_submitted = tap.submitted();
+        final_dropped = tap.dropped();
+    }
     if (trace && std::fflush(trace.get()) != 0) {
         throw std::runtime_error(std::string("flush trace: ") + std::strerror(errno));
     }
@@ -326,7 +375,7 @@ int run(int argc, char** argv) {
     const auto head = __atomic_load_n(consumed, __ATOMIC_ACQUIRE);
     const auto millis = [](auto interval) { return std::chrono::duration_cast<std::chrono::milliseconds>(interval).count(); };
     std::cerr << "{\"mode\":\"modern_ebpf\",\"map_id\":" << map.id << ",\"ring_bytes\":" << capacity
-              << ",\"packet_submitted\":" << tap.submitted() << ",\"packet_drops\":" << tap.dropped()
+              << ",\"packet_submitted\":" << final_submitted << ",\"packet_drops\":" << final_dropped
               << ",\"driver_api\":" << api << ",\"driver_schema\":" << schema
               << ",\"driver_events\":" << after.n_evts - before.n_evts
               << ",\"driver_drops\":" << after.n_drops - before.n_drops
