@@ -1,4 +1,6 @@
-# 阿里云 ecs.c7t.large 硬件 SGX 非调试性能测试计划
+# 阿里云 ecs.c7t.large 硬件 SGX 非调试性能测试计划（已过时）
+
+> **已过时。** 本批的 Falco 性能结果已被 2026-11-25 的 [ecs.c7t.xlarge 复测](../aliyun-c7t-xlarge/README.md)取代，当前结论以[新批次报告](../aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/REPORT.md)为准。本批运行的 `31ff860` 仍是单个 ECALL 忙等、订阅全部系统调用、告警按 64 KiB 刷新，与当前源码不同。GETPID 代码此后没有改动，新批次未重测，GETPID 结果仍以本批为准。告警一致性对照没有在新代码上重测，只作历史参考。
 
 目标是在同一台 ECS 上测出 GETPID 各种传输方式的成本、Falco 能持续处理的事件速率，以及开启检测对 HTTP 服务的影响。凡是使用 enclave 的实验，从首次功能验证到正式压测，都使用真实 Intel SGX 硬件，要求运行中的 enclave 报告 `ATTRIBUTES.DEBUG=0`。无监控、普通用户态和普通 Falco 对照组在同一台机器原生运行。
 

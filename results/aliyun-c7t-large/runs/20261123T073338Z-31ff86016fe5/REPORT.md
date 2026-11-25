@@ -1,4 +1,6 @@
-# 阿里云 ecs.c7t.large 硬件 SGX 非调试性能实测
+# 阿里云 ecs.c7t.large 硬件 SGX 非调试性能实测（已过时）
+
+> **已过时。** 本报告的 Falco 性能数据已被 [ecs.c7t.xlarge 复测报告](../../../aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/REPORT.md)取代。本批运行的 `31ff860` 与当前源码在线程结构、事件订阅和告警刷新上都不同。GETPID 结果仍以本批为准，告警一致性对照只作历史参考。
 
 批次 `20261123T073338Z-31ff86016fe5`。上海地域、Ubuntu 22.04.5、内核 `5.15.0-198-generic`、Xeon Platinum 8369B。实例向客体提供同一物理核的 2 个线程，Linux 可见内存为 1,756,258,304 字节，驱动识别 1,984 MiB EPC。[环境输出](raw/host-preflight-r01/stdout.txt)
 
