@@ -1,6 +1,19 @@
 #include "raven_syscalls.hpp"
 #include <arpa/inet.h>
 #include <cstring>
+#include <libsinsp/events/sinsp_events.h>
+
+libsinsp::events::set<ppm_sc_code> RavenSyscalls::sc_set() {
+    return libsinsp::events::event_set_to_sc_set({
+        PPME_SYSCALL_EXECVE_19_X, PPME_SYSCALL_EXECVEAT_X,
+        PPME_SYSCALL_CLONE_20_X, PPME_SYSCALL_CLONE3_X, PPME_SYSCALL_FORK_20_X, PPME_SYSCALL_VFORK_20_X,
+        PPME_PROCEXIT_1_E, PPME_SOCKET_CONNECT_X, PPME_SOCKET_LISTEN_X,
+        PPME_SYSCALL_OPEN_X, PPME_SYSCALL_OPENAT_2_X, PPME_SYSCALL_OPENAT2_X, PPME_SYSCALL_CREAT_X,
+        PPME_SYSCALL_WRITE_X, PPME_SYSCALL_PWRITE_X, PPME_SYSCALL_WRITEV_X, PPME_SYSCALL_PWRITEV_X,
+        PPME_SYSCALL_CHMOD_X, PPME_SYSCALL_FCHMOD_X, PPME_SYSCALL_FCHMODAT_X,
+        PPME_SYSCALL_SETUID_X, PPME_SYSCALL_SETRESUID_X, PPME_SYSCALL_SETREUID_X,
+    });
+}
 
 void RavenSyscalls::seed_from_snapshot(const sinsp& inspector) {
     // libsinsp has already applied a successful setuid when translate() sees its exit.

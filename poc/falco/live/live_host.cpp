@@ -4,6 +4,7 @@
 #include "packet_tap.skel.h"
 #include <arpa/inet.h>
 #include <bpf/bpf.h>
+#include <algorithm>
 #include <atomic>
 #include <cerrno>
 #include <chrono>
@@ -144,9 +145,11 @@ int run(int argc, char** argv) {
     args.import_users = true;
     args.proc_scan_timeout_ms = SCAP_PROC_SCAN_TIMEOUT_NONE;
     args.log_fn = log_driver;
-    for (int i = 1; i < PPM_SC_MAX; ++i) {
-        args.ppm_sc_of_interest.ppm_sc[i] = scap_get_ppm_sc_name(static_cast<ppm_sc_code>(i))[0] != '\0';
-    }
+    uint8_t selected[PPM_SC_MAX]{};
+    int result = -1;
+    auto status = falco_live_select(enclave.get(), &result, selected, sizeof(selected));
+    check(status, result, "select live syscalls");
+    std::copy_n(selected, PPM_SC_MAX, args.ppm_sc_of_interest.ppm_sc);
     char error[SCAP_LASTERR_SIZE]{};
     int32_t rc = 0;
     std::unique_ptr<scap_t, decltype(&scap_close)> driver(

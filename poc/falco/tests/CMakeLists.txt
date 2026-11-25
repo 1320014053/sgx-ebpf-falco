@@ -8,3 +8,7 @@ target_include_directories(replay-detector PRIVATE ../plugin "${DEPS}/njson/sing
 target_link_libraries(replay-detector PRIVATE raven_zeek)
 
 add_executable(bpf-ring-test EXCLUDE_FROM_ALL bpf-ring-test.cpp)
+
+add_custom_target(raven-syscalls-test
+    COMMAND python3 -B "${CMAKE_CURRENT_SOURCE_DIR}/test-raven-syscalls.py"
+    VERBATIM)

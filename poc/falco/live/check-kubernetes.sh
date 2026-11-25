@@ -51,6 +51,7 @@ sed -e 's|rules_files: \[falco_rules.yaml\]|rules_files: [falco_rules.yaml, case
     -e "s|cri: {enabled: false}|cri: {enabled: true, sockets: [$cri_socket]}|" \
     -e 's|extra_fields: \[evt.num, evt.type, thread.tid\]|extra_fields: [evt.num, evt.type, thread.tid, fd.sip, fd.sport, fd.sip.name, k8s.ns.name, k8s.pod.name, k8s.pod.uid, container.full_id, container.type, container.image.repository, container.privileged]|' \
     "$here/reference.yaml" >reference.yaml
+echo 'base_syscalls: {all: true}' >>reference.yaml
 cat >cases.yaml <<'YAML'
 - rule: POC Kubernetes test connection
   desc: Record the connection for each test case.
@@ -123,7 +124,6 @@ PY
 
 with_dns "$PWD/resolv.conf" /etc/resolv.conf timeout 90 bash -eu -c '
     "$1" -c reference.yaml -o engine.kind=modern_ebpf -o engine.modern_ebpf.disable_iterators=true \
-        -o base_syscalls.all=true \
         >native-live-alerts.jsonl 2>native-live.log &
     capture=$!
     trap "kill -INT $capture 2>/dev/null || true" EXIT

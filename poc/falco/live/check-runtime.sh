@@ -36,6 +36,7 @@ sed -e 's|rules_files: \[falco_rules.yaml\]|rules_files: [falco_rules.yaml, case
     -e "s|$engine: {enabled: false}|$engine: {enabled: true, sockets: [$socket]}|" \
     -e 's|extra_fields: \[evt.num, evt.type, thread.tid\]|extra_fields: [evt.num, evt.type, thread.tid, proc.args, container.full_id, container.name, container.type, container.image.repository, container.privileged]|' \
     "$here/reference.yaml" >reference.yaml
+echo 'base_syscalls: {all: true}' >>reference.yaml
 cat >cases.yaml <<'YAML'
 - rule: POC Runtime test shell
   desc: Record metadata for shells in the existing and newly created test containers.
@@ -76,7 +77,7 @@ SH
 
 sudo -n env TZ="$TZ" FALCO_HOSTNAME="$FALCO_HOSTNAME" timeout 95 bash -eu -c '
     "$1" -c reference.yaml -o engine.kind=modern_ebpf -o engine.modern_ebpf.disable_iterators=true \
-        -o base_syscalls.all=true >native-live-alerts.jsonl 2>native-live.log &
+        >native-live-alerts.jsonl 2>native-live.log &
     capture=$!
     trap "kill -INT $capture 2>/dev/null || true" EXIT
     shift

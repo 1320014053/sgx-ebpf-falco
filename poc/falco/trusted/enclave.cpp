@@ -17,6 +17,7 @@
 #include <libscap/scap_savefile.h>
 #include <libscap/ringbuffer/devset.h>
 #include <libsinsp/dns_manager.h>
+#include <libsinsp/events/sinsp_events.h>
 #include <libsinsp/filter_check_list.h>
 #include <libsinsp/plugin_manager.h>
 #include <libsinsp/sinsp.h>
@@ -78,6 +79,11 @@ struct Detector {
     bool spin = false;
     size_t block_count = 32, block_bytes = 256 * 1024;
     bool live_mode = false;
+    bool live_select_allowed;
+    bool base_syscalls_all = false;
+    bool rules_ready = false;
+    size_t loaded_rules = 0;
+    std::string rules_summary;
     std::mutex format_mutex;
     LiveErrors errors;
     rz::RavenOptions retention;
@@ -112,7 +118,7 @@ struct Detector {
             throw std::runtime_error("both detectors are disabled: remove raven_zeek from load_plugins");
     }
 
-    Detector(const char* yaml, const char* host, bool live) : hostname(host) {
+    Detector(const char* yaml, const char* host, bool live) : hostname(host), live_select_allowed(live) {
         const auto config = YAML::Load(yaml);
         paths = config["rules_files"].as<std::vector<std::string>>();
         if (paths.empty() || !config["json_output"].as<bool>(false) ||
@@ -145,6 +151,23 @@ struct Detector {
                                 : init.IsMap() ? init.as<nlohmann::json>()
                                                : nlohmann::json::parse(init.as<std::string>());
         if (live) {
+            const auto base = config["base_syscalls"];
+            if (base && !base.IsNull()) {
+                const char* message = "falco-live implements only base_syscalls.all";
+                if (!base.IsMap()) throw std::runtime_error(message);
+                for (const auto& entry : base) {
+                    if (!entry.first.IsScalar()) throw std::runtime_error(message);
+                    const auto key = entry.first.Scalar();
+                    const auto& value = entry.second;
+                    if (key == "custom_set" && value.IsSequence() && value.size() == 0) continue;
+                    if (key != "all" && key != "repair") throw std::runtime_error(message);
+                    bool enabled;
+                    if ((value.Tag() != "?" && value.Tag() != "tag:yaml.org,2002:bool") ||
+                        !YAML::convert<bool>::decode(value, enabled) || (key == "repair" && enabled))
+                        throw std::runtime_error(message);
+                    if (key == "all") base_syscalls_all = enabled;
+                }
+            }
             buffered_outputs = config["buffered_outputs"].as<bool>(false);
             const auto idle = config["idle"].as<std::string>("sleep");
             if (idle != "sleep" && idle != "spin") throw std::runtime_error("idle must be sleep or spin");
@@ -209,7 +232,7 @@ struct Detector {
     }
 
     void load(const std::string& path, const char* yaml) {
-        if (rule_contents.size() >= paths.size() || path != paths[rule_contents.size()]) {
+        if (loaded_rules != yaml_files.size() || loaded_rules >= paths.size() || path != paths[loaded_rules]) {
             throw std::runtime_error("rule file is out of order or absent from rules_files: " + path);
         }
         yaml_files.emplace_back(yaml);
@@ -222,10 +245,12 @@ struct Detector {
         if (result->has_warnings()) {
             emit(result->as_string(true, rule_contents) + "\n", true);
         }
+        ++loaded_rules;
     }
 
-    void ready() {
-        if (rule_contents.size() != paths.size()) {
+    const std::string& ready() {
+        if (rules_ready) return rules_summary;
+        if (loaded_rules != paths.size() || rule_contents.size() != paths.size()) {
             throw std::runtime_error("not all configured rules were loaded");
         }
         std::string error;
@@ -249,10 +274,41 @@ struct Detector {
                 enabled.push_back(info.at("name"));
             }
         }
-        emit(nlohmann::json{{"engine", FALCO_ENGINE_VERSION}, {"libs", SINSP_VERSION_STRING},
-                            {"required_engine_version", desc.at("required_engine_version")},
-                            {"loaded_rules", desc.at("rules").size()}, {"enabled", enabled}}.dump() + "\n", true);
+        rules_summary = nlohmann::json{{"engine", FALCO_ENGINE_VERSION}, {"libs", SINSP_VERSION_STRING},
+                                       {"required_engine_version", desc.at("required_engine_version")},
+                                       {"loaded_rules", desc.at("rules").size()}, {"enabled", enabled}}.dump() + "\n";
         engine->complete_rule_loading();
+        rules_ready = true;
+        return rules_summary;
+    }
+
+    void select_live_syscalls(uint8_t* ppm_sc) {
+        namespace events = libsinsp::events;
+        ready();
+        const auto rules_sc = engine->sc_codes_for_ruleset(falco_common::syscall_source);
+        events::set<ppm_event_code> plugin_events;
+        for (const auto& plugin : inspector.get_plugin_manager()->plugins()) {
+            if (plugin->caps() & CAP_PARSING) plugin_events = plugin_events.merge(plugin->parse_event_codes());
+        }
+        const auto state_sc = events::sinsp_state_sc_set();
+        auto selected = rules_sc.merge(events::event_set_to_sc_set(plugin_events)).merge(state_sc);
+        if (!base_syscalls_all) selected = selected.diff(events::io_sc_set().diff(state_sc));
+        selected.insert(PPM_SC_SCHED_PROCESS_EXIT);
+
+        events::set<ppm_sc_code> raven_added;
+        if (plugin_inspector && raven_enabled) {
+            raven_added = RavenSyscalls::sc_set().diff(selected);
+            selected = selected.merge(raven_added);
+        }
+        for (const auto code : selected) ppm_sc[code] = 1;
+
+        const auto names = [](const events::set<ppm_sc_code>& codes) {
+            const auto unordered = events::sc_set_to_event_names(codes);
+            return std::set<std::string>(unordered.begin(), unordered.end());
+        };
+        emit(nlohmann::ordered_json{{"mode", "event_selection"}, {"base_syscalls_all", base_syscalls_all},
+                                    {"selected", names(selected)}, {"raven_added", names(raven_added)},
+                                    {"rules_not_activated", names(rules_sc.diff(selected))}}.dump() + "\n", true);
     }
 
     template<class Operation>
@@ -502,7 +558,7 @@ int falco_replay(uint8_t* bytes, size_t size, const char* dns_hosts) {
                 }
             } while ((name = strtok_r(nullptr, " \t\r", &next)));
         }
-        detector->ready();
+        emit(detector->ready(), true);
         auto& inspector = detector->inspector;
         inspector.open_raw_block(&bytes, &length);
         inspector.start_capture();
@@ -579,7 +635,7 @@ struct LiveCapture {
             throw std::runtime_error("--record-inputs PACKETS requires the Zeek detector");
         pool.reserve(detector->block_count);
         for (size_t i = 0; i < detector->block_count; ++i) pool.emplace_back(detector->block_bytes);
-        detector->ready();
+        emit(detector->ready(), true);
         auto& inspector = detector->inspector;
         inspector.open_raw_block(&input, &input_bytes, detector->container_runtime);
         inspector.start_capture();
@@ -936,6 +992,20 @@ std::shared_ptr<LiveCapture> live;
 
 } // namespace
 
+int falco_live_select(uint8_t* ppm_sc, size_t bytes) {
+    std::lock_guard<std::mutex> lock(live_mutex);
+    try {
+        if (!ppm_sc || bytes != PPM_SC_MAX) throw std::runtime_error("invalid live syscall table");
+        std::memset(ppm_sc, 0, bytes);
+        if (!detector || !detector->live_select_allowed)
+            throw std::runtime_error("select live syscalls after live configuration and before capture setup");
+        detector->select_live_syscalls(ppm_sc);
+        return 0;
+    } catch (const std::exception& error) {
+        return fail(error);
+    }
+}
+
 int falco_live_setup(uint8_t* snapshot, size_t bytes, uint64_t consumer, uint64_t producer,
                      uint64_t control, size_t page, size_t capacity, uint8_t record, uint8_t inputs) {
     std::lock_guard<std::mutex> lock(live_mutex);
@@ -946,6 +1016,7 @@ int falco_live_setup(uint8_t* snapshot, size_t bytes, uint64_t consumer, uint64_
         if (live->has_detectors())
             __atomic_fetch_or(&live->control->flags, ring_detectors | (live->zeek ? ring_packets : 0), __ATOMIC_RELEASE);
         detector->live_mode = true;
+        detector->live_select_allowed = false;
         return 0;
     } catch (const std::exception& error) {
         if (!live) {

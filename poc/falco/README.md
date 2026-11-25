@@ -56,7 +56,7 @@ sudo falco-live falco-enclave.signed live.yaml 4096 - falco_rules.yaml raven_zee
 
 `-` 关闭 syscall 轨迹录制。需要保存检测输入做测试时，在规则文件前加 `--record-inputs events.jsonl packets.pcap`，用新文件名，任一位置可用 `-` 跳过。JSONL 保存交给 RAVEN 的事件，PCAP 保存 ring 中的原始 IP 报文和采集时间，每包最多 16 KiB。关闭 RAVEN 时，EVENTS 必须填 `-`；关闭 Zeek 时，PACKETS 必须填 `-`。为已关闭的检测器指定录制文件会导致启动失败。采集开始前失败时，宿主删除本次新建的轨迹和录制文件，修正配置后可用原路径重跑。回放本机录制的两份文件时，`falco-sgx` 使用 `--plugin-host EVENTS PCAP`，普通 Falco 在 `open_params` 中设置 `"host_capture":true`。这样能识别本机发送路径上等待网卡补全的 TCP 校验和。
 
-运行 `python3 falco/live/check-detectors.py FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY`。两个检测器都开启时，脚本检查关闭录制、开启录制及双端回放。单独开启时，脚本在工作负载退出前核对相应告警，停采后检查另一检测器的告警和输入计数均为零。另有五组启动反例，覆盖无效的开关配置和录制请求。
+运行 `python3 falco/live/check-detectors.py FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY`。两个检测器都开启时，脚本检查关闭录制、开启录制及双端回放。单独开启时，脚本在工作负载退出前核对相应告警，停采后检查另一检测器的告警和输入计数均为零。在双检测器录制和仅启用 RAVEN 两组中，脚本还按 PID、端口、文件路径及 UID 核对各类 RAVEN 输入。另有五组启动反例，覆盖无效的开关配置和录制请求。
 
 普通 Linux 对照需要 Python 3.10 或更高版本、PyYAML、psutil 和 Docker 守护进程访问权限。在 `poc/` 运行以下命令。`native-run` 保留输入、原版 RAVEN 字段及 Zeek 日志。
 
@@ -92,10 +92,15 @@ cmake -S falco/live -B build-falco-live -G Ninja -DCMAKE_BUILD_TYPE=Release \
     -DMODERN_BPFTOOL_EXE="$(realpath build-falco/deps/bpftool/bpftool)"
 cmake --build build-falco-live --parallel 2
 bash falco/live/check.sh build-falco/deps/package build-falco build-falco-live build-falco/live-run
+python3 falco/live/check-event-set.py build-falco/deps/package build-falco build-falco-live build-falco/event-set-run
 bash falco/live/check-ring.sh build-falco/deps/package build-falco build-falco-live build-falco/ring-run
 ```
 
 `check.sh` 在客体内用 `sudo -n` 装载探针，以当前账号运行回环工作负载，并将实时告警、普通 Falco 回放告警和 enclave 回放告警逐条比较。`check-ring.sh` 无需特权。它检查环绕、BUSY、DISCARD、格式拒绝，并在一批事件处理期间修改共享映射中的末条载荷，验证原版告警仍匹配私有副本。
+
+实时采集按 Falco 0.45.2 的方式合并规则、具备解析能力的插件和 libsinsp 状态维护所需的系统调用。默认移除状态集之外的高频 I/O，`base_syscalls.all: true` 则保留已选中的高频 I/O。两种配置均订阅 `sched_process_exit`。`base_syscalls` 仅支持调整 `all`，也接受默认值 `custom_set: []` 和 `repair: false`。
+
+启用 RAVEN 时，enclave 补订其事件翻译所需的系统调用。补订表与 `RavenSyscalls::translate` 处理的事件类型一致，由 `raven-syscalls-test` 核对。translate 不处理的事件即使订阅也会被丢弃。当前 setuid 程序在 `execve` 时的 uid 变化不生成 `privilege_change`，`mkdir`、`rename`、`sendfile` 等也不生成 RAVEN 输入。缩小订阅后 RAVEN 输入与全量订阅时一致，目前依据代码分析和 `check-detectors.py` 的十类输入标记，尚无同一轨迹的差分测试。Zeek 只读取 socket BPF 提交的 IP 报文。采集前 stderr 输出一行 `event_selection` JSON，其中 `base_syscalls_all` 为实际开关值，`selected` 为最终订阅，`raven_added` 为 RAVEN 补订的事件，`rules_not_activated` 为规则使用但未订阅的事件。三个列表均按事件名排序。`check-event-set.py` 在两种开关值下与原版 Falco 的调试日志逐项核对，并检查各检测器配置的订阅差异。
 
 ```text
 falco-live ENCLAVE CONFIG RING_KIB TRACE_OR_- [--record-inputs EVENTS_OR_- PACKETS_OR_-] RULES... [-- WORKLOAD [ARGS...]]

@@ -46,6 +46,7 @@ ln -s "$package/usr/share/falco/plugins/libcontainer.so" .
 sed -e 's|rules_files: \[falco_rules.yaml\]|rules_files: [falco_rules.yaml, dns-cases.yaml]|' \
     -e 's|extra_fields: \[evt.num, evt.type, thread.tid\]|extra_fields: [evt.num, evt.type, thread.tid, fd.sip, fd.sip.name, proc.args]|' \
     "$here/reference.yaml" >reference.yaml
+echo 'base_syscalls: {all: true}' >>reference.yaml
 
 cat >dns-cases.yaml <<'YAML'
 - macro: poc_dns_connect
@@ -90,9 +91,12 @@ cat >workload.sh <<'SH'
 set -euo pipefail
 if [[ $1 == refresh ]]; then
     python3 dns-client.py dns-a-before 127.0.0.1
+    until grep -Fq '"rule":"POC DNS A"' "$2"; do sleep 0.2; done
+    start=$(wc -l <resolver.log)
     printf '127.0.0.2 a.falco-dns.test\n::1 aaaa.falco-dns.test\n' >live.hosts
     systemctl kill --signal=HUP falco-dns-test
-    sleep 17
+    until awk -v start="$start" 'NR > start && /live\.hosts a\.falco-dns\.test is 127\.0\.0\.2$/ {seen=1}
+        END {exit !seen}' resolver.log; do sleep 0.2; done
     python3 dns-client.py dns-a-old-after 127.0.0.1
     python3 dns-client.py dns-a-new-after 127.0.0.2
 else
@@ -133,13 +137,12 @@ ln -s ../native-alerts.jsonl ../native-rules.json ../versions.txt replayed/
 python3 "$here/compare.py" replayed --captured | tee replayed/comparison.json
 
 with_dns timeout 90 "$live/falco-live" "$build/falco-enclave.signed" reference.yaml 16384 - \
-    falco_rules.yaml dns-cases.yaml -- bash "$PWD/workload.sh" refresh >refresh-alerts.jsonl 2>refresh.log
+    falco_rules.yaml dns-cases.yaml -- bash "$PWD/workload.sh" refresh refresh-alerts.jsonl >refresh-alerts.jsonl 2>refresh.log
 cp initial.hosts live.hosts
 sudo -n systemctl kill --signal=HUP falco-dns-test
 sleep 1
 with_dns timeout 90 bash -eu -c '
     "$1" -c reference.yaml -o engine.kind=modern_ebpf -o engine.modern_ebpf.disable_iterators=true \
-        -o base_syscalls.all=true \
         >native-refresh-alerts.jsonl 2>native-refresh.log &
     capture=$!
     trap "kill -INT $capture 2>/dev/null || true" EXIT
@@ -150,7 +153,7 @@ with_dns timeout 90 bash -eu -c '
     done
     grep -q "with modern BPF probe" native-refresh.log
     sleep 8
-    bash workload.sh refresh
+    bash workload.sh refresh native-refresh-alerts.jsonl
     sleep 2
     kill -INT "$capture"
     wait "$capture"

@@ -30,6 +30,24 @@ def workload(live, gate):
             endpoint = socket.socket()
             endpoint.bind((f"127.0.0.{last_octet}", port))
             destinations.append(endpoint)
+        with socket.socket() as listener, socket.socket() as client:
+            listener.bind(("127.0.0.26", port))
+            listener.listen()
+            client.connect(listener.getsockname())
+            peer, _ = listener.accept()
+            peer.close()
+        marker = gate.parent / "raven-file-marker"
+        marker.write_bytes(b"raven write\n")
+        assert marker.read_bytes() == b"raven write\n"
+        marker.chmod(0o700)
+        child = subprocess.Popen(["/bin/true", "raven-process-marker"])
+        assert child.wait() == 0
+        sudo = [] if os.geteuid() == 0 else ["sudo", "-n"]
+        uid_pid = subprocess.check_output([*sudo, sys.executable, "-I", "-S", "-c",
+                                          "import os; os.setuid(65534); print(os.getpid())"])
+        (gate.parent / "markers.json").write_text(json.dumps({
+            "pid": os.getpid(), "child": child.pid, "uid_pid": int(uid_pid), "port": port,
+        }))
         for endpoint in destinations:
             with socket.socket() as client:
                 if client.connect_ex(endpoint.getsockname()) != errno.ECONNREFUSED:
@@ -60,6 +78,29 @@ def detector_results(path):
             key = row["rule"], tuple(e["id"] for e in row["events"])
             raven[key] = (row["state"], row["risk"], row["breakdown"], row["events"])
     return raven, notices
+
+
+def check_raven_inputs(cwd, count):
+    marker = json.loads((cwd / "markers.json").read_text())
+    events = [json.loads(line) for line in (cwd / "events.jsonl").read_text().splitlines()]
+    assert len(events) == count and all(e["event_id"] for e in events)
+    expected = [
+        {"event_type": "process_fork", "pid": marker["child"], "ppid": marker["pid"]},
+        {"event_type": "process_exec", "pid": marker["child"], "args": ["raven-process-marker"]},
+        {"event_type": "process_exit", "pid": marker["child"]},
+        {"event_type": "net_listen", "pid": marker["pid"], "dst_port": marker["port"]},
+        {"event_type": "net_connect", "pid": marker["pid"], "dst_port": marker["port"], "dst_ip": "127.0.0.26"},
+        {"event_type": "privilege_change", "pid": marker["uid_pid"], "uid": 0, "euid": 65534},
+    ]
+    for op in ("open", "create", "write", "chmod"):
+        row = {"event_type": "file_access" if op == "open" else "file_modify", "file_op": op,
+               "file_path": str(cwd / "raven-file-marker"), "pid": marker["pid"]}
+        if op == "chmod":
+            row["metadata"] = {"created_executable": True}
+        expected.append(row)
+    for row in expected:
+        assert any(all(e.get(k) == v for k, v in row.items()) for e in events), (cwd, row)
+    return expected
 
 
 def check(package, build, live, out, strict=False):
@@ -101,6 +142,8 @@ def check(package, build, live, out, strict=False):
         cmd = [*sudo, "timeout", "--kill-after=10", "240", *collector, "reference.scap" if record else "-"]
         if record:
             cmd.extend(["--record-inputs", "events.jsonl", "packets.pcap"])
+        elif name == "raven-only":
+            cmd.extend(["--record-inputs", "events.jsonl", "-"])
         gate = cwd / "release"
         cmd.extend(rules)
         fixture = [sys.executable, Path(__file__).resolve(), "--workload", live, gate]
@@ -158,6 +201,9 @@ def check(package, build, live, out, strict=False):
         lines = (cwd / "live.log").read_text().splitlines()
         summary["enclave_mode"] = "SGX hardware DEBUG=0" if any(s.startswith("REPORT DEBUG=0 ") for s in lines) else "SGX Simulation"
         logs = [json.loads(s) for s in lines if s.startswith("{")]
+        if not raven:
+            selection, = (r for r in logs if r.get("mode") == "event_selection")
+            assert selection["raven_added"] == []
         ring = next(r for r in logs if r.get("mode") == "live")
         if strict and any(ring["errors"].values()):
             raise AssertionError(f"live errors: {ring['errors']}")
@@ -172,7 +218,10 @@ def check(package, build, live, out, strict=False):
         assert driver["driver_events"] + ring["packet_records"] == ring["accepted"] == ring["records"]
         assert driver["consumer"] == driver["producer"] == ring["consumer"] == ring["producer"]
         assert not any((driver["driver_drops"], driver["packet_drops"], ring["discarded"], ring["format_rejected"]))
-        assert all((cwd / p).exists() == record for p in ("events.jsonl", "packets.pcap", "reference.scap"))
+        inputs = (["events.jsonl"] if record or name == "raven-only" else [])
+        if record:
+            inputs.extend(["packets.pcap", "reference.scap"])
+        assert all((cwd / p).exists() == (p in inputs) for p in ("events.jsonl", "packets.pcap", "reference.scap"))
         result = {"before_workload_exit": sorted(found), "syscall_records": driver["driver_events"],
                   "detectors": ring["detectors"], "packet_submitted": driver["packet_submitted"],
                   "raven_events": ring["raven_events"], "packets": ring["packet_records"],
@@ -180,10 +229,10 @@ def check(package, build, live, out, strict=False):
                   "discarded": ring["discarded"], "format_rejected": ring["format_rejected"],
                   "map_id": driver["map_id"], "drained_position": ring["consumer"],
                   "stopped_by": "workload exit" if record else "SIGTERM",
-                  "input_files": ["events.jsonl", "packets.pcap", "reference.scap"] if record else []}
+                  "input_files": inputs}
+        if "events.jsonl" in inputs:
+            result["raven_markers"] = check_raven_inputs(cwd, ring["raven_events"])
         if record:
-            events = (cwd / "events.jsonl").read_text().splitlines()
-            assert len(events) == ring["raven_events"] and all(json.loads(e)["event_id"] for e in events)
             packets = (cwd / "packets.pcap").read_bytes()
             assert struct.unpack_from("<I", packets)[0] == 0xa1b23c4d
             pos, count = 24, 0
