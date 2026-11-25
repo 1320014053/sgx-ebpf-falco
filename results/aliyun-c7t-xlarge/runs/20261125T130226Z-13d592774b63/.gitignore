@@ -1,0 +1,13 @@
+/bulk/
+/e7/inputs/zeek.pcap
+/e7/inputs/repeat.jsonl
+/e7/inputs/churn.jsonl
+/e7/repeat-sgx/alerts.jsonl
+/e7/repeat-native/alerts.jsonl
+/e8/input-300000/reference.scap
+/e8/native-300000-file/alerts.jsonl
+/e8/input-600000/reference.scap
+/e8/native-600000/alerts.jsonl
+/e8/sgx-600000/alerts.jsonl
+/e8/native-300000/alerts.jsonl
+/e8/sgx-300000/alerts.jsonl

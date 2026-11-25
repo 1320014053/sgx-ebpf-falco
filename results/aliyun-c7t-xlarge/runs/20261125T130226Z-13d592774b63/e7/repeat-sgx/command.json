@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "/usr/bin/time",
+    "-q",
+    "-f",
+    "%U %S %M %w %c %I %O",
+    "-o",
+    "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e7/repeat-sgx/resources.txt",
+    "/root/c7t-xlarge-ship/src/probe/poc/build-falco/bin/falco-sgx",
+    "/root/c7t-xlarge-ship/src/probe/poc/build-falco/falco-enclave.signed",
+    "falco.yaml",
+    "reference.scap",
+    "--plugin-stream",
+    "events.jsonl",
+    "falco_rules.yaml",
+    "raven_zeek_rules.yaml"
+  ],
+  "cwd": "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e7/input-repeat",
+  "stdout": "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e7/repeat-sgx/alerts.jsonl",
+  "env": {
+    "TZ": "UTC",
+    "LC_ALL": "C",
+    "FALCO_HOSTNAME": "raven-retention",
+    "FALCO_SGX_REPORT": "1"
+  }
+}

@@ -1,0 +1,38 @@
+rules_files: [falco_rules.yaml]
+engine:
+  kind: modern_ebpf
+  modern_ebpf:
+    cpus_for_each_buffer: 0
+    buf_size_preset: 4
+rule_matching: all
+priority: debug
+plugins:
+  - name: container
+    library_path: /proc/self/cwd/libcontainer.so
+    init_config:
+      engines:
+        docker: {enabled: false}
+        podman: {enabled: false}
+        containerd: {enabled: false}
+        cri: {enabled: false}
+        lxc: {enabled: false}
+        libvirt_lxc: {enabled: false}
+        bpm: {enabled: false}
+load_plugins: [container]
+watch_config_files: false
+log_stderr: true
+log_syslog: false
+syslog_output:
+  enabled: false
+stdout_output:
+  enabled: true
+json_output: true
+json_include_message_property: true
+time_format_iso_8601: true
+append_output:
+  - extra_fields: [evt.num, evt.type, thread.tid]
+
+webserver: {enabled: false}
+metrics: {enabled: true, interval: 1s, output_file: native-metrics.jsonl, output_rule: false, kernel_event_counters_enabled: true, include_empty_values: true, libbpf_stats_enabled: false}
+base_syscalls: {all: false}
+buffered_outputs: false

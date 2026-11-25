@@ -1,0 +1,2 @@
+{"PCID":1,"SGX":1,"SGX_LC":1,"PKS":0,"INVPCID":1,"SGX1":1,"SGX2":1}
+0

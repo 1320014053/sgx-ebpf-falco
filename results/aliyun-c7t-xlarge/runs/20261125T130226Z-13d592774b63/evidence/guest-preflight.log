@@ -1,0 +1,5 @@
+batch=/home/poc/hw-ship-1795610679657/verify/src/results/aliyun-c7t-xlarge/runs/20261125T125237Z-13d592774b63
+hardware SGX unavailable (need SGX, SGX1, SGX_LC and /dev/sgx_enclave)
+falco-sgx failed; see report.log
+missing hardware REPORT or DEBUG is set
+REPORT measurements do not match the signed image

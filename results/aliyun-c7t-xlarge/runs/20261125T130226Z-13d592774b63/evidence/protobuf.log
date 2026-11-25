@@ -1,0 +1,11 @@
+libprotobuf23:
+  Installed: (none)
+  Candidate: 3.12.4-1ubuntu7.22.04.6
+  Version table:
+     3.12.4-1ubuntu7.22.04.6 500
+        500 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages
+        500 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages
+     3.12.4-1ubuntu7 500
+        500 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages
+debs/libprotobuf23_3.12.4-1ubuntu7.22.04.6_amd64.deb: OK
+libprotobuf23 3.12.4-1ubuntu7.22.04.6 b3680d038ac8272d3793d7c3eda651b19522127e7679c9c504f7ac548bbdf2ce pool/main/p/protobuf/libprotobuf23_3.12.4-1ubuntu7.22.04.6_amd64.deb

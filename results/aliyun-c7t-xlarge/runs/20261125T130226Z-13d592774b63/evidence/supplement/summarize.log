@@ -1,0 +1,3 @@
+/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/summary: each point is one run. Min/median/max are within-run one-second statistics.
+Capacity limits use valid runs and any syscall or packet drops. Unlimited is positioned by achieved producer rate; E1 converts pairs using the calibrated ratio.
+Received/offered counts cover the actual counter interval. Window rates and per-request values use one-second counter snapshots interpolated at workload boundaries.

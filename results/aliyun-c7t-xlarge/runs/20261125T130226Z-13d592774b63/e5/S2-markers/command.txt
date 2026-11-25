@@ -1,0 +1,5 @@
+# collector mode: hardware; cwd: this run directory
+/usr/bin/python3 /root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/scripts/http-load.py serve
+/usr/bin/python3 /root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/scripts/http-load.py client 43825 30 producer.json --rate 10 --gate
+runuser -u nobody -- /tmp/falco-bench-x_d_uzfr/httpd sgxbench_s2 0.05 30 --gate
+env TZ=UTC FALCO_HOSTNAME=falco-bench FALCO_LIVE_STATS_MS=1000 /root/c7t-xlarge-ship/src/poc/build-falco-live/falco-live /root/c7t-xlarge-ship/src/poc/build-falco/falco-enclave.signed falco.yaml 8192 - falco_rules.yaml raven_zeek_rules.yaml

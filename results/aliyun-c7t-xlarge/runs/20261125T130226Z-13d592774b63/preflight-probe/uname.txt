@@ -1,0 +1,1 @@
+Linux iZbp1b6gozmnui4bssrnodZ 5.15.0-198-generic #208-Ubuntu SMP Fri Sep 4 10:22:38 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux

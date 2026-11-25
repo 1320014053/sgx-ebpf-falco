@@ -1,0 +1,4 @@
+# collector mode: hardware; cwd: this run directory
+/usr/bin/python3 /root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/scripts/http-load.py serve
+/usr/bin/python3 /root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/scripts/http-load.py client 33791 30 producer.json --rate 0 --gate
+env TZ=UTC FALCO_HOSTNAME=falco-bench /root/c7t-xlarge-ship/src/poc/build-falco/deps/package/usr/bin/falco -c falco.yaml

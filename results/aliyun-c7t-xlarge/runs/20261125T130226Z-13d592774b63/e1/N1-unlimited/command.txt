@@ -1,0 +1,3 @@
+# collector mode: hardware; cwd: this run directory
+env TZ=UTC FALCO_HOSTNAME=falco-bench /root/c7t-xlarge-ship/src/poc/build-falco/deps/package/usr/bin/falco -c falco.yaml
+/tmp/falco-bench-x_d_uzfr/falco-load 0 30 producer.json

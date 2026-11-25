@@ -1,0 +1,16 @@
+REPORT DEBUG=0 MRENCLAVE=4a60c294fe882a9c4e996c64bc805467efe6a5cc5db65f78adb62ec03cc92b45 MRSIGNER=48acfb2734b51cc8550d5b70df28b69591a5dd2da1535f3093f8b762e925956d
+falco_rules.yaml | schema validation: ok
+falco_rules.yaml: Ok, with warnings
+1 Warnings:
+In rules content: (falco_rules.yaml:0:0)
+    rule 'Preflight exec': (falco_rules.yaml:0:2)
+    rule condition: (falco_rules.yaml:2:13)
+    condition expression: ("evt.type=execve a...":2:13)
+------
+evt.type=execve and evt.dir=<
+                            ^
+------
+LOAD_DEPRECATED_ITEM (Used deprecated item: field 'evt.dir'): due to the drop of enter events, 'evt.dir = <' always evaluates to true, and 'evt.dir = >' always evaluates to false. The rule expression can be simplified by removing the condition on 'evt.dir'
+
+{"enabled":["Preflight exec"],"engine":"0.65.0","libs":"0.26.1","loaded_rules":1,"required_engine_version":"0.0.0"}
+{"alerts":6,"events":42,"scap_bytes":8424}

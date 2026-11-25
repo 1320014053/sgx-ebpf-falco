@@ -1,0 +1,113 @@
+--- a/results/aliyun-c7t-xlarge/scripts/bench.py
++++ b/results/aliyun-c7t-xlarge/scripts/bench.py
+@@ -504,7 +504,10 @@
+         writer = csv.DictWriter(stream, fields, extrasaction="ignore")
+         if not stream.tell():
+             writer.writeheader()
+-        writer.writerow(dict(row, metrics=relative, reasons=" | ".join(row["reasons"])))
++        reasons = [*row["reasons"]]
++        if "alert_context" in row:
++            reasons.append(row["alert_context"])
++        writer.writerow(dict(row, metrics=relative, reasons=" | ".join(reasons)))
+ 
+ 
+ def run_point(args, exp, config, point, rate=None, target=None, ratio=None, seconds=None):
+@@ -516,12 +519,15 @@
+         row = read_json(metrics)
+         if (row["duration_s"], row["mode"], row["load_rate"]) != (seconds, mode, rate):
+             raise ValueError(f"{metrics} belongs to a different run; supply a new batch directory")
+-        index_trial(args.out, metrics, row)
++        if not args.dry_run:
++            index_trial(args.out, metrics, row)
+         if not row["valid"]:
+             args.invalid.append(str(metrics))
+         print(f"skip {exp}/{directory.name} (complete)", flush=True)
+         args.remaining -= 1
+         return row
++    if args.dry_run:
++        raise ValueError(f"missing base point for the E2 supplement preview: {metrics}")
+     if exp in ("e1", "e2", "e3"):
+         compile_tool(args.binaries, "tcp-load" if exp == "e2" else "falco-load")
+     if exp in ("e3", "e5") and point != "cal6250":
+@@ -549,6 +555,8 @@
+                 row["axis_rate"] = target
+             if "driver_drops" in row:
+                 row["lossy"] = bool(row["driver_drops"] or row.get("packet_drops"))
++            if args.background_alerts_ok and not row["valid"] and capacity_eligible(row, True):
++                row["alert_context"] = "后台告警"
+         write_json(work / "metrics.json", row)
+         work.chmod(directory.parent.stat().st_mode & 0o777)
+         work.rename(directory)
+@@ -574,6 +582,14 @@
+         subprocess.run(["cc", "-O2", *flags, src, "-o", exe], check=True)
+ 
+ 
++def capacity_eligible(row, background_alerts_ok):
++    if row["valid"]:
++        return True
++    alerts = row.get("raven_zeek_alerts", 0)
++    return (background_alerts_ok and row["experiment"] == "e2" and alerts > 0
++            and row["reasons"] == [f"{alerts} unexpected raven_zeek alerts"])
++
++
+ def capacity(args, exp, config):
+     rows = []
+     ratio = 1
+@@ -585,19 +601,29 @@
+         rows.append(first)
+     targets = (50000, 100000, 150000, 200000) if exp == "e1" else (1000, 2000, 4000, 8000, 16000)
+     for target in targets:
+-        if len(rows) >= 2 and all(r["valid"] and r["lossy"] for r in rows[-2:]):
++        if len(rows) >= 2 and all(capacity_eligible(r, args.background_alerts_ok) and r["lossy"]
++                                  for r in rows[-2:]):
+             break
+         rate = max(1, round(target / ratio))
+         rows.append(run_point(args, exp, config, str(target), rate, target))
+     rows.append(run_point(args, exp, config, "unlimited", 0, ratio=ratio))
+-    for _ in range(2):
+-        lows = [r["axis_rate"] for r in rows if r["valid"] and not r["lossy"]]
+-        highs = [r["axis_rate"] for r in rows if r["valid"] and r["lossy"]]
++    for step in range(2):
++        eligible = [r for r in rows if capacity_eligible(r, args.background_alerts_ok)]
++        if args.background_alerts_ok and len(eligible) != len(rows):
++            break
++        lows = [r["axis_rate"] for r in eligible if not r["lossy"]]
++        highs = [r["axis_rate"] for r in eligible if r["lossy"]]
+         if not lows or not highs or max(lows) >= min(highs):
+             break
+         target = round((max(lows) + min(highs)) / 2)
+         rate = max(1, round(target / ratio))
+         if any(r["load_rate"] == rate for r in rows):
++            break
++        if args.dry_run and not (args.out / exp / f"{config}-bisect{target}" / "metrics.json").exists():
++            print(f"plan {exp}/{config}-bisect{target} in [{max(lows):g}, {min(highs):g}]")
++            if step == 0:
++                print(f"at most one further midpoint: {round((max(lows)+target)/2)} if lossy, "
++                      f"{round((target+min(highs))/2)} if lossless")
+             break
+         rows.append(run_point(args, exp, config, f"bisect{target}", rate, target))
+     args.remaining -= len(plan_points(exp)) - len(rows)
+@@ -628,6 +654,8 @@
+     parser.add_argument("--configs", nargs="+", help="configuration IDs, space- or comma-separated")
+     parser.add_argument("--sim", action="store_true", help="use the supplied simulation build directories")
+     parser.add_argument("--dry-run", action="store_true")
++    parser.add_argument("--background-alerts-ok", action="store_true",
++                        help="use E2 points invalid only for detector alerts in capacity decisions")
+     args = parser.parse_args()
+     if args.duration < 1:
+         parser.error("--duration must be a positive integer")
+@@ -639,6 +667,14 @@
+     plan = selected_plan(args)
+     if not plan:
+         parser.error("no selected configs apply to this experiment")
++    if args.background_alerts_ok and args.experiment != "e2":
++        parser.error("--background-alerts-ok applies only to e2")
++    if args.dry_run and args.background_alerts_ok:
++        args.remaining = len(plan["e2"]) * len(plan_points("e2"))
++        args.invalid = []
++        for config in plan["e2"]:
++            capacity(args, "e2", config)
++        return 0
+     if args.dry_run:
+         for exp, configs in plan.items():
+             if exp == "e3":

@@ -1,0 +1,1242 @@
++++ dirname build.sh
+++ cd .
+++ pwd
++ W=/home/poc/hw-ship-1795610679657
++ cd /home/poc/hw-ship-1795610679657
++ sha256sum -c initial.sha256
+initial.tar: OK
++ mkdir source
++ tar -xf initial.tar -C source
++ cd source
++ R=/home/poc/hw-ship-1795610679657/source
++ S=/home/poc/hw-ship-1795610679657/source/results/aliyun-c7t-xlarge/scripts
++ B=/home/poc/hw-ship-1795610679657/source/poc/build-falco
++ L=/home/poc/hw-ship-1795610679657/source/poc/build-falco-live
++ D=/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps
++ P=/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/package
++ export CC=clang CXX=clang++
++ CC=clang
++ CXX=clang++
++ clang --version
+Ubuntu clang version 14.0.0-1ubuntu1.1
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
++ clang++ --version
+Ubuntu clang version 14.0.0-1ubuntu1.1
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
++ cmake --version
+cmake version 3.22.1
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
++ opts=(-G Ninja -DFALCO_SGX_HARDWARE=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE=-O1 -DCMAKE_CXX_FLAGS_RELEASE=-O1)
++ bash poc/falco/fetch.sh /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps
+yaml.tar.gz: OK
+njson.tar.gz: OK
+valijson.tar.gz: OK
+uthash.tar.gz: OK
+re2.tar.gz: OK
+jsoncpp.tar.gz: OK
+zlib.tar.gz: OK
+package.tar.gz: OK
+package/etc/falco/falco_rules.yaml: OK
+edgelessrt.deb: OK
++ mkdir -p /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/bpftool
++ curl -fsSL https://github.com/libbpf/bpftool/releases/download/v7.5.0/bpftool-v7.5.0-amd64.tar.gz
++ tar -xz -C /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/bpftool bpftool
++ chmod u+x /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/bpftool/bpftool
++ /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/bpftool/bpftool version
+bpftool v7.5.0
+using libbpf v1.5
+features: llvm, skeletons
++ cmake -S poc/falco -B /home/poc/hw-ship-1795610679657/source/poc/build-falco -G Ninja -DFALCO_SGX_HARDWARE=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE=-O1 -DCMAKE_CXX_FLAGS_RELEASE=-O1
+-- The C compiler identification is Clang 14.0.0
+-- The CXX compiler identification is Clang 14.0.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Looking for crypto library - found
+-- Looking for dl library - found
+CMake Warning at /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/lib/openenclave/cmake/openenclave-config.cmake:122 (message):
+  -- Looking for sgx_dcap_ql library - not found.  Attestations based on
+  quotes would not function without the quote provider.
+Call Stack (most recent call first):
+  CMakeLists.txt:15 (find_package)
+
+
+-- Performing Test OE_SPECTRE_MITIGATION_C_FLAGS_SUPPORTED
+-- Performing Test OE_SPECTRE_MITIGATION_C_FLAGS_SUPPORTED - Success
+-- Performing Test OE_SPECTRE_MITIGATION_CXX_FLAGS_SUPPORTED
+-- Performing Test OE_SPECTRE_MITIGATION_CXX_FLAGS_SUPPORTED - Success
+-- Using the multi-header code from /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/njson/include/
+-- JsonCpp Version: 1.9.5
+-- Looking for C++ include clocale
+-- Looking for C++ include clocale - found
+-- Looking for localeconv
+-- Looking for localeconv - found
+-- Looking for C++ include sys/types.h
+-- Looking for C++ include sys/types.h - found
+-- Looking for C++ include stdint.h
+-- Looking for C++ include stdint.h - found
+-- Looking for C++ include stddef.h
+-- Looking for C++ include stddef.h - found
+-- Check size of lconv
+-- Check size of lconv - done
+-- Performing Test HAVE_DECIMAL_POINT
+-- Performing Test HAVE_DECIMAL_POINT - Success
+-- Driver API version 11.0.1
+-- Driver schema version 4.5.2
+-- Looking for strlcpy
+-- Looking for strlcpy - not found
+-- Looking for strlcat
+-- Looking for strlcat - not found
+-- No strlcpy found, will use local definition
+-- No strlcat found, will use local definition
+-- Looking for sys/mkdev.h
+-- Looking for sys/mkdev.h - not found
+-- Looking for sys/sysmacros.h
+-- Looking for sys/sysmacros.h - found
+-- Using jsoncpp: include: /home/poc/hw-ship-1795610679657/source/poc/falco/../build-falco/deps/jsoncpp/include, lib: jsoncpp_static
+-- Using re2: include: /home/poc/hw-ship-1795610679657/source/poc/falco/../build-falco/deps/re2, lib: re2
+-- Using jsoncpp: include: /home/poc/hw-ship-1795610679657/source/poc/falco/../build-falco/deps/jsoncpp/include, lib: jsoncpp_static
+-- Performing Test HAVE_SSE2
+-- Performing Test HAVE_SSE2 - Success
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/poc/hw-ship-1795610679657/source/poc/build-falco
++ cmake --build /home/poc/hw-ship-1795610679657/source/poc/build-falco --parallel 2
+[0/2] Re-checking globbed directories...
+[1/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/plugin.cpp.o
+[2/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/graph.cpp.o
+[3/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/raven.cpp.o
+[4/274] Generating Falco_t.c, Falco_t.h, Falco_u.c, Falco_u.h, Falco_args.h
+Generating edge routine, for the Open Enclave SDK.
+Processing /home/poc/hw-ship-1795610679657/source/poc/falco/Falco.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/syscall.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/epoll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/fcntl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ioctl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/poll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/signal.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/socket.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/time.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/unistd.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/utsname.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/platform.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/attestation.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/cpu.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/debug.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/thread.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/switchless.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/tdx_verification.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ertlibc.edl.
+Success.
+Generating edge routine, for the Open Enclave SDK.
+Processing /home/poc/hw-ship-1795610679657/source/poc/falco/Falco.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/syscall.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/epoll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/fcntl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ioctl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/poll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/signal.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/socket.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/time.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/unistd.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/utsname.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/platform.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/attestation.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/cpu.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/debug.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/thread.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/switchless.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/tdx_verification.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ertlibc.edl.
+Success.
+[5/274] Building CXX object CMakeFiles/falco-sgx.dir/host.cpp.o
+[6/274] Building CXX object CMakeFiles/falco-sgx.dir/replay_host.cpp.o
+[7/274] Building C object CMakeFiles/falco-sgx.dir/Falco_u.c.o
+[8/274] Linking CXX executable bin/falco-sgx
+[9/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/adler32.c.o
+[10/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/compress.c.o
+[11/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/crc32.c.o
+[12/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/deflate.c.o
+[13/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/gzclose.c.o
+[14/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/gzlib.c.o
+[15/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/gzread.c.o
+[16/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/zeek.cpp.o
+[17/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/gzwrite.c.o
+[18/274] Linking CXX shared library lib/libraven_zeek.so
+[19/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/inffast.c.o
+[20/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/infback.c.o
+[21/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/inftrees.c.o
+[22/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/trees.c.o
+[23/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/inflate.c.o
+[24/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/uncompr.c.o
+[25/274] Building C object trusted/CMakeFiles/falco_zlib.dir/__/deps/zlib/zutil.c.o
+[26/274] Linking C static library lib/libfalco_zlib.a
+[27/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/plugin.cpp.o
+[28/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/graph.cpp.o
+[29/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/raven.cpp.o
+[30/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/zeek.cpp.o
+[31/274] Linking CXX static library lib/libraven_zeek_trusted.a
+[32/274] Building C object trusted/CMakeFiles/falco-enclave-objects.dir/__/Falco_t.c.o
+[33/274] Building CXX object trusted/CMakeFiles/falco-enclave-objects.dir/raven_syscalls.cpp.o
+[34/274] Building C object trusted/CMakeFiles/falco-enclave-objects.dir/cgo_posix.c.o
+[35/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/ringbuffer.c.o
+[36/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/bitstate.cc.o
+[37/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/compile.cc.o
+[38/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/dfa.cc.o
+[39/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/filtered_re2.cc.o
+[40/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/mimics_pcre.cc.o
+[41/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/nfa.cc.o
+[42/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/onepass.cc.o
+[43/274] Building CXX object trusted/CMakeFiles/falco-enclave-objects.dir/enclave.cpp.o
+[44/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/perl_groups.cc.o
+[45/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/prefilter.cc.o
+[46/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/parse.cc.o
+[47/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/prefilter_tree.cc.o
+[48/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/prog.cc.o
+[49/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/re2.cc.o
+[50/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/regexp.cc.o
+[51/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/set.cc.o
+[52/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/simplify.cc.o
+[53/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/stringpiece.cc.o
+[54/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/unicode_casefold.cc.o
+[55/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/unicode_groups.cc.o
+[56/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/util/rune.cc.o
+[57/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/tostring.cc.o
+[58/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/util/strutil.cc.o
+[59/274] Linking CXX static library trusted/re2/libre2.a
+[60/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilder.cpp.o
+[61/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o
+[62/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilderadapter.cpp.o
+[63/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o
+[64/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/directives.cpp.o
+[65/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/convert.cpp.o
+[66/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emit.cpp.o
+[67/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o
+[68/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o
+[69/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o
+[70/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o
+[71/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o
+[72/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/exp.cpp.o
+[73/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/node.cpp.o
+[74/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/memory.cpp.o
+[75/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o
+[76/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o
+[77/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/null.cpp.o
+[78/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o
+[79/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o
+[80/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/parser.cpp.o
+[81/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/parse.cpp.o
+[82/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o
+[83/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o
+[84/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o
+[85/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o
+[86/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o
+[87/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o
+[88/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o
+[89/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o
+[90/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o
+[91/274] Linking CXX static library trusted/yaml/libyaml-cpp.a
+[92/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_load_result.cpp.o
+[93/274] Building CXX object trusted/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_reader.cpp.o
+[94/274] Building CXX object trusted/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_writer.cpp.o
+[95/274] Building C object libscap/CMakeFiles/scap_error.dir/strerror.c.o
+[96/274] Linking C static library lib/libscap_error.a
+[97/274] Building CXX object trusted/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_value.cpp.o
+[98/274] Linking CXX static library lib/libjsoncpp.a
+[99/274] Building C object libscap/CMakeFiles/scap.dir/scap.c.o
+[100/274] Building C object libscap/CMakeFiles/scap.dir/scap_api_version.c.o
+[101/274] Building C object libscap/CMakeFiles/scap.dir/scap_platform_api.c.o
+[102/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_platform.c.o
+[103/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_fds.c.o
+[104/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_iflist.c.o
+[105/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_proc_util.c.o
+[106/274] Building C object libscap/CMakeFiles/scap.dir/scap_savefile.c.o
+[107/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_userlist.c.o
+[108/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_procs.c.o
+[109/274] Linking C static library lib/libscap_platform_util.a
+[110/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_event.c.o
+[111/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/ppm_sc_names.c.o
+[112/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_threadinfo.c.o
+[113/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_event.c.o
+[114/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_empty_params_set.c.o
+[115/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_fdinfo.c.o
+[116/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/__/deps/libs/driver/dynamic_params_table.c.o
+[117/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/__/deps/libs/driver/event_table.c.o
+[118/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/__/deps/libs/driver/flags_table.c.o
+[119/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/__/deps/libs/driver/syscall_table64.c.o
+[120/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/__/deps/libs/driver/syscall_ia32_64_map.c.o
+[121/274] Building C object libscap/CMakeFiles/driver_event_schema.dir/__/deps/libs/driver/fillers_table.c.o
+[122/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/linux/scap_ppm_sc.c.o
+[123/274] Linking C static library lib/libdriver_event_schema.a
+[124/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/scap_engine_util.c.o
+[125/274] Linking C static library lib/libscap_event_schema.a
+[126/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/devset.c.o
+[127/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/ringbuffer_dump.c.o
+[128/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_linux_platform.c.o
+[129/274] Linking C static library lib/libscap_engine_util.a
+[130/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_linux_hostinfo_platform.c.o
+[131/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_procs.c.o
+[132/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_userlist.c.o
+[133/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_fds.c.o
+[134/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_iflist.c.o
+[135/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_machine_info.c.o
+[136/274] Building C object libscap/engine/noop/CMakeFiles/scap_engine_noop.dir/noop.c.o
+[137/274] Linking C static library lib/libscap_engine_noop.a
+[138/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_cgroup.c.o
+[139/274] Linking C static library lib/libscap_platform.a
+[140/274] Building C object libscap/engine/nodriver/CMakeFiles/scap_engine_nodriver.dir/nodriver.c.o
+[141/274] Linking C static library lib/libscap_engine_nodriver.a
+[142/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_reader_gzfile.c.o
+[143/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_reader_buffered.c.o
+[144/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_savefile.c.o
+[145/274] Building CXX object libscap/engine/savefile/converter/CMakeFiles/scap_savefile_converter.dir/converter.cpp.o
+[146/274] Building C object libscap/engine/raw_block/CMakeFiles/scap_engine_raw_block.dir/scap_raw_block.c.o
+[147/274] Building C object libscap/engine/raw_block/CMakeFiles/scap_engine_raw_block.dir/scap_reader_membuf.c.o
+[148/274] Building C object libscap/engine/source_plugin/CMakeFiles/scap_engine_source_plugin.dir/source_plugin.c.o
+[149/274] Linking C static library lib/libscap_engine_source_plugin.a
+[150/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/ast.cpp.o
+[151/274] Building CXX object libscap/engine/savefile/converter/CMakeFiles/scap_savefile_converter.dir/table.cpp.o
+[152/274] Linking CXX static library lib/libscap_engine_savefile.a
+[153/274] Linking CXX static library lib/libscap_engine_raw_block.a
+[154/274] Linking CXX static library lib/libscap.a
+[155/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/escaping.cpp.o
+[156/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/parser.cpp.o
+[157/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/ppm_codes.cpp.o
+[158/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_len.cpp.o
+[159/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_cycledumper.cpp.o
+[160/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/event.cpp.o
+[161/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/eventformatter.cpp.o
+[162/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/dumper.cpp.o
+[163/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/dns_manager.cpp.o
+[164/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/fdinfo.cpp.o
+[165/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/fdtable.cpp.o
+[166/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer.cpp.o
+[167/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_base64.cpp.o
+[168/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter.cpp.o
+[169/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_basename.cpp.o
+[170/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_storage.cpp.o
+[171/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_tolower.cpp.o
+[172/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_toupper.cpp.o
+[173/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck.cpp.o
+[174/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_event.cpp.o
+[175/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_fdlist.cpp.o
+[176/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_fd.cpp.o
+[177/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_gen_event.cpp.o
+[178/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_fspath.cpp.o
+[179/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_multivalue_transformer.cpp.o
+[180/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_group.cpp.o
+[181/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_reference.cpp.o
+[182/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_rawstring.cpp.o
+[183/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_static.cpp.o
+[184/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_thread.cpp.o
+[185/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_user.cpp.o
+[186/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter_compare.cpp.o
+[187/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_utils.cpp.o
+[188/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter_check_list.cpp.o
+[189/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/ifinfo.cpp.o
+[190/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/metrics_collector.cpp.o
+[191/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/logger.cpp.o
+[192/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/parsers.cpp.o
+[193/274] Building C object libsinsp/CMakeFiles/sinsp.dir/__/deps/libs/userspace/plugin/plugin_loader.c.o
+[194/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin.cpp.o
+/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/userspace/libsinsp/plugin.cpp:26:32: warning: unknown warning group '-Wmaybe-uninitialized', ignored [-Wunknown-warning-option]
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+                               ^
+1 warning generated.
+[195/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin_table_api.cpp.o
+[196/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin_tables.cpp.o
+[197/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin_filtercheck.cpp.o
+[198/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/prefix_search.cpp.o
+[199/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/thread_manager.cpp.o
+[200/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/tuples.cpp.o
+[201/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/threadinfo.cpp.o
+[202/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/token_bucket.cpp.o
+[203/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp.cpp.o
+[204/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/utils.cpp.o
+[205/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/value_parser.cpp.o
+[206/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_suppress.cpp.o
+[207/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/user.cpp.o
+[208/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/events/sinsp_events.cpp.o
+[209/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/events/sinsp_events_ppm_sc.cpp.o
+[210/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/linux/resource_utilization.cpp.o
+[211/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/procfs_utils.cpp.o
+[212/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/state/table.cpp.o
+[213/274] Linking CXX static library lib/libsinsp.a
+[214/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_common.cpp.o
+[215/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_utils.cpp.o
+[216/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_ruleset.cpp.o
+[217/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_engine.cpp.o
+[218/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/formats.cpp.o
+[219/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/evttype_index_ruleset.cpp.o
+[220/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_details_resolver.cpp.o
+[221/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_macro_resolver.cpp.o
+[222/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/field_formatter.cpp.o
+[223/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_warning_resolver.cpp.o
+[224/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/logger.cpp.o
+[225/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/stats_manager.cpp.o
+[226/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader.cpp.o
+[227/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader_collector.cpp.o
+[228/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader_compiler.cpp.o
+[229/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader_reader.cpp.o
+[230/274] Linking CXX static library lib/libfalco_engine.a
+[231/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/convert.cpp.o
+[232/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/debug.cpp.o
+[233/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/error.cpp.o
+[234/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/input.cpp.o
+[235/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/matcher.cpp.o
+[236/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/matcher_avx2.cpp.o
+[237/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/matcher_avx512bw.cpp.o
+[238/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/pattern.cpp.o
+[239/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/posix.cpp.o
+[240/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/simd.cpp.o
+[241/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/simd_avx2.cpp.o
+[242/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/simd_avx512bw.cpp.o
+[243/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/unicode.cpp.o
+[244/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/utf8.cpp.o
+[245/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/block_scripts.cpp.o
+[246/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/language_scripts.cpp.o
+[247/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/letter_scripts.cpp.o
+[248/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/composer.cpp.o
+[249/274] Linking CXX static library lib/libreflex_static_lib.a
+[250/274] Generating libworker.a, libworker.h
+[251/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/api.cpp.o
+[252/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/container_info.cpp.o
+[253/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/container_info_json.cpp.o
+[254/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/bpm.cpp.o
+[255/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/cri.cpp.o
+[256/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/containerd.cpp.o
+[257/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/docker.cpp.o
+[258/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/libvirt_lxc.cpp.o
+[259/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/lxc.cpp.o
+[260/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/matcher.cpp.o
+[261/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/runc.cpp.o
+[262/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/podman.cpp.o
+[263/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/matchers/static_container.cpp.o
+[264/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/plugin_config.cpp.o
+[265/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/plugin.cpp.o
+[266/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/table.cpp.o
+[267/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/caps/async/async.cpp.o
+[268/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/caps/parse/parse.cpp.o
+[269/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/caps/listening/listening.cpp.o
+[270/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/__/__/deps/plugins/plugins/container/src/caps/extract/extract.cpp.o
+[271/274] Linking CXX static library lib/libcontainer_trusted.a
+[272/274] Linking CXX executable bin/falco-enclave
+[273/274] Generating test-key.pem
+[274/274] Generating ../falco-enclave.signed
+Created /home/poc/hw-ship-1795610679657/source/poc/build-falco/bin/falco-enclave.signed
++ cmake -S poc/falco/live -B /home/poc/hw-ship-1795610679657/source/poc/build-falco-live -G Ninja -DFALCO_SGX_HARDWARE=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE=-O1 -DCMAKE_CXX_FLAGS_RELEASE=-O1 -DMODERN_BPFTOOL_EXE=/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/bpftool/bpftool
+-- The C compiler identification is Clang 14.0.0
+-- The CXX compiler identification is Clang 14.0.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Driver API version 11.0.1
+-- Driver schema version 4.5.2
+-- Looking for strlcpy
+-- Looking for strlcpy - not found
+-- Looking for strlcat
+-- Looking for strlcat - not found
+-- No strlcpy found, will use local definition
+-- No strlcat found, will use local definition
+-- Found zlib: include: /usr/include, lib: /usr/lib/x86_64-linux-gnu/libz.so
+-- Looking for sys/mkdev.h
+-- Looking for sys/mkdev.h - not found
+-- Looking for sys/sysmacros.h
+-- Looking for sys/sysmacros.h - found
+-- Build modern BPF engine
+-- Found LIBELF: include: /usr/include, lib: /usr/lib/x86_64-linux-gnu/libelf.so
+-- Using bundled libbpf: include'/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/root/usr/include', lib: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/root/usr/lib64/libbpf.a
+-- [MODERN BPF] MODERN_BPF_DEBUG_MODE: OFF
+-- Driver API version 11.0.1
+-- Driver schema version 4.5.2
+-- [MODERN BPF] clang used by the modern bpf probe: '/usr/bin/clang'
+-- [MODERN BPF] Found clang version: 14.0.0-1ubuntu1.1
+-- [MODERN BPF] bpftool used by the modern bpf probe: '/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/bpftool/bpftool'
+-- [MODERN BPF] BPF system include flags: -idirafter /usr/lib/llvm-14/lib/clang/14.0.0/include -idirafter /usr/local/include -idirafter /usr/include/x86_64-linux-gnu -idirafter /usr/include
+-- [MODERN BPF] Target arch: x86
+-- [MODERN BPF] Compilation flags: -g;-O2;-target;bpf;-D____;-D__TARGET_ARCH_x86;-D__USE_VMLINUX__;-I$<BUILD_INTERFACE:/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/root/usr/include>;-I/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/modern_bpf;-I/home/poc/hw-ship-1795610679657/source/poc/falco/live/../../build-falco/deps/libs;-isystem
+-- [MODERN BPF] USE_BUNDLED_MODERN_BPF: ON, using skeleton dir: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/skel_dir
+-- [MODERN BPF] full skeleton path: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/skel_dir/bpf_probe.skel.h
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Looking for crypto library - found
+-- Looking for dl library - found
+CMake Warning at /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/lib/openenclave/cmake/openenclave-config.cmake:122 (message):
+  -- Looking for sgx_dcap_ql library - not found.  Attestations based on
+  quotes would not function without the quote provider.
+Call Stack (most recent call first):
+  CMakeLists.txt:36 (find_package)
+
+
+-- Performing Test OE_SPECTRE_MITIGATION_C_FLAGS_SUPPORTED
+-- Performing Test OE_SPECTRE_MITIGATION_C_FLAGS_SUPPORTED - Success
+-- Performing Test OE_SPECTRE_MITIGATION_CXX_FLAGS_SUPPORTED
+-- Performing Test OE_SPECTRE_MITIGATION_CXX_FLAGS_SUPPORTED - Success
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live
++ cmake --build /home/poc/hw-ship-1795610679657/source/poc/build-falco-live --parallel 2
+[0/2] Re-checking globbed directories...
+[1/274] Generating Falco_u.c, Falco_u.h, Falco_args.h
+Generating edge routine, for the Open Enclave SDK.
+Processing /home/poc/hw-ship-1795610679657/source/poc/falco/live/../Falco.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/syscall.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/epoll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/fcntl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ioctl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/poll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/signal.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/socket.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/time.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/unistd.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/utsname.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/platform.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/attestation.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/cpu.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/debug.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/thread.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/switchless.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/tdx_verification.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ertlibc.edl.
+Success.
+[2/274] Building C object CMakeFiles/httpd.dir/workload.c.o
+[3/274] Building C object CMakeFiles/falco_live_host.dir/Falco_u.c.o
+[4/274] Linking C executable httpd
+[5/274] Building CXX object CMakeFiles/falco_live_host.dir/home/poc/hw-ship-1795610679657/source/poc/falco/host.cpp.o
+[6/274] Linking CXX static library libfalco_live_host.a
+[7/274] Building C object libscap/CMakeFiles/scap_error.dir/strerror.c.o
+[8/274] Linking C static library libscap/libscap_error.a
+[9/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_platform.c.o
+[10/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_fds.c.o
+[11/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_iflist.c.o
+[12/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_proc_util.c.o
+[13/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_procs.c.o
+[14/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_userlist.c.o
+[15/274] Linking C static library libscap/libscap_platform_util.a
+[16/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_event.c.o
+[17/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/ppm_sc_names.c.o
+[18/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_event.c.o
+[19/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_threadinfo.c.o
+[20/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_fdinfo.c.o
+[21/274] Building CXX object CMakeFiles/falco-ring-test.dir/ring_test.cpp.o
+[22/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_empty_params_set.c.o
+[23/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/dynamic_params_table.c.o
+[24/274] Linking CXX executable falco-ring-test
+[25/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/event_table.c.o
+[26/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/syscall_table64.c.o
+[27/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/flags_table.c.o
+[28/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/syscall_ia32_64_map.c.o
+[29/274] Building C object libscap/CMakeFiles/driver_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/fillers_table.c.o
+[30/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/linux/scap_ppm_sc.c.o
+[31/274] Linking C static library libscap/libdriver_event_schema.a
+[32/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/scap_engine_util.c.o
+[33/274] Linking C static library libscap/libscap_event_schema.a
+[34/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/devset.c.o
+[35/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/ringbuffer.c.o
+[36/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_linux_platform.c.o
+[37/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/ringbuffer_dump.c.o
+[38/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_linux_hostinfo_platform.c.o
+[39/274] Linking C static library libscap/libscap_engine_util.a
+[40/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_procs.c.o
+[41/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_fds.c.o
+[42/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_userlist.c.o
+[43/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_iflist.c.o
+[44/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_machine_info.c.o
+[45/274] Building C object libscap/engine/noop/CMakeFiles/scap_engine_noop.dir/noop.c.o
+[46/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_cgroup.c.o
+[47/274] Linking C static library libscap/engine/noop/libscap_engine_noop.a
+[48/274] Linking C static library libscap/linux/libscap_platform.a
+[49/274] Building C object libscap/engine/nodriver/CMakeFiles/scap_engine_nodriver.dir/nodriver.c.o
+[50/274] Linking C static library libscap/engine/nodriver/libscap_engine_nodriver.a
+[51/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_reader_gzfile.c.o
+[52/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_reader_buffered.c.o
+[53/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_savefile.c.o
+[54/274] Building CXX object libscap/engine/savefile/converter/CMakeFiles/scap_savefile_converter.dir/converter.cpp.o
+[55/274] Building C object libscap/engine/raw_block/CMakeFiles/scap_engine_raw_block.dir/scap_raw_block.c.o
+[56/274] Building C object libscap/engine/raw_block/CMakeFiles/scap_engine_raw_block.dir/scap_reader_membuf.c.o
+[57/274] Building C object libscap/engine/source_plugin/CMakeFiles/scap_engine_source_plugin.dir/source_plugin.c.o
+[58/274] Linking C static library libscap/engine/source_plugin/libscap_engine_source_plugin.a
+[59/274] Creating directories for 'libbpf'
+[60/274] Building CXX object libscap/engine/savefile/converter/CMakeFiles/scap_savefile_converter.dir/table.cpp.o
+[61/274] Linking CXX static library libscap/engine/savefile/libscap_engine_savefile.a
+[62/274] Linking CXX static library libscap/engine/raw_block/libscap_engine_raw_block.a
+[63/274] Performing download step (download, verify and extract) for 'libbpf'
+-- Downloading...
+   dst='/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/v1.3.0.tar.gz'
+   timeout='none'
+   inactivity timeout='none'
+-- Using src='https://github.com/libbpf/libbpf/archive/refs/tags/v1.3.0.tar.gz'
+-- verifying file...
+       file='/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/v1.3.0.tar.gz'
+-- Downloading... done
+-- extracting...
+     src='/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/v1.3.0.tar.gz'
+     dst='/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf'
+-- extracting... [tar xfz]
+-- extracting... [analysis]
+-- extracting... [rename]
+-- extracting... [clean up]
+-- extracting... done
+[64/274] No update step for 'libbpf'
+[65/274] No patch step for 'libbpf'
+[66/274] Performing configure step for 'libbpf'
+[67/274] Building CXX object driver/modern_bpf/CMakeFiles/events_dimensions_generator.dir/definitions/generator/generator.cpp.o
+[68/274] Linking CXX executable driver/modern_bpf/events_dimensions_generator
+[69/274] [MODERN BPF] Building events dimensions file: /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/modern_bpf/definitions/events_dimensions.h
+[70/274] Performing build step for 'libbpf'
+make: Entering directory '/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf/src'
+  MKDIR    /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/bpf.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/btf.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/libbpf.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/libbpf_errno.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/netlink.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/nlattr.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/str_error.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/libbpf_probes.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/bpf_prog_linfo.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/btf_dump.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/hashmap.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/ringbuf.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/strset.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/linker.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/gen_loader.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/relo_core.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/usdt.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/zip.o
+  CC       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/staticobjs/elf.o
+  AR       /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/libbpf.a
+  INSTALL  bpf.h libbpf.h btf.h libbpf_common.h libbpf_legacy.h bpf_helpers.h bpf_helper_defs.h bpf_tracing.h bpf_endian.h bpf_core_read.h skel_internal.h libbpf_version.h usdt.bpf.h
+  INSTALL  /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/libbpf.pc
+  INSTALL  /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf-build/build/libbpf.a 
+  INSTALL  ../include/uapi/linux/bpf.h ../include/uapi/linux/bpf_common.h ../include/uapi/linux/btf.h
+make: Leaving directory '/home/poc/hw-ship-1795610679657/source/poc/build-falco-live/libbpf-prefix/src/libbpf/src'
+[71/274] No install step for 'libbpf'
+[72/274] Completed 'libbpf'
+[73/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/dup.bpf.o
+[74/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/bind.bpf.o
+[75/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/bpf.bpf.o
+[76/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/accept.bpf.o
+[77/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/access.bpf.o
+[78/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/page_fault_user.bpf.o
+[79/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/chown.bpf.o
+[80/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/accept4.bpf.o
+[81/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/brk.bpf.o
+[82/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/capset.bpf.o
+[83/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/chdir.bpf.o
+[84/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/chmod.bpf.o
+[85/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/chroot.bpf.o
+[86/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/clone.bpf.o
+[87/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/clone3.bpf.o
+[88/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/close.bpf.o
+[89/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/close_range.bpf.o
+[90/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/connect.bpf.o
+[91/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/copy_file_range.bpf.o
+[92/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/creat.bpf.o
+[93/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/delete_module.bpf.o
+[94/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/dup2.bpf.o
+[95/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/dup3.bpf.o
+[96/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/epoll_create.bpf.o
+[97/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/epoll_create1.bpf.o
+[98/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/epoll_wait.bpf.o
+[99/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/eventfd.bpf.o
+[100/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/eventfd2.bpf.o
+[101/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/execve.bpf.o
+[102/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/execveat.bpf.o
+[103/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fchdir.bpf.o
+[104/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/keyctl.bpf.o
+[105/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fchmod.bpf.o
+[106/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fchown.bpf.o
+[107/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fchmodat.bpf.o
+[108/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/license.bpf.o
+[109/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/semop.bpf.o
+[110/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fchownat.bpf.o
+[111/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fcntl.bpf.o
+[112/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/finit_module.bpf.o
+[113/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/flock.bpf.o
+[114/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fsconfig.bpf.o
+[115/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fork.bpf.o
+[116/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/fstat.bpf.o
+[117/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/futex.bpf.o
+[118/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/generic.bpf.o
+[119/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getcwd.bpf.o
+[120/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getdents.bpf.o
+[121/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getdents64.bpf.o
+[122/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getegid.bpf.o
+[123/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/geteuid.bpf.o
+[124/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getgid.bpf.o
+[125/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getpeername.bpf.o
+[126/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getresgid.bpf.o
+[127/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getresuid.bpf.o
+[128/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getrlimit.bpf.o
+[129/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getsockname.bpf.o
+[130/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getuid.bpf.o
+[131/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/getsockopt.bpf.o
+[132/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/inotify_init.bpf.o
+[133/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/init_module.bpf.o
+[134/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/inotify_init1.bpf.o
+[135/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/io_uring_enter.bpf.o
+[136/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/io_uring_register.bpf.o
+[137/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/io_uring_setup.bpf.o
+[138/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/seccomp.bpf.o
+[139/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/ioctl.bpf.o
+[140/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/kill.bpf.o
+[141/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/lchown.bpf.o
+[142/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/send.bpf.o
+[143/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/link.bpf.o
+[144/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/listen.bpf.o
+[145/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/linkat.bpf.o
+[146/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/llseek.bpf.o
+[147/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/lseek.bpf.o
+[148/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/lstat.bpf.o
+[149/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/memfd_create.bpf.o
+[150/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mkdir.bpf.o
+[151/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mkdirat.bpf.o
+[152/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mknod.bpf.o
+[153/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mknodat.bpf.o
+[154/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mlock.bpf.o
+[155/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mlock2.bpf.o
+[156/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mlockall.bpf.o
+[157/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mmap.bpf.o
+[158/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mmap2.bpf.o
+[159/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mount.bpf.o
+[160/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/mprotect.bpf.o
+[161/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/munlock.bpf.o
+[162/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/munlockall.bpf.o
+[163/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/munmap.bpf.o
+[164/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/nanosleep.bpf.o
+[165/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/newfstatat.bpf.o
+[166/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/open.bpf.o
+[167/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/openat.bpf.o
+[168/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/open_by_handle_at.bpf.o
+[169/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/openat2.bpf.o
+[170/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/page_fault_kernel.bpf.o
+[171/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/pidfd_getfd.bpf.o
+[172/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/pidfd_open.bpf.o
+[173/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/pipe.bpf.o
+[174/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sched_process_exec.bpf.o
+[175/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/pipe2.bpf.o
+[176/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/poll.bpf.o
+[177/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/ppoll.bpf.o
+[178/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/prctl.bpf.o
+[179/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/pread64.bpf.o
+[180/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/preadv.bpf.o
+[181/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/prlimit64.bpf.o
+[182/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/process_vm_readv.bpf.o
+[183/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/process_vm_writev.bpf.o
+[184/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/ptrace.bpf.o
+[185/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/pwrite64.bpf.o
+[186/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/pwritev.bpf.o
+[187/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/quotactl.bpf.o
+[188/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/read.bpf.o
+[189/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/readv.bpf.o
+[190/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/recv.bpf.o
+[191/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/recvfrom.bpf.o
+[192/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/recvmmsg.bpf.o
+[193/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/recvmsg.bpf.o
+[194/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/rename.bpf.o
+[195/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/renameat.bpf.o
+[196/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/renameat2.bpf.o
+[197/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/rmdir.bpf.o
+[198/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/signal_deliver.bpf.o
+[199/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sched_process_exit.bpf.o
+[200/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sched_process_fork.bpf.o
+[201/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/select.bpf.o
+[202/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sched_switch.bpf.o
+[203/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/semctl.bpf.o
+[204/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/semget.bpf.o
+[205/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sendfile.bpf.o
+[206/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sendmmsg.bpf.o
+[207/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sendmsg.bpf.o
+[208/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sendto.bpf.o
+[209/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setgid.bpf.o
+[210/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setns.bpf.o
+[211/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setpgid.bpf.o
+[212/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setregid.bpf.o
+[213/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setresgid.bpf.o
+[214/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setresuid.bpf.o
+[215/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setreuid.bpf.o
+[216/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setsid.bpf.o
+[217/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setrlimit.bpf.o
+[218/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setuid.bpf.o
+[219/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/setsockopt.bpf.o
+[220/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/shutdown.bpf.o
+[221/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/signalfd.bpf.o
+[222/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/signalfd4.bpf.o
+[223/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/socket.bpf.o
+[224/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/socketpair.bpf.o
+[225/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/splice.bpf.o
+[226/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/stat.bpf.o
+[227/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/symlink.bpf.o
+[228/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/symlinkat.bpf.o
+[229/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sys_enter_connect.bpf.o
+[230/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sys_enter_creat.bpf.o
+[231/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sys_enter_open.bpf.o
+[232/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sys_enter_openat.bpf.o
+[233/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/sys_enter_openat2.bpf.o
+[234/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/syscall_exit.bpf.o
+[235/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/task.bpf.o
+[236/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/task_file.bpf.o
+[237/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/tgkill.bpf.o
+[238/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/tkill.bpf.o
+[239/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/timerfd_create.bpf.o
+[240/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/umount.bpf.o
+[241/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/umount2.bpf.o
+[242/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/unlink.bpf.o
+[243/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/unlinkat.bpf.o
+[244/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/userfaultfd.bpf.o
+[245/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/unshare.bpf.o
+[246/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/write.bpf.o
+[247/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/vfork.bpf.o
+[248/274] [MODERN BPF] Building BPF object: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/writev.bpf.o
+[249/274] [MODERN BPF] Building BPF unique object file: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/driver/modern_bpf/bpf_probe.o
+[250/274] [MODERN BPF] Building BPF skeleton: /home/poc/hw-ship-1795610679657/source/poc/build-falco-live/skel_dir/bpf_probe.skel.h
+[251/274] Building C object libscap/CMakeFiles/scap.dir/scap.c.o
+[252/274] Building C object libscap/CMakeFiles/scap.dir/scap_api_version.c.o
+[253/274] Building C object CMakeFiles/falco_ring_map.dir/ring_map.c.o
+[254/274] Building C object libscap/CMakeFiles/scap.dir/scap_platform_api.c.o
+[255/274] Building C object libscap/engine/modern_bpf/CMakeFiles/scap_engine_modern_bpf.dir/scap_modern_bpf.c.o
+[256/274] Building C object libscap/CMakeFiles/scap.dir/scap_savefile.c.o
+[257/274] Building C object libpman/CMakeFiles/pman.dir/src/stats.c.o
+[258/274] Building C object libpman/CMakeFiles/pman.dir/src/maps.c.o
+[259/274] Building C object libpman/CMakeFiles/pman.dir/src/lifecycle.c.o
+[260/274] Building C object libpman/CMakeFiles/pman.dir/src/programs.c.o
+[261/274] Building C object libpman/CMakeFiles/pman.dir/src/ringbuffer.c.o
+[262/274] Building C object libpman/CMakeFiles/pman.dir/src/configuration.c.o
+[263/274] Building C object libpman/CMakeFiles/pman.dir/src/state.c.o
+[264/274] Building C object libpman/CMakeFiles/pman.dir/src/sc_set.c.o
+[265/274] Building C object libpman/CMakeFiles/pman.dir/src/events_prog_table.c.o
+[266/274] Building C object libpman/CMakeFiles/pman.dir/src/iterators.c.o
+[267/274] Building C object libpman/CMakeFiles/pman.dir/src/support_probing.c.o
+[268/274] Linking C static library libpman/libpman.a
+[269/274] Linking C static library libfalco_ring_map.a
+[270/274] Linking C static library libscap/engine/modern_bpf/libscap_engine_modern_bpf.a
+[271/274] Linking CXX static library libscap/libscap.a
+[272/274] Generating packet_tap.skel.h
+[273/274] Building CXX object CMakeFiles/falco-live.dir/live_host.cpp.o
+[274/274] Linking CXX executable falco-live
++ T=/home/poc/hw-ship-1795610679657/source/probe
++ mkdir -p /home/poc/hw-ship-1795610679657/source/probe/poc
++ cp -a poc/falco /home/poc/hw-ship-1795610679657/source/probe/poc/
++ patch -p1 -d /home/poc/hw-ship-1795610679657/source/probe/poc/falco
+patching file plugin/detectors.hpp
+patching file plugin/plugin.cpp
+patching file plugin/zeek.cpp
++ M=/home/poc/hw-ship-1795610679657/source/probe/poc/build-falco
++ cmake -S /home/poc/hw-ship-1795610679657/source/probe/poc/falco -B /home/poc/hw-ship-1795610679657/source/probe/poc/build-falco -G Ninja -DFALCO_SGX_HARDWARE=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS_RELEASE=-O1 -DCMAKE_CXX_FLAGS_RELEASE=-O1 -DDEPS=/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps
+-- The C compiler identification is Clang 14.0.0
+-- The CXX compiler identification is Clang 14.0.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Looking for crypto library - found
+-- Looking for dl library - found
+CMake Warning at /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/lib/openenclave/cmake/openenclave-config.cmake:122 (message):
+  -- Looking for sgx_dcap_ql library - not found.  Attestations based on
+  quotes would not function without the quote provider.
+Call Stack (most recent call first):
+  CMakeLists.txt:15 (find_package)
+
+
+-- Performing Test OE_SPECTRE_MITIGATION_C_FLAGS_SUPPORTED
+-- Performing Test OE_SPECTRE_MITIGATION_C_FLAGS_SUPPORTED - Success
+-- Performing Test OE_SPECTRE_MITIGATION_CXX_FLAGS_SUPPORTED
+-- Performing Test OE_SPECTRE_MITIGATION_CXX_FLAGS_SUPPORTED - Success
+-- Using the multi-header code from /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/njson/include/
+-- JsonCpp Version: 1.9.5
+-- Looking for C++ include clocale
+-- Looking for C++ include clocale - found
+-- Looking for localeconv
+-- Looking for localeconv - found
+-- Looking for C++ include sys/types.h
+-- Looking for C++ include sys/types.h - found
+-- Looking for C++ include stdint.h
+-- Looking for C++ include stdint.h - found
+-- Looking for C++ include stddef.h
+-- Looking for C++ include stddef.h - found
+-- Check size of lconv
+-- Check size of lconv - done
+-- Performing Test HAVE_DECIMAL_POINT
+-- Performing Test HAVE_DECIMAL_POINT - Success
+-- Driver API version 11.0.1
+-- Driver schema version 4.5.2
+-- Looking for strlcpy
+-- Looking for strlcpy - not found
+-- Looking for strlcat
+-- Looking for strlcat - not found
+-- No strlcpy found, will use local definition
+-- No strlcat found, will use local definition
+-- Looking for sys/mkdev.h
+-- Looking for sys/mkdev.h - not found
+-- Looking for sys/sysmacros.h
+-- Looking for sys/sysmacros.h - found
+-- Using jsoncpp: include: /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/jsoncpp/include, lib: jsoncpp_static
+-- Using re2: include: /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/re2, lib: re2
+-- Using jsoncpp: include: /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/jsoncpp/include, lib: jsoncpp_static
+-- Performing Test HAVE_SSE2
+-- Performing Test HAVE_SSE2 - Success
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/poc/hw-ship-1795610679657/source/probe/poc/build-falco
++ cmake --build /home/poc/hw-ship-1795610679657/source/probe/poc/build-falco --parallel 2
+[0/2] Re-checking globbed directories...
+[1/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/plugin.cpp.o
+[2/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/graph.cpp.o
+[3/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/raven.cpp.o
+[4/274] Generating Falco_t.c, Falco_t.h, Falco_u.c, Falco_u.h, Falco_args.h
+Generating edge routine, for the Open Enclave SDK.
+Processing /home/poc/hw-ship-1795610679657/source/probe/poc/falco/Falco.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/syscall.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/epoll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/fcntl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ioctl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/poll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/signal.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/socket.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/time.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/unistd.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/utsname.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/platform.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/attestation.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/cpu.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/debug.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/thread.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/switchless.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/tdx_verification.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ertlibc.edl.
+Success.
+Generating edge routine, for the Open Enclave SDK.
+Processing /home/poc/hw-ship-1795610679657/source/probe/poc/falco/Falco.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/syscall.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/epoll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/fcntl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ioctl.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/poll.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/signal.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/socket.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/time.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/unistd.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/utsname.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/platform.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/attestation.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/cpu.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/debug.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/thread.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/switchless.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/sgx/tdx_verification.edl.
+Processing /home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/ert/opt/edgelessrt/include/openenclave/edl/ertlibc.edl.
+Success.
+[5/274] Building CXX object CMakeFiles/falco-sgx.dir/host.cpp.o
+[6/274] Building CXX object CMakeFiles/falco-sgx.dir/replay_host.cpp.o
+[7/274] Building C object CMakeFiles/falco-sgx.dir/Falco_u.c.o
+[8/274] Linking CXX executable bin/falco-sgx
+[9/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/adler32.c.o
+[10/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/compress.c.o
+[11/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/crc32.c.o
+[12/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/deflate.c.o
+[13/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/gzclose.c.o
+[14/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/gzlib.c.o
+[15/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/gzread.c.o
+[16/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/gzwrite.c.o
+[17/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/infback.c.o
+[18/274] Building CXX object CMakeFiles/raven_zeek.dir/plugin/zeek.cpp.o
+[19/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/inffast.c.o
+[20/274] Linking CXX shared library lib/libraven_zeek.so
+[21/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/inftrees.c.o
+[22/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/trees.c.o
+[23/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/inflate.c.o
+[24/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/uncompr.c.o
+[25/274] Building C object trusted/CMakeFiles/falco_zlib.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/zlib/zutil.c.o
+[26/274] Linking C static library lib/libfalco_zlib.a
+[27/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/plugin.cpp.o
+[28/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/graph.cpp.o
+[29/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/raven.cpp.o
+[30/274] Building CXX object trusted/CMakeFiles/raven_zeek_trusted.dir/__/plugin/zeek.cpp.o
+[31/274] Linking CXX static library lib/libraven_zeek_trusted.a
+[32/274] Building CXX object trusted/CMakeFiles/falco-enclave-objects.dir/raven_syscalls.cpp.o
+[33/274] Building C object trusted/CMakeFiles/falco-enclave-objects.dir/cgo_posix.c.o
+[34/274] Building C object trusted/CMakeFiles/falco-enclave-objects.dir/__/Falco_t.c.o
+[35/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/ringbuffer.c.o
+[36/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/bitstate.cc.o
+[37/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/compile.cc.o
+[38/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/dfa.cc.o
+[39/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/filtered_re2.cc.o
+[40/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/mimics_pcre.cc.o
+[41/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/nfa.cc.o
+[42/274] Building CXX object trusted/CMakeFiles/falco-enclave-objects.dir/enclave.cpp.o
+[43/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/onepass.cc.o
+[44/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/perl_groups.cc.o
+[45/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/prefilter.cc.o
+[46/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/parse.cc.o
+[47/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/prog.cc.o
+[48/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/prefilter_tree.cc.o
+[49/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/re2.cc.o
+[50/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/regexp.cc.o
+[51/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/simplify.cc.o
+[52/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/set.cc.o
+[53/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/stringpiece.cc.o
+[54/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/unicode_casefold.cc.o
+[55/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/unicode_groups.cc.o
+[56/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/util/rune.cc.o
+[57/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/re2/tostring.cc.o
+[58/274] Building CXX object trusted/re2/CMakeFiles/re2.dir/util/strutil.cc.o
+[59/274] Linking CXX static library trusted/re2/libre2.a
+[60/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilder.cpp.o
+[61/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o
+[62/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilderadapter.cpp.o
+[63/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o
+[64/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/directives.cpp.o
+[65/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/convert.cpp.o
+[66/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emit.cpp.o
+[67/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o
+[68/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o
+[69/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o
+[70/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o
+[71/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o
+[72/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/exp.cpp.o
+[73/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/node.cpp.o
+[74/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/memory.cpp.o
+[75/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o
+[76/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o
+[77/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/null.cpp.o
+[78/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o
+[79/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o
+[80/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/parser.cpp.o
+[81/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/parse.cpp.o
+[82/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o
+[83/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o
+[84/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o
+[85/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o
+[86/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o
+[87/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o
+[88/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o
+[89/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o
+[90/274] Building CXX object trusted/yaml/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o
+[91/274] Linking CXX static library trusted/yaml/libyaml-cpp.a
+[92/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_utils.cpp.o
+[93/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_ruleset.cpp.o
+[94/274] Building CXX object trusted/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_reader.cpp.o
+[95/274] Building CXX object trusted/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_value.cpp.o
+[96/274] Building C object libscap/CMakeFiles/scap_error.dir/strerror.c.o
+[97/274] Linking C static library lib/libscap_error.a
+[98/274] Building CXX object trusted/jsoncpp/src/lib_json/CMakeFiles/jsoncpp_static.dir/json_writer.cpp.o
+[99/274] Linking CXX static library lib/libjsoncpp.a
+[100/274] Building C object libscap/CMakeFiles/scap.dir/scap.c.o
+[101/274] Building C object libscap/CMakeFiles/scap.dir/scap_api_version.c.o
+[102/274] Building C object libscap/CMakeFiles/scap.dir/scap_platform_api.c.o
+[103/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_platform.c.o
+[104/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_fds.c.o
+[105/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_iflist.c.o
+[106/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_proc_util.c.o
+[107/274] Building C object libscap/CMakeFiles/scap.dir/scap_savefile.c.o
+[108/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_userlist.c.o
+[109/274] Building C object libscap/CMakeFiles/scap_platform_util.dir/scap_procs.c.o
+[110/274] Linking C static library lib/libscap_platform_util.a
+[111/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_event.c.o
+[112/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/ppm_sc_names.c.o
+[113/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_event.c.o
+[114/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_threadinfo.c.o
+[115/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_print_fdinfo.c.o
+[116/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/scap_empty_params_set.c.o
+[117/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/dynamic_params_table.c.o
+[118/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/event_table.c.o
+[119/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/flags_table.c.o
+[120/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/syscall_table64.c.o
+[121/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/syscall_ia32_64_map.c.o
+[122/274] Building C object libscap/CMakeFiles/driver_event_schema.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/driver/fillers_table.c.o
+[123/274] Building C object libscap/CMakeFiles/scap_event_schema.dir/linux/scap_ppm_sc.c.o
+[124/274] Linking C static library lib/libdriver_event_schema.a
+[125/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/scap_engine_util.c.o
+[126/274] Linking C static library lib/libscap_event_schema.a
+[127/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/devset.c.o
+[128/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_linux_platform.c.o
+[129/274] Building C object libscap/CMakeFiles/scap_engine_util.dir/ringbuffer/ringbuffer_dump.c.o
+[130/274] Linking C static library lib/libscap_engine_util.a
+[131/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_linux_hostinfo_platform.c.o
+[132/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_procs.c.o
+[133/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_userlist.c.o
+[134/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_fds.c.o
+[135/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_iflist.c.o
+[136/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_machine_info.c.o
+[137/274] Building C object libscap/engine/noop/CMakeFiles/scap_engine_noop.dir/noop.c.o
+[138/274] Building C object libscap/linux/CMakeFiles/scap_platform.dir/scap_cgroup.c.o
+[139/274] Linking C static library lib/libscap_engine_noop.a
+[140/274] Linking C static library lib/libscap_platform.a
+[141/274] Building C object libscap/engine/nodriver/CMakeFiles/scap_engine_nodriver.dir/nodriver.c.o
+[142/274] Linking C static library lib/libscap_engine_nodriver.a
+[143/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_reader_gzfile.c.o
+[144/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_reader_buffered.c.o
+[145/274] Building C object libscap/engine/savefile/CMakeFiles/scap_engine_savefile.dir/scap_savefile.c.o
+[146/274] Building CXX object libscap/engine/savefile/converter/CMakeFiles/scap_savefile_converter.dir/converter.cpp.o
+[147/274] Building C object libscap/engine/raw_block/CMakeFiles/scap_engine_raw_block.dir/scap_raw_block.c.o
+[148/274] Building C object libscap/engine/raw_block/CMakeFiles/scap_engine_raw_block.dir/scap_reader_membuf.c.o
+[149/274] Building C object libscap/engine/source_plugin/CMakeFiles/scap_engine_source_plugin.dir/source_plugin.c.o
+[150/274] Linking C static library lib/libscap_engine_source_plugin.a
+[151/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/ast.cpp.o
+[152/274] Building CXX object libscap/engine/savefile/converter/CMakeFiles/scap_savefile_converter.dir/table.cpp.o
+[153/274] Linking CXX static library lib/libscap_engine_savefile.a
+[154/274] Linking CXX static library lib/libscap_engine_raw_block.a
+[155/274] Linking CXX static library lib/libscap.a
+[156/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/escaping.cpp.o
+[157/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/parser.cpp.o
+[158/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter/ppm_codes.cpp.o
+[159/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_cycledumper.cpp.o
+[160/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/event.cpp.o
+[161/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/eventformatter.cpp.o
+[162/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/dumper.cpp.o
+[163/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/dns_manager.cpp.o
+[164/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/fdinfo.cpp.o
+[165/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter.cpp.o
+[166/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer.cpp.o
+[167/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/fdtable.cpp.o
+[168/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_basename.cpp.o
+[169/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_base64.cpp.o
+[170/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_len.cpp.o
+[171/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_tolower.cpp.o
+[172/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_storage.cpp.o
+[173/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filter_transformers/sinsp_filter_transformer_toupper.cpp.o
+[174/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck.cpp.o
+[175/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_event.cpp.o
+[176/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_fdlist.cpp.o
+[177/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_fd.cpp.o
+[178/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_fspath.cpp.o
+[179/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_gen_event.cpp.o
+[180/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_rawstring.cpp.o
+[181/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_group.cpp.o
+[182/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_multivalue_transformer.cpp.o
+[183/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_reference.cpp.o
+[184/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_static.cpp.o
+[185/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_user.cpp.o
+[186/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_utils.cpp.o
+[187/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_filtercheck_thread.cpp.o
+[188/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter_compare.cpp.o
+[189/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/ifinfo.cpp.o
+[190/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/filter_check_list.cpp.o
+[191/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/metrics_collector.cpp.o
+[192/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/logger.cpp.o
+[193/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/parsers.cpp.o
+[194/274] Building C object libsinsp/CMakeFiles/sinsp.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/userspace/plugin/plugin_loader.c.o
+[195/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin_table_api.cpp.o
+[196/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin_tables.cpp.o
+[197/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin_filtercheck.cpp.o
+[198/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/plugin.cpp.o
+/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/libs/userspace/libsinsp/plugin.cpp:26:32: warning: unknown warning group '-Wmaybe-uninitialized', ignored [-Wunknown-warning-option]
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+                               ^
+1 warning generated.
+[199/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/prefix_search.cpp.o
+[200/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/threadinfo.cpp.o
+[201/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/tuples.cpp.o
+[202/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/thread_manager.cpp.o
+[203/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/token_bucket.cpp.o
+[204/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/value_parser.cpp.o
+[205/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp.cpp.o
+[206/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/utils.cpp.o
+[207/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/sinsp_suppress.cpp.o
+[208/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/user.cpp.o
+[209/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/events/sinsp_events.cpp.o
+[210/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/events/sinsp_events_ppm_sc.cpp.o
+[211/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/state/table.cpp.o
+[212/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/linux/resource_utilization.cpp.o
+[213/274] Building CXX object libsinsp/CMakeFiles/sinsp.dir/procfs_utils.cpp.o
+[214/274] Linking CXX static library lib/libsinsp.a
+[215/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_common.cpp.o
+[216/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_load_result.cpp.o
+[217/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/falco_engine.cpp.o
+[218/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/formats.cpp.o
+[219/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/evttype_index_ruleset.cpp.o
+[220/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_details_resolver.cpp.o
+[221/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_macro_resolver.cpp.o
+[222/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/field_formatter.cpp.o
+[223/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/logger.cpp.o
+[224/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/filter_warning_resolver.cpp.o
+[225/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/stats_manager.cpp.o
+[226/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader.cpp.o
+[227/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader_collector.cpp.o
+[228/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader_compiler.cpp.o
+[229/274] Building CXX object trusted/engine/CMakeFiles/falco_engine.dir/rule_loader_reader.cpp.o
+[230/274] Linking CXX static library lib/libfalco_engine.a
+[231/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/convert.cpp.o
+[232/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/debug.cpp.o
+[233/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/error.cpp.o
+[234/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/input.cpp.o
+[235/274] Generating libworker.a, libworker.h
+[236/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/api.cpp.o
+[237/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/container_info.cpp.o
+[238/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/matcher.cpp.o
+[239/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/bpm.cpp.o
+[240/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/container_info_json.cpp.o
+[241/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/cri.cpp.o
+[242/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/containerd.cpp.o
+[243/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/docker.cpp.o
+[244/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/libvirt_lxc.cpp.o
+[245/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/lxc.cpp.o
+[246/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/matcher.cpp.o
+[247/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/runc.cpp.o
+[248/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/podman.cpp.o
+[249/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/matchers/static_container.cpp.o
+[250/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/table.cpp.o
+[251/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/plugin.cpp.o
+[252/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/plugin_config.cpp.o
+[253/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/caps/async/async.cpp.o
+[254/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/caps/extract/extract.cpp.o
+[255/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/caps/listening/listening.cpp.o
+[256/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/matcher_avx2.cpp.o
+[257/274] Building CXX object trusted/container/CMakeFiles/container_trusted.dir/home/poc/hw-ship-1795610679657/source/poc/build-falco/deps/plugins/plugins/container/src/caps/parse/parse.cpp.o
+[258/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/matcher_avx512bw.cpp.o
+[259/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/posix.cpp.o
+[260/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/simd.cpp.o
+[261/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/simd_avx2.cpp.o
+[262/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/simd_avx512bw.cpp.o
+[263/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/unicode.cpp.o
+[264/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/utf8.cpp.o
+[265/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/block_scripts.cpp.o
+[266/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/language_scripts.cpp.o
+[267/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/letter_scripts.cpp.o
+[268/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/unicode/composer.cpp.o
+[269/274] Building CXX object trusted/container/reflex/CMakeFiles/ReflexLibStatic.dir/lib/pattern.cpp.o
+[270/274] Linking CXX static library lib/libreflex_static_lib.a
+[271/274] Linking CXX static library lib/libcontainer_trusted.a
+[272/274] Linking CXX executable bin/falco-enclave
+[273/274] Generating test-key.pem
+[274/274] Generating ../falco-enclave.signed
+Created /home/poc/hw-ship-1795610679657/source/probe/poc/build-falco/bin/falco-enclave.signed

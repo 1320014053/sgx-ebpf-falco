@@ -1,0 +1,2 @@
+[    0.426107] sgx: EPC section 0x140000000-0x237ffffff
+[    0.435089] sgx: [Firmware Bug]: Unable to map EPC section to online node. Fallback to the NUMA node 0.

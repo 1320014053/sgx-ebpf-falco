@@ -1,0 +1,5 @@
+{
+  "reference.scap": "fd33638faf166a687e646b377ca9f1005961a98e7e12bb24e3c1f40adcef1f7e",
+  "reference.yaml": "2475feddef3cd9541583bac684f73159343a73232519f242e1301e537053bdc2",
+  "falco_rules.yaml": "30a1a60263ab97650c851011468da03b17fc0096a7cfa3b6686eba5de73b865b"
+}

@@ -1,0 +1,3 @@
+The final source-snapshot.tar was verified, then extracted to a fresh ship/src. B, L and M were built from initial.tar. The exact member modes and bytes were identical except for the following files. No compiled input changed. The shipped scripts include ship-run.sh.
+results/aliyun-c7t-xlarge/scripts/README.md
+results/aliyun-c7t-xlarge/scripts/ship-run.sh

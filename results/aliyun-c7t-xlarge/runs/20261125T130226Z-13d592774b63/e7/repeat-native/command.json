@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "/usr/bin/time",
+    "-q",
+    "-f",
+    "%U %S %M %w %c %I %O",
+    "-o",
+    "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e7/repeat-native/resources.txt",
+    "/root/c7t-xlarge-ship/src/poc/build-falco/deps/package/usr/bin/falco",
+    "-c",
+    "falco.yaml",
+    "-o",
+    "engine.kind=modern_ebpf",
+    "--enable-source",
+    "raven_zeek"
+  ],
+  "cwd": "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e7/input-repeat",
+  "stdout": "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e7/repeat-native/alerts.jsonl",
+  "env": {
+    "TZ": "UTC",
+    "LC_ALL": "C",
+    "FALCO_HOSTNAME": "raven-retention"
+  }
+}

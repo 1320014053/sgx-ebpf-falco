@@ -1,0 +1,39 @@
+{
+  "mode": "hardware",
+  "uname": "Linux sgx-ebpf-sim 5.15.0-198-generic #208-Ubuntu SMP Fri Sep 4 10:22:38 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+  "nproc": 4,
+  "page_size": 4096,
+  "btf_readable": true,
+  "sgx_enclave": false,
+  "sgx_provision": false,
+  "cpuid": {
+    "PCID": 1,
+    "SGX": 0,
+    "SGX_LC": 0,
+    "PKS": 0,
+    "INVPCID": 1,
+    "SGX1": 0,
+    "SGX2": 0
+  },
+  "bpf_ringbuf": true,
+  "bpf_ringbuf_errno": 0,
+  "epc_sysfs_bytes": {},
+  "epc_bytes": null,
+  "checks": {
+    "hardware_sgx": false,
+    "debug_zero": false,
+    "measurements_match": false
+  },
+  "falco_exit": 1,
+  "signed_image": {
+    "mrenclave": "e3b0acfe93113a56a658fbd466a0641fb83fe50bdef065b0fead45b9d38044db",
+    "mrsigner": "1cc2cbab46c069658003011c94727bf550fdc70a0349cfab5dca037c0fba213b"
+  },
+  "errors": [
+    "hardware SGX unavailable (need SGX, SGX1, SGX_LC and /dev/sgx_enclave)",
+    "falco-sgx failed; see report.log",
+    "missing hardware REPORT or DEBUG is set",
+    "REPORT measurements do not match the signed image"
+  ],
+  "pass": false
+}

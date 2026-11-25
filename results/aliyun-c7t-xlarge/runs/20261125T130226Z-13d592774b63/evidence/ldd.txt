@@ -1,0 +1,149 @@
+OE host code is linked from liboehost.a; see oehost-link.txt. Check the executables, plugins and the SGX libraries used by local REPORT.
+
+/home/poc/hw-ship-1795610679657/verify/src/poc/build-falco-live/falco-live
+	linux-vdso.so.1 (0x00007ffed93e7000)
+	libcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007fbd3403d000)
+	libelf.so.1 => /lib/x86_64-linux-gnu/libelf.so.1 (0x00007fbd3401f000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007fbd34003000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fbd33dd7000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fbd33cf0000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fbd33cce000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fbd33aa5000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fbd35029000)
+
+/home/poc/hw-ship-1795610679657/verify/src/poc/build-falco/bin/falco-sgx
+	linux-vdso.so.1 (0x00007ffcf7d8f000)
+	libcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007fa1f5b63000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fa1f5937000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fa1f5850000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fa1f5830000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa1f5607000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fa1f60a8000)
+
+/home/poc/hw-ship-1795610679657/verify/src/probe/poc/build-falco/bin/falco-sgx
+	linux-vdso.so.1 (0x00007ffcc33f7000)
+	libcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007f7770411000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f77701e5000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f77700fe000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f77700de000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f776feb5000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f7770956000)
+
+/home/poc/hw-ship-1795610679657/verify/src/poc/build-falco/deps/package/usr/bin/falco
+	linux-vdso.so.1 (0x00007ffe7e379000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ff1820f4000)
+	libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007ff1820ef000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ff181ec6000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007ff181ec1000)
+	librt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007ff181ebc000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ff1821e4000)
+
+/home/poc/hw-ship-1795610679657/verify/src/poc/build-falco/deps/package/usr/share/falco/plugins/libcontainer.so
+	linux-vdso.so.1 (0x00007fffcef80000)
+	libresolv.so.2 => /lib/x86_64-linux-gnu/libresolv.so.2 (0x00007f66ae28f000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f66ae066000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f66b29ea000)
+
+/home/poc/hw-ship-1795610679657/verify/src/poc/build-falco/lib/libraven_zeek.so
+	linux-vdso.so.1 (0x00007ffc935b9000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fef669b6000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fef668cf000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fef668af000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fef66686000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fef66c92000)
+
+/home/poc/hw-ship-1795610679657/verify/src/probe/poc/build-falco/lib/libraven_zeek.so
+	linux-vdso.so.1 (0x00007ffca3dcf000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f41fd37b000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f41fd294000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f41fd274000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f41fd04b000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f41fd658000)
+
+/home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_enclave_common.so.1
+	linux-vdso.so.1 (0x00007ffe2cda4000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f4ec1438000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f4ec1418000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f4ec11ef000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f4ec1108000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f4ec167c000)
+
+/home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_urts.so.2
+	linux-vdso.so.1 (0x00007ffe1b7b0000)
+	libsgx_enclave_common.so.1 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_enclave_common.so.1 (0x00007f3c8c3b5000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f3c8c182000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f3c8c162000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f3c8bf39000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f3c8be52000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f3c8c6c5000)
+
+/home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_dcap_ql.so.1
+	linux-vdso.so.1 (0x00007ffd7a502000)
+	libsgx_qe3_logic.so => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_qe3_logic.so (0x00007f00fbb7a000)
+	libsgx_pce_logic.so.1 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_pce_logic.so.1 (0x00007f00fbb6f000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f00fb93f000)
+	libsgx_urts.so.2 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_urts.so.2 (0x00007f00fb640000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f00fb414000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f00fbb90000)
+	libsgx_enclave_common.so.1 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_enclave_common.so.1 (0x00007f00fb403000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f00fb3e3000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f00fb2fc000)
+
+/home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_quote_ex.so.1
+	linux-vdso.so.1 (0x00007ffe0f7f4000)
+	libprotobuf.so.23 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libprotobuf.so.23 (0x00007ff1c515d000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007ff1c4f2a000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007ff1c4f0a000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ff1c4ce1000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007ff1c4cc5000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ff1c5467000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ff1c4bdc000)
+
+/home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_qe3_logic.so
+	linux-vdso.so.1 (0x00007ffc767c3000)
+	libsgx_urts.so.2 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_urts.so.2 (0x00007fa2ff620000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fa2ff3ed000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa2ff1c4000)
+	libsgx_enclave_common.so.1 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_enclave_common.so.1 (0x00007fa2ff1b5000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fa2ff195000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fa2ff0ac000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fa2ff92f000)
+
+/home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_pce_logic.so.1
+	linux-vdso.so.1 (0x00007ffe835f4000)
+	libsgx_urts.so.2 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_urts.so.2 (0x00007f2e068eb000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f2e066b8000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2e0648f000)
+	libsgx_enclave_common.so.1 => /home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_enclave_common.so.1 (0x00007f2e06480000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f2e06460000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2e06377000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f2e06bf7000)
+
+/home/poc/hw-ship-1795610679657/verify/runtime/usr/lib/x86_64-linux-gnu/libsgx_uae_service.so.2
+	linux-vdso.so.1 (0x00007ffd949bd000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f29685d2000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f29683a9000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f29682c2000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f296880d000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f29682a2000)
+dlopen from bundle: libsgx_enclave_common.so.1
+dlopen from bundle: libsgx_urts.so.2
+dlopen from bundle: libsgx_dcap_ql.so.1
+dlopen from bundle: libsgx_quote_ex.so.1
+dlopen from bundle: libsgx_qe3_logic.so
+dlopen from bundle: libsgx_pce_logic.so.1
+dlopen from bundle: libsgx_uae_service.so.2
+architectural enclave: libsgx_qe3.signed.so.1
+architectural enclave: libsgx_pce.signed.so.1
+architectural enclave: libsgx_id_enclave.signed.so.1
+Falco version: 0.45.2
+Libs version:  0.26.1
+Plugin API:    3.12.0
+Engine:        0.65.0
+Driver:
+  API version:    11.0.0
+  Schema version: 4.3.0
+  Default driver: 11.0.1+driver
+bpftool v7.5.0
+using libbpf v1.5
+features: llvm, skeletons

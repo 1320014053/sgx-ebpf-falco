@@ -1,0 +1,39 @@
+{
+  "mode": "hardware",
+  "uname": "Linux iZbp1b6gozmnui4bssrnodZ 5.15.0-198-generic #208-Ubuntu SMP Fri Sep 4 10:22:38 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+  "nproc": 4,
+  "page_size": 4096,
+  "btf_readable": true,
+  "sgx_enclave": true,
+  "sgx_provision": true,
+  "cpuid": {
+    "PCID": 1,
+    "SGX": 1,
+    "SGX_LC": 1,
+    "PKS": 0,
+    "INVPCID": 1,
+    "SGX1": 1,
+    "SGX2": 1
+  },
+  "bpf_ringbuf": true,
+  "bpf_ringbuf_errno": 0,
+  "epc_sysfs_bytes": {},
+  "epc_bytes": 4160749568,
+  "checks": {
+    "hardware_sgx": true,
+    "debug_zero": true,
+    "measurements_match": true
+  },
+  "falco_exit": 0,
+  "report": {
+    "debug": 0,
+    "mrenclave": "e3b0acfe93113a56a658fbd466a0641fb83fe50bdef065b0fead45b9d38044db",
+    "mrsigner": "1cc2cbab46c069658003011c94727bf550fdc70a0349cfab5dca037c0fba213b"
+  },
+  "signed_image": {
+    "mrenclave": "e3b0acfe93113a56a658fbd466a0641fb83fe50bdef065b0fead45b9d38044db",
+    "mrsigner": "1cc2cbab46c069658003011c94727bf550fdc70a0349cfab5dca037c0fba213b"
+  },
+  "errors": [],
+  "pass": true
+}

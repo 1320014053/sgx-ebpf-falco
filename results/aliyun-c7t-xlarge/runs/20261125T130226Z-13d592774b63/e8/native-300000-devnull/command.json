@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "/usr/bin/time",
+    "-q",
+    "-f",
+    "%U %S %M %w %c %I %O",
+    "-o",
+    "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e8/native-300000-devnull/resources.txt",
+    "/root/c7t-xlarge-ship/src/poc/build-falco/deps/package/usr/bin/falco",
+    "-c",
+    "reference.yaml"
+  ],
+  "cwd": "/root/c7t-xlarge-ship/src/results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/e8/input-300000",
+  "stdout": "/dev/null",
+  "env": {
+    "TZ": "UTC",
+    "LC_ALL": "C",
+    "FALCO_HOSTNAME": "falco-sgx-fixture"
+  }
+}

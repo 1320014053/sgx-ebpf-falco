@@ -1,0 +1,198 @@
+diff --git a/poc/falco/README.md b/poc/falco/README.md
+index 62e828b..d30b6e0 100644
+--- a/poc/falco/README.md
++++ b/poc/falco/README.md
+@@ -108,8 +108,12 @@ falco-live ENCLAVE CONFIG RING_KIB TRACE_OR_- [--record-inputs EVENTS_OR_- PACKE
+ 
+ Host 初始化固定版本驱动和 procfs 快照，核对所有 CPU 指向同一个真实 ring map。它保留失败的 syscall exit，并关闭 BPF 迭代器。宿主调用 `falco_live_setup` 校验映射和快照，再让采集线程与分析线程分别进入 `falco_live_run`。采集线程把载荷复制到 enclave 私有块后立即写回消费位置。分析线程运行 libsinsp 和官方规则。启用任一检测器时，第三个宿主线程进入 enclave，按顺序处理对应的输入与时钟更新。检测线程处理完一个私有块，采集线程才可复用它。官方规则和 raven_zeek 各自按来源顺序输出，两个来源的告警可以交错。两个线程并行匹配，但格式化告警时串行，因为固定版本 libsinsp 的时间格式化使用不可重入的 `gmtime()`。停止时依次排空 ring、私有块和宿主输出队列，再由 `falco_live_finish` 输出统计。`TRACE_OR_-` 传新文件名时批量导出同一份 syscall 轨迹。ring 容量为 16 至 65536 KiB 的二次幂，运行要求 4 KiB 页。
+ 
++可从 `/proc/<pid>/task/*/comm` 识别实时线程。采集、分析和告警写出线程分别名为 `fl-ingest`、`fl-analysis` 和 `fl-writer`。启用任一检测器时还有 `fl-detect`。
++
+ 实时配置默认 `buffered_outputs: false`，每个有告警的事件交付一次，由宿主线程写 stdout。设为 `true` 后按 64 KiB 刷新，停止时写出余量。ring 读空时按 libscap 的常量从 500 µs 退避到 30 ms，`idle: spin` 可用于忙等对照。`live_block_count` 默认 32，`live_block_bytes` 默认 262144。统计中的 `ingest_stalls` 是采集线程等待空闲块的次数，`peak_blocks` 与 `output_queue_peak` 分别记录在用块数和宿主待写块数的峰值。`output_queue_peak_bytes` 记录宿主队列同时待写的最大载荷字节数。驱动单独报告丢失。
+ 
++设置 `FALCO_LIVE_STATS_MS=N` 后，宿主从采集开始每 N 毫秒向 stderr 写一行 `"mode":"live_tick"` JSON，停止驱动后再写最后一行。N 必须是正整数，默认关闭。`mono_ns` 是 `CLOCK_MONOTONIC` 纳秒时间戳。`driver_events`、`driver_drops`、`packet_submitted`、`packet_dropped` 均为本次采集的累计计数。关闭报文探针时后两项为零。最后一行的 `packet_dropped` 对应 `modern_ebpf` 汇总的 `packet_drops`。`ring_backlog_bytes` 是生产位置与消费位置的字节差，读取期间消费位置发生变化时省略。
++
+ `"mode":"live"` 统计行的 `detectors` 对象用布尔字段 `raven` 和 `zeek` 标明实际启用的检测器。关闭 RAVEN 时 `raven_events` 为零。关闭 Zeek 时 `packet_records` 和宿主 `"mode":"modern_ebpf"` 统计行的 `packet_submitted` 都为零。
+ 
+ 实时统计的 `errors` 按 raw-block 读取（`batch`）、官方规则的匹配和格式化（`match`、`format`）、raven_zeek 告警的匹配和格式化（`plugin_match`、`plugin_format`）、翻译（`translate`）、RAVEN 事件和时钟推进（`raven`、`raven_advance`）、Zeek 报文和时钟推进（`zeek`、`zeek_advance`）分项计数，两个来源各自计算错误预算。RAVEN 事件或时钟推进出错时以 `error` 缺口重置状态，Zeek 跳过出错的报文或时钟推进。可恢复错误默认继续，每类只打印前三条。某类连续失败 16 次，或从首次失败起的一秒采样窗口内至少尝试 64 次且超过半数失败，采集以非零状态结束。运行 `live/check.sh`、`live/check-ring.sh`、`live/check-detectors.py` 时可在首参数加 `--strict`，令任何恢复计数都使测试失败。`tests/check-history.py ring` 也接受此选项。
+diff --git a/poc/falco/host.cpp b/poc/falco/host.cpp
+index a4260a7..8494571 100644
+--- a/poc/falco/host.cpp
++++ b/poc/falco/host.cpp
+@@ -9,6 +9,7 @@
+ #include <fstream>
+ #include <iterator>
+ #include <mutex>
++#include <pthread.h>
+ #include <signal.h>
+ #include <stdexcept>
+ #include <string_view>
+@@ -34,6 +35,7 @@ struct OutputQueue {
+     size_t queued_bytes = 0;
+ 
+     void write(RingControl* control) {
++        pthread_setname_np(pthread_self(), "fl-writer");
+         sigset_t blocked;
+         sigemptyset(&blocked);
+         sigaddset(&blocked, SIGPIPE);
+@@ -81,6 +83,7 @@ unsigned run_live(oe_enclave_t* enclave, uint8_t* snapshot, size_t bytes, uint64
+         for (unsigned i = 0; i < peers; ++i) {
+             workers[i] = std::thread([&, i] {
+                 const auto role = i == 0 ? analysis_role : detection_role;
++                pthread_setname_np(pthread_self(), role == analysis_role ? "fl-analysis" : "fl-detect");
+                 statuses[i] = falco_live_run(enclave, &results[i], role);
+                 if (statuses[i] != OE_OK || results[i]) __atomic_fetch_or(&ctl->flags, ring_abort, __ATOMIC_RELEASE);
+                 // A role whose ECALL failed never ran, so it cannot wake its peers itself.
+@@ -88,6 +91,7 @@ unsigned run_live(oe_enclave_t* enclave, uint8_t* snapshot, size_t bytes, uint64
+             });
+         }
+         entered_ingest = true;
++        if (gettid() != getpid()) pthread_setname_np(pthread_self(), "fl-ingest");
+         timespec begin{}, end{};
+         clock_gettime(CLOCK_THREAD_CPUTIME_ID, &begin);
+         status = falco_live_run(enclave, &result, ingest_role);
+diff --git a/poc/falco/live/live_host.cpp b/poc/falco/live/live_host.cpp
+index ffc3e0f..ff74bbf 100644
+--- a/poc/falco/live/live_host.cpp
++++ b/poc/falco/live/live_host.cpp
+@@ -7,6 +7,7 @@
+ #include <algorithm>
+ #include <atomic>
+ #include <cerrno>
++#include <charconv>
+ #include <chrono>
+ #include <cstdlib>
+ #include <cstring>
+@@ -22,6 +23,7 @@
+ #include <libscap/scap_engines.h>
+ #include <libscap/scap_platform.h>
+ #include <libscap/scap_savefile_api.h>
++#include <sstream>
+ #include <spawn.h>
+ #include <signal.h>
+ #include <stdexcept>
+@@ -96,8 +98,8 @@ public:
+         }
+     }
+     ~PacketTap() { stop(); }
+-    uint64_t submitted() const { return program ? program->bss->submitted : 0; }
+-    uint64_t dropped() const { return program ? program->bss->dropped : 0; }
++    uint64_t submitted() const { return program ? __atomic_load_n(&program->bss->submitted, __ATOMIC_RELAXED) : 0; }
++    uint64_t dropped() const { return program ? __atomic_load_n(&program->bss->dropped, __ATOMIC_RELAXED) : 0; }
+ };
+ 
+ int run(int argc, char** argv) {
+@@ -111,6 +113,13 @@ int run(int argc, char** argv) {
+                      "[--record-inputs EVENTS.jsonl PACKETS.pcap] RULES... [-- WORKLOAD [ARGS...]]\n";
+         return 2;
+     }
++    uint64_t stats_ms = 0;
++    if (const char* value = std::getenv("FALCO_LIVE_STATS_MS")) {
++        const auto* end = value + std::strlen(value);
++        const auto parsed = std::from_chars(value, end, stats_ms);
++        if (parsed.ec != std::errc{} || parsed.ptr != end || stats_ms == 0)
++            throw std::runtime_error("FALCO_LIVE_STATS_MS must be a positive integer in milliseconds");
++    }
+     if (!with_workload) {
+         struct sigaction action{};
+         action.sa_handler = request_stop;
+@@ -222,6 +231,21 @@ int run(int argc, char** argv) {
+     const auto schema = scap_get_driver_schema_version(driver.get());
+     const auto api = scap_get_driver_api_version(driver.get());
+     PacketTap tap;
++    auto emit_tick = [&](const scap_stats& stats, uint64_t submitted, uint64_t dropped) {
++        const auto mono_ns = clock_ns(CLOCK_MONOTONIC);
++        const auto head = __atomic_load_n(consumed, __ATOMIC_ACQUIRE);
++        const auto tail = __atomic_load_n(published, __ATOMIC_ACQUIRE);
++        const bool stable = head == __atomic_load_n(consumed, __ATOMIC_ACQUIRE);
++        std::ostringstream line;
++        line << "{\"mode\":\"live_tick\",\"mono_ns\":" << mono_ns
++             << ",\"driver_events\":" << stats.n_evts - before.n_evts
++             << ",\"driver_drops\":" << stats.n_drops - before.n_drops
++             << ",\"packet_submitted\":" << submitted << ",\"packet_dropped\":" << dropped;
++        if (stable) line << ",\"ring_backlog_bytes\":" << tail - head;
++        line << "}\n";
++        std::fputs(line.str().c_str(), stderr);
++    };
++    uint64_t final_submitted = 0, final_dropped = 0;
+     std::future<unsigned> worker;
+     int exit_status = 0;
+     uint64_t progress = 0;
+@@ -272,6 +296,7 @@ int run(int argc, char** argv) {
+         } else {
+             std::cerr << "{\"mode\":\"capture_ready\",\"pid\":" << getpid() << ",\"map_id\":" << map.id << "}\n";
+         }
++        uint64_t last_interval = 0;
+         while (!stop_requested.load(std::memory_order_relaxed)) {
+             __atomic_store_n(&control_page->realtime_ns, clock_ns(CLOCK_REALTIME), __ATOMIC_RELEASE);
+             if (with_workload) {
+@@ -289,12 +314,32 @@ int run(int argc, char** argv) {
+                 ++progress;
+                 position = next;
+             }
+-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
++            if (stats_ms) {
++                using std::chrono::milliseconds;
++                const auto elapsed = std::chrono::duration_cast<milliseconds>(std::chrono::steady_clock::now() - started);
++                const uint64_t interval = elapsed.count() / stats_ms;
++                if (interval != last_interval) {
++                    scap_stats stats{};
++                    check_driver(scap_get_stats(driver.get(), &stats), "read interval driver counters");
++                    emit_tick(stats, tap.submitted(), tap.dropped());
++                    last_interval = interval;
++                }
++                const auto wait_ms = std::min<uint64_t>(100, stats_ms - elapsed.count() % stats_ms);
++                std::this_thread::sleep_until(started + elapsed + milliseconds(wait_ms));
++            } else {
++                std::this_thread::sleep_for(std::chrono::milliseconds(100));
++            }
+         }
+         tap.stop();
+         check_driver(scap_stop_capture(driver.get()), "stop Modern eBPF capture");
+         stopped = std::chrono::steady_clock::now();
+         capturing = false;
++        if (stats_ms) {
++            check_driver(scap_get_stats(driver.get(), &after), "read final driver counters");
++            final_submitted = tap.submitted();
++            final_dropped = tap.dropped();
++            emit_tick(after, final_submitted, final_dropped);
++        }
+     } catch (...) {
+         tap.stop();
+         if (capturing && scap_stop_capture(driver.get()) != SCAP_SUCCESS) {
+@@ -314,7 +359,11 @@ int run(int argc, char** argv) {
+     __atomic_fetch_or(flags, ring_stop, __ATOMIC_RELEASE);
+     const auto data_ecalls = worker.get();
+     const auto drained = std::chrono::steady_clock::now();
+-    check_driver(scap_get_stats(driver.get(), &after), "read final driver counters");
++    if (!stats_ms) {
++        check_driver(scap_get_stats(driver.get(), &after), "read final driver counters");
++        final_submitted = tap.submitted();
++        final_dropped = tap.dropped();
++    }
+     if (trace && std::fflush(trace.get()) != 0) {
+         throw std::runtime_error(std::string("flush trace: ") + std::strerror(errno));
+     }
+@@ -326,7 +375,7 @@ int run(int argc, char** argv) {
+     const auto head = __atomic_load_n(consumed, __ATOMIC_ACQUIRE);
+     const auto millis = [](auto interval) { return std::chrono::duration_cast<std::chrono::milliseconds>(interval).count(); };
+     std::cerr << "{\"mode\":\"modern_ebpf\",\"map_id\":" << map.id << ",\"ring_bytes\":" << capacity
+-              << ",\"packet_submitted\":" << tap.submitted() << ",\"packet_drops\":" << tap.dropped()
++              << ",\"packet_submitted\":" << final_submitted << ",\"packet_drops\":" << final_dropped
+               << ",\"driver_api\":" << api << ",\"driver_schema\":" << schema
+               << ",\"driver_events\":" << after.n_evts - before.n_evts
+               << ",\"driver_drops\":" << after.n_drops - before.n_drops
+diff --git a/poc/falco/live/verification.md b/poc/falco/live/verification.md
+index 6185685..db385d9 100644
+--- a/poc/falco/live/verification.md
++++ b/poc/falco/live/verification.md
+@@ -241,3 +241,9 @@ DNS 首次失败的原因：刷新阶段固定等待 17 秒，原版采集器第
+ 未运行的项目：重新生成上游结果的 behavior-review 和 parity-audit 套件（客体缺固定的 RAVEN checkout 和 Zeek 镜像）、TSAN、硬件 SGX 和性能测试。缩小订阅后 RAVEN 输入与全量订阅一致，目前依据代码分析和十类输入标记，尚无同一轨迹的差分测试。
+ 
+ 逐项命令输出和比较文件保存在宿主仓库外的 `tmp/event-selection-verify`，约 600 KiB。收尾时删除了客体测试目录（1.7 GiB），并删除测试从 `falco-poc` 和 `moby` 命名空间导入的固定镜像。K3s 集群原有的 `k8s.io` 镜像保留。客体执行 `sudo -n poweroff`，串口末尾记录 `reboot: Power down`。宿主确认 QEMU 已退出，2222 端口无监听。
++
++## 实时线程名称与周期统计
++
++2026-11-25，在 Ubuntu 22.04.5、5.15.0-198-generic、WHPX 4 vCPU、5120 MiB 的 SGX Simulation 客体重新构建。清除 `FALCO_LIVE_STATS_MS` 后依次运行 `check.sh --strict`、`check-ring.sh --strict`、`check-detectors.py --strict`，三项均退出 0，日志中没有 `live_tick`。
++
++在双检测器配置中设置 `FALCO_LIVE_STATS_MS=1000`，停止前从 `/proc/<pid>/task/*/comm` 读到 `fl-ingest`、`fl-analysis`、`fl-detect` 和 `fl-writer`。连续周期样本间隔 0.999 至 1.000 秒，停采时额外输出末条。该次末条的驱动事件、驱动丢失、报文提交、报文丢失依次为 55104、0、0、0，四项与 `modern_ebpf` 相等。命令和报文负载短测见[本批模拟验收](../../../results/aliyun-c7t-xlarge/sim-verification.md)。

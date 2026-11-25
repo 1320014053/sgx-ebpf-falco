@@ -1,0 +1,27 @@
+rules_files: [falco_rules.yaml, raven_zeek_rules.yaml]
+engine: {kind: modern_ebpf}
+rule_matching: all
+json_output: true
+json_include_message_property: true
+time_format_iso_8601: true
+load_plugins: [container, raven_zeek]
+plugins:
+  - name: container
+    init_config:
+      engines:
+        docker: {enabled: false}
+        podman: {enabled: false}
+        containerd: {enabled: false}
+        cri: {enabled: false}
+        lxc: {enabled: false}
+        libvirt_lxc: {enabled: false}
+        bpm: {enabled: false}
+  - name: raven_zeek
+    init_config: {raven: true, zeek: true}
+append_output:
+  - match: {source: syscall}
+    extra_fields: [evt.num, evt.type, thread.tid]
+
+idle: sleep
+base_syscalls: {all: false}
+buffered_outputs: false

@@ -11,6 +11,7 @@
 | [回归测试](poc/falco/tests/README.md) | 固定上游参考、共享输入、历史独立用例及签名 enclave 回放 |
 | [RAVEN 内存测试](poc/falco/RAVEN-历史回收.md) | 事件保留策略、长时间负载和验收阈值 |
 | [阿里云 c7t.large 硬件 SGX 性能测试计划](results/aliyun-c7t-large/README.md) | 关闭 enclave 调试后的硬件验收、性能对照和[实测批次记录](results/aliyun-c7t-large/runs/README.md) |
+| [阿里云 c7t.xlarge 硬件 SGX 性能复测计划](results/aliyun-c7t-xlarge/README.md) | 4 vCPU 上按 RAVEN、Zeek 分开测量吞吐、跨边界方式、业务开销、延迟、空闲、内存和回放，见[实测报告](results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/REPORT.md) |
 | [MOAT 内核工作流](.github/workflows/build.yml) | 从固定提交构建 Linux 6.1.38，生成带校验和的 Debian 包 |
 | [Windows QEMU 客体](vm/README.md) | 安装 Ubuntu、启动实验客体和传输源码 |
 | [GETPID 前期实验](poc/README.md) | 概念验证：eBPF 探针、宿主、enclave、发生器和 ring 解析测试 |
@@ -48,6 +49,8 @@ sudo python3 moat-kernel-build/tests/falco-modern-smoke.py --default-buffer \
 已有验收涵盖 Falco 规则、检测器回放、MOAT 上的 SGX Simulation，以及 GETPID 前期实验。回放中仍有与固定上游不一致的用例，内存长测也保留了超过阈值的实测值。这批历史验收未覆盖硬件 SGX 隔离和内核事件来源认证。[验收摘要与原始记录](results/falco/acceptance.md)
 
 阿里云 `ecs.c7t.large` 的硬件批次另行保存了 Falco 和 GETPID 的 `DEBUG=0` 运行报告、签名度量与性能记录。[硬件实测批次](results/aliyun-c7t-large/runs/README.md)
+
+阿里云 `ecs.c7t.xlarge` 的复测批次在 4 vCPU 上分别测量 SGX + RAVEN、SGX + Zeek 和两者合用，覆盖 RQ2、RQ3。[实测报告](results/aliyun-c7t-xlarge/runs/20261125T130226Z-13d592774b63/REPORT.md) · [批次索引](results/aliyun-c7t-xlarge/runs/README.md)
 
 ## GETPID 前期实验
 

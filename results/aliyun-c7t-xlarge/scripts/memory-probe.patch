@@ -1,0 +1,74 @@
+--- a/plugin/detectors.hpp
++++ b/plugin/detectors.hpp
+@@ -32,7 +32,7 @@
+ };
+ 
+ Json raven(std::string_view events, bool tetragon, RavenOptions options = {});
+-void zeek(std::string_view packets, bool host_capture, Publish publish);
++void zeek(std::string_view packets, bool host_capture, Publish publish, bool metrics = false);
+ Json zeek(std::string_view packets, bool host_capture = false);
+ 
+ class RavenStream {
+--- a/plugin/plugin.cpp
++++ b/plugin/plugin.cpp
+@@ -63,9 +63,9 @@
+         try {
+             auto publish = [this](const Json& notice) { notices.push_back(notice); };
+ #ifdef RZ_ENCLAVE
+-            if (inputs.packets) rz::zeek(*inputs.packets, inputs.host_capture, publish);
+-#else
+-            rz::zeek(rz::read_capture(cfg.at("pcap")), cfg.value("host_capture", false), publish);
++            if (inputs.packets) rz::zeek(*inputs.packets, inputs.host_capture, publish, inputs.retention.metrics);
++#else
++            rz::zeek(rz::read_capture(cfg.at("pcap")), cfg.value("host_capture", false), publish, cfg.value("retention_metrics", false));
+ #endif
+         } catch (const std::exception& error) {
+             if (!replay_error.empty()) {
+--- a/plugin/zeek.cpp
++++ b/plugin/zeek.cpp
+@@ -572,7 +572,7 @@
+     state->advance(ns / 1000000000 + ((ns % 1000000000) / 1000) / 1e6, finish);
+ }
+ 
+-void zeek(std::string_view input, bool host_capture, Publish publish) {
++void zeek(std::string_view input, bool host_capture, Publish publish, bool metrics) {
+     if (input.size() < 24) throw std::runtime_error("truncated PCAP header");
+     Scan scan;
+     scan.publish = std::move(publish);
+@@ -589,6 +589,13 @@
+     if (!supported(link))
+         throw std::runtime_error("unsupported PCAP link type " + std::to_string(link));
+     input.remove_prefix(24);
++    size_t packets = 0;
++    bool saw_expiry_gap = false;
++    auto sample = [&](const char* phase) {
++        retention_report({{"phase", phase}, {"packets", packets}, {"connections", scan.connections.size()},
++                          {"capture_time", scan.now}});
++    };
++    if (metrics) sample("zeek_start");
+     while (!input.empty()) {
+         if (input.size() < 16) throw std::runtime_error("truncated PCAP packet header");
+         auto cap = u32(8), wire = u32(12);
+@@ -596,11 +603,20 @@
+         if (minor == 3 && cap > wire) std::swap(cap, wire);
+         if (cap > input.size()-16 || cap > wire) throw std::runtime_error("invalid PCAP packet length");
+         auto usec = nano ? u32(4) / 1000 : u32(4);
+-        scan.advance(u32(0) + usec / 1e6);
++        double timestamp = u32(0) + usec / 1e6;
++        if (metrics && packets && timestamp - scan.now > 3600) {
++            sample("zeek_before_gap");
++            saw_expiry_gap = true;
++        }
++        scan.advance(timestamp);
+         parse_packet(scan,input.substr(16,cap),link,host_capture);
+         input.remove_prefix(16+size_t(cap));
+-    }
++        if (metrics && ++packets % 10000 == 0) sample("zeek_packets");
++    }
++    // Capture-time expiry is sampled before the separate EOF timer drain.
++    if (metrics && saw_expiry_gap) sample("zeek_after_expiry");
+     scan.advance(scan.now,true);
++    if (metrics) sample("zeek_finish");
+ }
+ 
+ Json zeek(std::string_view input, bool host_capture) {

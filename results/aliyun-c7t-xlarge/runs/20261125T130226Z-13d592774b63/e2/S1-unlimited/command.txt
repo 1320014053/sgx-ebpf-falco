@@ -1,0 +1,3 @@
+# collector mode: hardware; cwd: this run directory
+env TZ=UTC FALCO_HOSTNAME=falco-bench FALCO_LIVE_STATS_MS=1000 /root/c7t-xlarge-ship/src/poc/build-falco-live/falco-live /root/c7t-xlarge-ship/src/poc/build-falco/falco-enclave.signed falco.yaml 8192 - falco_rules.yaml
+/tmp/falco-bench-x_d_uzfr/tcp-load 0 30 producer.json

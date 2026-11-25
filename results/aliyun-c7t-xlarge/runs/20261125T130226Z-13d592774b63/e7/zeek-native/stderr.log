@@ -1,0 +1,138 @@
+2026-11-25T14:03:08+0000: Falco version: 0.45.2 (x86_64)
+2026-11-25T14:03:08+0000: Falco initialized with configuration files:
+2026-11-25T14:03:08+0000:    falco.yaml | schema validation: ok
+2026-11-25T14:03:08+0000: System info: Linux version 5.15.0-198-generic (buildd@lcy02-amd64-040) (gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #208-Ubuntu SMP Fri Sep 4 10:22:38 UTC 2026
+2026-11-25T14:03:08+0000: Loaded plugin 'container@0.7.6' from file /proc/self/cwd/libcontainer.so
+2026-11-25T14:03:08+0000: Loaded plugin 'raven_zeek@1.0.0' from file /proc/self/cwd/libraven_zeek.so
+2026-11-25T14:03:08+0000: Loading rules from:
+2026-11-25T14:03:08+0000:    falco_rules.yaml | schema validation: ok
+2026-11-25T14:03:08+0000:    raven_zeek_rules.yaml | schema validation: ok
+2026-11-25T14:03:08+0000: Hostname value has been overridden via environment variable to: raven-retention
+2026-11-25T14:03:08+0000: The chosen syscall buffer dimension is: 8388608 bytes (8 MBs)
+2026-11-25T14:03:08+0000: Loaded event sources: syscall, raven_zeek
+2026-11-25T14:03:08+0000: Enabled event sources: raven_zeek
+2026-11-25T14:03:08+0000: Opening 'raven_zeek' source with plugin 'raven_zeek'
+2026-11-25T14:03:08+0000: [libs]: Trying to open the right engine!
+RZRET {"budget_evicted":0,"charged":0,"cutoff_seq":0,"cycles":0,"evicted":0,"hash":"14695981039346656037","lineage_calls":0,"now":null,"observations":0,"oldest_retained":null,"ordinal_ids":0,"peak_charged":0,"phase":"start","published":0,"reason":"none","resets":0,"review_calls":0,"rss":54435840,"seconds":0.0,"seen":0,"settle_calls":0,"skipped":0,"snapshots":0,"start":0.0,"time_evicted":0,"tree":0}
+RZRET {"capture_time":0.0,"connections":0,"packets":0,"phase":"zeek_start","rss":120684544}
+RZRET {"capture_time":1700000000.09999,"connections":10000,"packets":10000,"phase":"zeek_packets","rss":124088320}
+RZRET {"capture_time":1700000000.19999,"connections":20000,"packets":20000,"phase":"zeek_packets","rss":127520768}
+RZRET {"capture_time":1700000000.29999,"connections":30000,"packets":30000,"phase":"zeek_packets","rss":131006464}
+RZRET {"capture_time":1700000000.39999,"connections":40000,"packets":40000,"phase":"zeek_packets","rss":134475776}
+RZRET {"capture_time":1700000000.49999,"connections":50000,"packets":50000,"phase":"zeek_packets","rss":137949184}
+RZRET {"capture_time":1700000000.59999,"connections":60000,"packets":60000,"phase":"zeek_packets","rss":141414400}
+RZRET {"capture_time":1700000000.69999,"connections":70000,"packets":70000,"phase":"zeek_packets","rss":144887808}
+RZRET {"capture_time":1700000000.79999,"connections":80000,"packets":80000,"phase":"zeek_packets","rss":148348928}
+RZRET {"capture_time":1700000000.89999,"connections":90000,"packets":90000,"phase":"zeek_packets","rss":153927680}
+RZRET {"capture_time":1700000000.99999,"connections":100000,"packets":100000,"phase":"zeek_packets","rss":157380608}
+RZRET {"capture_time":1700000017.660003,"connections":501,"packets":110000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000034.330001,"connections":501,"packets":120000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000050.990005,"connections":500,"packets":130000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000067.660003,"connections":501,"packets":140000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000084.330001,"connections":501,"packets":150000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000100.990005,"connections":500,"packets":160000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000117.660003,"connections":501,"packets":170000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000134.330001,"connections":501,"packets":180000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000150.990005,"connections":500,"packets":190000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000167.660003,"connections":501,"packets":200000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000184.330001,"connections":501,"packets":210000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000200.990005,"connections":500,"packets":220000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000217.660003,"connections":501,"packets":230000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000234.330001,"connections":501,"packets":240000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000250.990005,"connections":500,"packets":250000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000267.660003,"connections":501,"packets":260000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000284.330001,"connections":501,"packets":270000,"phase":"zeek_packets","rss":172883968}
+RZRET {"capture_time":1700000300.990005,"connections":500,"packets":280000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000317.660003,"connections":501,"packets":290000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000334.330001,"connections":501,"packets":300000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000350.990005,"connections":500,"packets":310000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000367.660003,"connections":501,"packets":320000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000384.330001,"connections":501,"packets":330000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000400.990005,"connections":500,"packets":340000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000417.660003,"connections":501,"packets":350000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000434.330001,"connections":501,"packets":360000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000450.990005,"connections":500,"packets":370000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000467.660003,"connections":501,"packets":380000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000484.330001,"connections":501,"packets":390000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000500.990005,"connections":500,"packets":400000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000517.660003,"connections":501,"packets":410000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000534.330001,"connections":501,"packets":420000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000550.990005,"connections":500,"packets":430000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000567.660003,"connections":501,"packets":440000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000584.330001,"connections":501,"packets":450000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000600.990005,"connections":500,"packets":460000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000617.660003,"connections":501,"packets":470000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000634.330001,"connections":501,"packets":480000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000650.990005,"connections":500,"packets":490000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000667.660003,"connections":501,"packets":500000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000684.330001,"connections":501,"packets":510000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000700.990005,"connections":500,"packets":520000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000717.660003,"connections":501,"packets":530000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000734.330001,"connections":501,"packets":540000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000750.990005,"connections":500,"packets":550000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000767.660003,"connections":501,"packets":560000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000784.330001,"connections":501,"packets":570000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000800.990005,"connections":500,"packets":580000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000817.660003,"connections":501,"packets":590000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000834.330001,"connections":501,"packets":600000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000850.990005,"connections":500,"packets":610000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000867.660003,"connections":501,"packets":620000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000884.330001,"connections":501,"packets":630000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000900.990005,"connections":500,"packets":640000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000917.660003,"connections":501,"packets":650000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000934.330001,"connections":501,"packets":660000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000950.990005,"connections":500,"packets":670000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000967.660003,"connections":501,"packets":680000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700000984.330001,"connections":501,"packets":690000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001000.990005,"connections":500,"packets":700000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001017.660003,"connections":501,"packets":710000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001034.330001,"connections":501,"packets":720000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001050.990005,"connections":500,"packets":730000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001067.660003,"connections":501,"packets":740000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001084.330001,"connections":501,"packets":750000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001100.990005,"connections":500,"packets":760000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001117.660003,"connections":501,"packets":770000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001134.330001,"connections":501,"packets":780000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001150.990005,"connections":500,"packets":790000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001167.660003,"connections":501,"packets":800000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001184.330001,"connections":501,"packets":810000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001200.990005,"connections":500,"packets":820000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001217.660003,"connections":501,"packets":830000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001234.330001,"connections":501,"packets":840000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001250.990005,"connections":500,"packets":850000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001267.660003,"connections":501,"packets":860000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001284.330001,"connections":501,"packets":870000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001300.990005,"connections":500,"packets":880000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001317.660003,"connections":501,"packets":890000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001334.330001,"connections":501,"packets":900000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001350.990005,"connections":500,"packets":910000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001367.660003,"connections":501,"packets":920000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001384.330001,"connections":501,"packets":930000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001400.990005,"connections":500,"packets":940000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001417.660003,"connections":501,"packets":950000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001434.330001,"connections":501,"packets":960000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001450.990005,"connections":500,"packets":970000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001467.660003,"connections":501,"packets":980000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001484.330001,"connections":501,"packets":990000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001500.990005,"connections":500,"packets":1000000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001517.660003,"connections":501,"packets":1010000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001534.330001,"connections":501,"packets":1020000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001550.990005,"connections":500,"packets":1030000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001567.660003,"connections":501,"packets":1040000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001584.330001,"connections":501,"packets":1050000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001600.990005,"connections":500,"packets":1060000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001617.660003,"connections":501,"packets":1070000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001634.330001,"connections":501,"packets":1080000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001650.990005,"connections":500,"packets":1090000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001667.660003,"connections":501,"packets":1100000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001684.330001,"connections":501,"packets":1110000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001700.990005,"connections":500,"packets":1120000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001717.660003,"connections":501,"packets":1130000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001734.330001,"connections":501,"packets":1140000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001750.990005,"connections":500,"packets":1150000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001767.660003,"connections":501,"packets":1160000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001784.330001,"connections":501,"packets":1170000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001800.990005,"connections":500,"packets":1180000,"phase":"zeek_packets","rss":164450304}
+RZRET {"capture_time":1700001800.990005,"connections":500,"packets":1180000,"phase":"zeek_before_gap","rss":164450304}
+RZRET {"capture_time":1700005402.005005,"connections":0,"packets":1180016,"phase":"zeek_after_expiry","rss":164450304}
+RZRET {"capture_time":1700005402.005005,"connections":0,"packets":1180016,"phase":"zeek_finish","rss":164450304}
