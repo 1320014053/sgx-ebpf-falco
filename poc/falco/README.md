@@ -30,13 +30,33 @@ DNS 规则的离线入口接受 `falco-sgx ENCLAVE CONFIG CAPTURE --dns-hosts FI
 
 从下一节构建的 Linux 宿主运行现场检测。在工作目录提供 `plugin/live.yaml`、官方 `falco_rules.yaml` 和另存为 `raven_zeek_rules.yaml` 的 `plugin/rules.yaml`。
 
+`plugin/live.yaml` 在插件条目中启用两个检测器。只用 RAVEN 时把 `zeek` 设为 `false`，只用 Zeek 时把 `raven` 设为 `false`。
+
+```yaml
+  - name: raven_zeek
+    init_config: {raven: true, zeek: true}
+```
+
+`init_config` 接受 YAML 映射或包含 JSON 对象的字符串，例如 `'{"raven":false,"zeek":true}'`。省略 `init_config`、设为 `null` 或 `{}` 时两个检测器都开启。省略单个键时该项也默认开启。只接受 `raven`、`zeek` 两个键，值必须是布尔值。未知键、非布尔值或两项都为 `false` 会导致启动失败。要关闭整个插件，从 `load_plugins` 中移除 `raven_zeek`，同时移除需要该插件的规则文件。
+
+| 实时检测器 | RAVEN 的 syscall 翻译 | Zeek 的报文探针与 TCP 超时结算 |
+| --- | --- | --- |
+| 两个都开启 | 运行 | 运行 |
+| 仅 RAVEN | 运行 | 关闭 |
+| 仅 Zeek | 关闭 | 运行 |
+| 未加载插件 | 关闭 | 关闭 |
+
+各组合下官方 syscall 规则都继续运行。这两个开关仅用于实时采集。离线回放仍通过 `--plugin*` 或 `open_params` 选择输入。
+
 ```bash
 sudo falco-live falco-enclave.signed live.yaml 4096 - falco_rules.yaml raven_zeek_rules.yaml
 ```
 
 宿主输出 `capture_ready` 后持续监听。Ctrl+C 或 SIGTERM 会停止采集、排空 ring 并输出统计。测试时可以追加 `-- WORKLOAD [ARGS...]`，让采集随工作负载退出。
 
-`-` 关闭 syscall 轨迹录制。需要保存检测输入做测试时，在规则文件前加 `--record-inputs events.jsonl packets.pcap`，用新文件名，任一位置可用 `-` 跳过。JSONL 保存交给 RAVEN 的事件，PCAP 保存 ring 中的原始 IP 报文和采集时间，每包最多 16 KiB。回放本机录制的两份文件时，`falco-sgx` 使用 `--plugin-host EVENTS PCAP`，普通 Falco 在 `open_params` 中设置 `"host_capture":true`。这样能识别本机发送路径上等待网卡补全的 TCP 校验和。运行 `python3 falco/live/check-detectors.py FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY` 可验证关闭录制、开启录制及双端回放。
+`-` 关闭 syscall 轨迹录制。需要保存检测输入做测试时，在规则文件前加 `--record-inputs events.jsonl packets.pcap`，用新文件名，任一位置可用 `-` 跳过。JSONL 保存交给 RAVEN 的事件，PCAP 保存 ring 中的原始 IP 报文和采集时间，每包最多 16 KiB。关闭 RAVEN 时，EVENTS 必须填 `-`；关闭 Zeek 时，PACKETS 必须填 `-`。为已关闭的检测器指定录制文件会导致启动失败。采集开始前失败时，宿主删除本次新建的轨迹和录制文件，修正配置后可用原路径重跑。回放本机录制的两份文件时，`falco-sgx` 使用 `--plugin-host EVENTS PCAP`，普通 Falco 在 `open_params` 中设置 `"host_capture":true`。这样能识别本机发送路径上等待网卡补全的 TCP 校验和。
+
+运行 `python3 falco/live/check-detectors.py FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY`。两个检测器都开启时，脚本检查关闭录制、开启录制及双端回放。单独开启时，脚本在工作负载退出前核对相应告警，停采后检查另一检测器的告警和输入计数均为零。另有五组启动反例，覆盖无效的开关配置和录制请求。
 
 普通 Linux 对照需要 Python 3.10 或更高版本、PyYAML、psutil 和 Docker 守护进程访问权限。在 `poc/` 运行以下命令。`native-run` 保留输入、原版 RAVEN 字段及 Zeek 日志。
 
@@ -78,12 +98,14 @@ bash falco/live/check-ring.sh build-falco/deps/package build-falco build-falco-l
 `check.sh` 在客体内用 `sudo -n` 装载探针，以当前账号运行回环工作负载，并将实时告警、普通 Falco 回放告警和 enclave 回放告警逐条比较。`check-ring.sh` 无需特权。它检查环绕、BUSY、DISCARD、格式拒绝，并在一批事件处理期间修改共享映射中的末条载荷，验证原版告警仍匹配私有副本。
 
 ```text
-falco-live ENCLAVE CONFIG RING_KIB TRACE_OR_- RULES... [-- WORKLOAD [ARGS...]]
+falco-live ENCLAVE CONFIG RING_KIB TRACE_OR_- [--record-inputs EVENTS_OR_- PACKETS_OR_-] RULES... [-- WORKLOAD [ARGS...]]
 ```
 
-Host 初始化固定版本驱动和 procfs 快照，核对所有 CPU 指向同一个真实 ring map。它保留失败的 syscall exit，并关闭 BPF 迭代器。宿主调用 `falco_live_setup` 校验映射和快照，再让采集线程与分析线程分别进入 `falco_live_run`。采集线程把载荷复制到 enclave 私有块后立即写回消费位置。分析线程运行 libsinsp 和官方规则。启用 raven_zeek 时，第三个宿主线程进入 enclave，按顺序接收分析线程交付的 RAVEN 行、报文和时钟更新。检测线程处理完一个私有块，采集线程才可复用它。官方规则和 raven_zeek 各自按来源顺序输出，两个来源的告警可以交错。两个线程并行匹配，但格式化告警时串行，因为固定版本 libsinsp 的时间格式化使用不可重入的 `gmtime()`。停止时依次排空 ring、私有块和宿主输出队列，再由 `falco_live_finish` 输出统计。`TRACE_OR_-` 传新文件名时批量导出同一份输入，传 `-` 时仅输出告警和统计。ring 容量为 16 至 65536 KiB 的二次幂，运行要求 4 KiB 页。
+Host 初始化固定版本驱动和 procfs 快照，核对所有 CPU 指向同一个真实 ring map。它保留失败的 syscall exit，并关闭 BPF 迭代器。宿主调用 `falco_live_setup` 校验映射和快照，再让采集线程与分析线程分别进入 `falco_live_run`。采集线程把载荷复制到 enclave 私有块后立即写回消费位置。分析线程运行 libsinsp 和官方规则。启用任一检测器时，第三个宿主线程进入 enclave，按顺序处理对应的输入与时钟更新。检测线程处理完一个私有块，采集线程才可复用它。官方规则和 raven_zeek 各自按来源顺序输出，两个来源的告警可以交错。两个线程并行匹配，但格式化告警时串行，因为固定版本 libsinsp 的时间格式化使用不可重入的 `gmtime()`。停止时依次排空 ring、私有块和宿主输出队列，再由 `falco_live_finish` 输出统计。`TRACE_OR_-` 传新文件名时批量导出同一份 syscall 轨迹。ring 容量为 16 至 65536 KiB 的二次幂，运行要求 4 KiB 页。
 
 实时配置默认 `buffered_outputs: false`，每个有告警的事件交付一次，由宿主线程写 stdout。设为 `true` 后按 64 KiB 刷新，停止时写出余量。ring 读空时按 libscap 的常量从 500 µs 退避到 30 ms，`idle: spin` 可用于忙等对照。`live_block_count` 默认 32，`live_block_bytes` 默认 262144。统计中的 `ingest_stalls` 是采集线程等待空闲块的次数，`peak_blocks` 与 `output_queue_peak` 分别记录在用块数和宿主待写块数的峰值。`output_queue_peak_bytes` 记录宿主队列同时待写的最大载荷字节数。驱动单独报告丢失。
+
+`"mode":"live"` 统计行的 `detectors` 对象用布尔字段 `raven` 和 `zeek` 标明实际启用的检测器。关闭 RAVEN 时 `raven_events` 为零。关闭 Zeek 时 `packet_records` 和宿主 `"mode":"modern_ebpf"` 统计行的 `packet_submitted` 都为零。
 
 实时统计的 `errors` 按 raw-block 读取（`batch`）、官方规则的匹配和格式化（`match`、`format`）、raven_zeek 告警的匹配和格式化（`plugin_match`、`plugin_format`）、翻译（`translate`）、RAVEN 事件和时钟推进（`raven`、`raven_advance`）、Zeek 报文和时钟推进（`zeek`、`zeek_advance`）分项计数，两个来源各自计算错误预算。RAVEN 事件或时钟推进出错时以 `error` 缺口重置状态，Zeek 跳过出错的报文或时钟推进。可恢复错误默认继续，每类只打印前三条。某类连续失败 16 次，或从首次失败起的一秒采样窗口内至少尝试 64 次且超过半数失败，采集以非零状态结束。运行 `live/check.sh`、`live/check-ring.sh`、`live/check-detectors.py` 时可在首参数加 `--strict`，令任何恢复计数都使测试失败。`tests/check-history.py ring` 也接受此选项。
 

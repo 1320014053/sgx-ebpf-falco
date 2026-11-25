@@ -1,0 +1,116 @@
+{
+  "kernel": "5.15.0-198-generic",
+  "enclave_mode": "SGX Simulation",
+  "ring-only": {
+    "before_workload_exit": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan",
+      "server_spawns_shell"
+    ],
+    "syscall_records": 35114,
+    "detectors": {
+      "raven": true,
+      "zeek": true
+    },
+    "packet_submitted": 92,
+    "raven_events": 259,
+    "packets": 92,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 169,
+    "drained_position": 2467504,
+    "stopped_by": "SIGTERM",
+    "input_files": []
+  },
+  "recorded": {
+    "before_workload_exit": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan",
+      "server_spawns_shell"
+    ],
+    "syscall_records": 21823,
+    "detectors": {
+      "raven": true,
+      "zeek": true
+    },
+    "packet_submitted": 91,
+    "raven_events": 193,
+    "packets": 91,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 212,
+    "drained_position": 1596312,
+    "stopped_by": "workload exit",
+    "input_files": [
+      "events.jsonl",
+      "packets.pcap",
+      "reference.scap"
+    ],
+    "recorded_replay": [
+      "enclave",
+      "native"
+    ]
+  },
+  "raven-only": {
+    "before_workload_exit": [
+      "server_spawns_shell"
+    ],
+    "syscall_records": 20063,
+    "detectors": {
+      "raven": true,
+      "zeek": false
+    },
+    "packet_submitted": 0,
+    "raven_events": 260,
+    "packets": 0,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 235,
+    "drained_position": 1349112,
+    "stopped_by": "SIGTERM",
+    "input_files": []
+  },
+  "zeek-only": {
+    "before_workload_exit": [
+      "Scan::Address_Scan",
+      "Scan::Port_Scan"
+    ],
+    "syscall_records": 20010,
+    "detectors": {
+      "raven": false,
+      "zeek": true
+    },
+    "packet_submitted": 92,
+    "raven_events": 0,
+    "packets": 92,
+    "driver_drops": 0,
+    "packet_drops": 0,
+    "discarded": 0,
+    "format_rejected": 0,
+    "map_id": 255,
+    "drained_position": 1447624,
+    "stopped_by": "SIGTERM",
+    "input_files": []
+  },
+  "both-disabled": {
+    "returncode": 1
+  },
+  "unknown-key": {
+    "returncode": 1
+  },
+  "non-boolean": {
+    "returncode": 1
+  },
+  "record-disabled-zeek": {
+    "returncode": 1
+  },
+  "record-disabled-raven": {
+    "returncode": 1
+  }
+}

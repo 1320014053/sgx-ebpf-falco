@@ -54,7 +54,9 @@ build/check-zeek-state --sessions build/sessions.pcap
 build/check-zeek-state build/suppression.pcap
 ```
 
-签名 enclave 的 8 组回放使用归档的进程快照和 ring 记录。测试检查读指针排空、翻译后的事件及输出告警。
+签名 enclave 的 ring 套件共回放 17 次。8 组归档输入先后在双检测器配置和对应的单检测器配置下各运行一次。4 组 RAVEN 用例逐条比较翻译后的事件、告警和检测 ID 的引用关系。4 组 Zeek 用例逐条比较完整 Notice，包括时间戳、顺序和空结果。单检测器配置从 `plugin/live.yaml` 派生，并核对 enclave 报告的检测器开关。每轮都检查 ring 读指针排空，加 `--strict` 可要求各阶段的恢复错误计数均为零。
+
+额外一轮 `timer-queue-30-syscall-tick/zeek-only` 专门检查 syscall 推进 TCP 超时。原始 `timer-queue` 输入只有报文，报文本身会推进 Zeek 时钟。这个派生用例保留 `timer-queue-30` 的 45 个 SYN，将末尾三个 ACK 换成一条时间为 `1700000008` 的归档 execve，并把结束 tick 设为 `1700000010`。它复用原用例的完整 Notice 预期。如果跳过 syscall tick，EOF 才会结算扫描，`ordered alerts[0].ts` 会得到 `1700000010`，预期为 `1700000008`。
 
 ```bash
 cmake --build build-falco-live --target replay-ring

@@ -14,9 +14,9 @@
 
 ## 实时输入
 
-现场配置为 `plugin/live.yaml`。`falco-live` 取得 Falco 所有 CPU 共用的 ring map 后，让报文探针复用该 map 的文件描述符。一条消费游标同时接收 syscall 和带类型标记的 IP 报文，enclave 先把载荷复制到私有内存，再校验和分发。syscall 继续进入官方规则，也为 RAVEN 提供执行、进程关系、文件、身份和连接事件。报文直接推进 Zeek 的连接状态，空闲期间的时钟也会推进无响应连接的超时。每批命中在工作负载运行期间输出。RAVEN 的初次命中和后续良性上下文更新使用同一检测 ID。[现场消费](trusted/enclave.cpp) · [系统调用映射](trusted/raven_syscalls.cpp) · [报文探针](live/packet_tap.bpf.c)
+现场配置为 `plugin/live.yaml`。启用 RAVEN 时，enclave 将 syscall 翻译为执行、进程关系、文件、身份和连接事件。官方 syscall 规则在各组合下都运行。启用 Zeek 时，报文探针复用 Falco 所有 CPU 共用的 ring map。一条消费游标同时接收 syscall 和带类型标记的 IP 报文，enclave 先把载荷复制到私有内存，再校验和分发。报文推进 Zeek 的连接状态，空闲期间的时钟也会推进无响应连接的超时。每批命中在工作负载运行期间输出。RAVEN 的初次命中和后续良性上下文更新使用同一检测 ID。[现场消费](trusted/enclave.cpp) · [系统调用映射](trusted/raven_syscalls.cpp) · [报文探针](live/packet_tap.bpf.c)
 
-JSONL 和 PCAP 是可选录制。现场验收让工作负载持有回环测试端口，等到外部进程实际读到 `server_spawns_shell`、`Scan::Address_Scan` 和 `Scan::Port_Scan` 后才允许退出。Ubuntu 22.04、Linux 5.15.0-198 和 SGX Simulation 的常驻运行从同一个 map 收到 7,953 条 syscall 和 92 条报文，未录制输入。SIGTERM 停采后读写游标一致。开启录制的独立运行收到 7,890 条 syscall 和 92 条报文。两次的驱动丢失、报文丢失和格式拒绝计数均为 0。普通 Falco 与 enclave 回放后，RAVEN 的证据事件、风险分解和最终状态，以及 Zeek Notice 的各字段均与现场一致。[验收程序](live/check-detectors.py) · [实时验证记录](../../results/falco/raven-zeek-plugin/live-ring.json)
+JSONL 和 PCAP 是可选录制。两个检测器都开启时，现场验收让工作负载持有回环测试端口，等到外部进程实际读到 `server_spawns_shell`、`Scan::Address_Scan` 和 `Scan::Port_Scan` 后才允许退出。Ubuntu 22.04、Linux 5.15.0-198 和 SGX Simulation 的常驻运行从同一个 map 收到 7,953 条 syscall 和 92 条报文，未录制输入。SIGTERM 停采后读写游标一致。开启录制的独立运行收到 7,890 条 syscall 和 92 条报文。两次的驱动丢失、报文丢失和格式拒绝计数均为 0。普通 Falco 与 enclave 回放后，RAVEN 的证据事件、风险分解和最终状态，以及 Zeek Notice 的各字段均与现场一致。[验收程序](live/check-detectors.py) · [实时验证记录](../../results/falco/raven-zeek-plugin/live-ring.json)
 
 RAVEN 映射跳过采集宿主自身的文件写入，以免一条测试录制再产生下一条输入。原版 syscall 检测仍消费这些 ring 记录。RAVEN 的 `full` 证据图按采集会话积累，以上实测覆盖现场功能和回放一致性，长期内存占用尚待测量。
 

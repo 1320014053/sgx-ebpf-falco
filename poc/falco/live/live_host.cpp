@@ -214,52 +214,52 @@ int run(int argc, char** argv) {
 
     const bool record = std::strcmp(argv[4], "-") != 0;
     std::unique_ptr<std::FILE, decltype(&std::fclose)> trace(nullptr, std::fclose);
-    if (record) {
-        trace.reset(std::fopen(argv[4], "wbex"));
-        if (!trace || std::fwrite(snapshot.data(), 1, snapshot.size(), trace.get()) != snapshot.size()) {
-            throw std::runtime_error(std::string("write trace snapshot: ") + std::strerror(errno));
-        }
-        falco_trace_file = trace.get();
-    }
-
     scap_stats before{}, after{};
     check_driver(scap_get_stats(driver.get(), &before), "read baseline driver counters");
     const auto schema = scap_get_driver_schema_version(driver.get());
     const auto api = scap_get_driver_api_version(driver.get());
     PacketTap tap;
-    if (record_inputs & record_host_events) {
-        events.reset(std::fopen(argv[6], "wbex"));
-        if (!events) throw std::runtime_error("could not create the detector test JSONL");
-        falco_events_file = events.get();
-    }
-    if (record_inputs & record_ip_packets) {
-        packets.reset(std::fopen(argv[7], "wbex"));
-        const uint32_t pcap_header[]{0xa1b23c4d, 0x00040002, 0, 0, RZ_SNAPLEN, 101};
-        if (!packets || std::fwrite(pcap_header, sizeof(pcap_header), 1, packets.get()) != 1)
-            throw std::runtime_error("could not create the detector test PCAP");
-        falco_packets_file = packets.get();
-    }
-    __atomic_store_n(&control_page->realtime_ns, clock_ns(CLOCK_REALTIME), __ATOMIC_RELEASE);
-    auto worker = std::async(std::launch::async, [&]() {
-        return run_live(enclave.get(), snapshot.data(), snapshot.size(), reinterpret_cast<uint64_t>(consumer.addr),
-                 reinterpret_cast<uint64_t>(producer.addr), reinterpret_cast<uint64_t>(control.addr),
-                 ring_page_bytes, capacity, record, record_inputs);
-    });
-
+    std::future<unsigned> worker;
     int exit_status = 0;
     uint64_t progress = 0;
-    bool capturing = false;
+    bool capturing = false, capture_started = false;
     std::chrono::steady_clock::time_point started, stopped;
     try {
+        if (record) {
+            trace.reset(std::fopen(argv[4], "wbex"));
+            if (!trace || std::fwrite(snapshot.data(), 1, snapshot.size(), trace.get()) != snapshot.size()) {
+                throw std::runtime_error(std::string("write trace snapshot: ") + std::strerror(errno));
+            }
+            falco_trace_file = trace.get();
+        }
+        if (record_inputs & record_host_events) {
+            events.reset(std::fopen(argv[6], "wbex"));
+            if (!events) throw std::runtime_error("could not create the detector test JSONL");
+            falco_events_file = events.get();
+        }
+        if (record_inputs & record_ip_packets) {
+            packets.reset(std::fopen(argv[7], "wbex"));
+            const uint32_t pcap_header[]{0xa1b23c4d, 0x00040002, 0, 0, RZ_SNAPLEN, 101};
+            if (!packets || std::fwrite(pcap_header, sizeof(pcap_header), 1, packets.get()) != 1)
+                throw std::runtime_error("could not create the detector test PCAP");
+            falco_packets_file = packets.get();
+        }
+        __atomic_store_n(&control_page->realtime_ns, clock_ns(CLOCK_REALTIME), __ATOMIC_RELEASE);
+        worker = std::async(std::launch::async, [&]() {
+            return run_live(enclave.get(), snapshot.data(), snapshot.size(), reinterpret_cast<uint64_t>(consumer.addr),
+                     reinterpret_cast<uint64_t>(producer.addr), reinterpret_cast<uint64_t>(control.addr),
+                     ring_page_bytes, capacity, record, record_inputs);
+        });
         while (!(__atomic_load_n(flags, __ATOMIC_ACQUIRE) & ring_ready)) {
             if (worker.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
                 worker.get();
                 throw std::runtime_error("Falco consumer exited during startup");
             }
         }
-        if (__atomic_load_n(flags, __ATOMIC_ACQUIRE) & ring_detectors) tap.start(map_fd, capacity);
+        if (__atomic_load_n(flags, __ATOMIC_ACQUIRE) & ring_packets) tap.start(map_fd, capacity);
         capturing = true;
         check_driver(scap_start_capture(driver.get()), "attach Modern eBPF capture programs");
+        capture_started = true;
         started = std::chrono::steady_clock::now();
 
         pid_t child = -1;
@@ -300,6 +300,11 @@ int run(int argc, char** argv) {
         __atomic_fetch_or(flags, ring_stop, __ATOMIC_RELEASE);
         if (worker.valid()) {
             worker.wait();
+        }
+        if (!capture_started) {
+            // Setup rejected the run before capture, so a corrected rerun can reuse these new paths.
+            for (const char* path : {trace ? argv[4] : nullptr, events ? argv[6] : nullptr, packets ? argv[7] : nullptr})
+                if (path) unlink(path);
         }
         throw;
     }

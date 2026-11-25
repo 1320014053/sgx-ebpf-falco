@@ -73,6 +73,7 @@ struct Detector {
     AlertBuffer output, plugin_output;
     size_t source, plugin_source = 0;
     bool container_runtime = false;
+    bool raven_enabled = false, zeek_enabled = false;
     bool buffered_outputs = true;
     bool spin = false;
     size_t block_count = 32, block_bytes = 256 * 1024;
@@ -82,6 +83,34 @@ struct Detector {
     rz::RavenOptions retention;
     std::deque<rz::Json> stream_pending;
     std::unique_ptr<rz::RavenStream> stream;
+
+    void configure_live_detectors(const YAML::Node& init) {
+        auto options = rz::Json::object();
+        if (init && init.IsMap()) {
+            for (const auto& entry : init) {
+                const auto key = entry.first.as<std::string>();
+                const auto& value = entry.second;
+                bool enabled;
+                // Check the tag because yaml-cpp also decodes quoted strings as bool.
+                if ((value.Tag() != "?" && value.Tag() != "tag:yaml.org,2002:bool") ||
+                    !YAML::convert<bool>::decode(value, enabled))
+                    throw std::runtime_error("raven_zeek init_config requires a boolean for " + key);
+                options[key] = enabled;
+            }
+        } else if (init && !init.IsNull()) {
+            if (!init.IsScalar()) throw std::runtime_error("raven_zeek init_config must be an object");
+            options = rz::Json::parse(init.Scalar(), nullptr, false);
+        }
+        if (!options.is_object()) throw std::runtime_error("raven_zeek init_config must be an object");
+        for (const auto& [key, value] : options.items()) {
+            if (key != "raven" && key != "zeek") throw std::runtime_error("unknown raven_zeek init_config key: " + key);
+            if (!value.is_boolean()) throw std::runtime_error("raven_zeek init_config requires a boolean for " + key);
+        }
+        raven_enabled = options.value("raven", true);
+        zeek_enabled = options.value("zeek", true);
+        if (!raven_enabled && !zeek_enabled)
+            throw std::runtime_error("both detectors are disabled: remove raven_zeek from load_plugins");
+    }
 
     Detector(const char* yaml, const char* host, bool live) : hostname(host) {
         const auto config = YAML::Load(yaml);
@@ -104,6 +133,7 @@ struct Detector {
             if (name == "container") plugin_settings.reset(*entry);
             else if (name == "raven_zeek") {
                 with_detectors = true;
+                if (live) configure_live_detectors((*entry)["init_config"]);
                 auto params = (*entry)["open_params"];
                 if (params && !params.IsNull()) retention = rz::RavenOptions::parse(rz::Json::parse(params.as<std::string>()));
             }
@@ -543,6 +573,10 @@ struct LiveCapture {
           initial_consumer(ring.consumer_position()), cursor(initial_consumer), tail(ring.producer_position(cursor)) {
         if (inputs && !detector->plugin_inspector)
             throw std::runtime_error("recording detector inputs requires raven_zeek in load_plugins");
+        if ((inputs & record_host_events) && !detector->raven_enabled)
+            throw std::runtime_error("--record-inputs EVENTS requires the RAVEN detector");
+        if ((inputs & record_ip_packets) && !detector->zeek_enabled)
+            throw std::runtime_error("--record-inputs PACKETS requires the Zeek detector");
         pool.reserve(detector->block_count);
         for (size_t i = 0; i < detector->block_count; ++i) pool.emplace_back(detector->block_bytes);
         detector->ready();
@@ -552,17 +586,19 @@ struct LiveCapture {
         if (inspector.get_bytes_read() != bytes)
             throw std::runtime_error("live input must begin with a metadata-only .scap snapshot");
         if (detector->plugin_inspector) {
-            syscalls.seed_from_snapshot(inspector);
+            if (detector->raven_enabled) syscalls.seed_from_snapshot(inspector);
             rz::Inputs plugin_inputs{{},{},false,true,&pending};
             detector->open_plugin(plugin_inputs);
             auto publish = [this](const rz::Json& row) {
                 if (!std::isfinite(row.at("ts").get<double>())) throw std::runtime_error("invalid plugin timestamp");
                 pending.push_back(row);
             };
-            raven = std::make_unique<rz::RavenStream>(publish, detector->retention);
-            zeek = std::make_unique<rz::ZeekStream>(publish);
+            if (detector->raven_enabled) raven = std::make_unique<rz::RavenStream>(publish, detector->retention);
+            if (detector->zeek_enabled) zeek = std::make_unique<rz::ZeekStream>(publish);
         }
     }
+
+    bool has_detectors() const { return raven || zeek; }
 
     void cancel() {
         std::lock_guard<std::mutex> lock(mutex);
@@ -582,7 +618,7 @@ struct LiveCapture {
             const bool empty = cursor == tail;
             const auto tick = empty ? __atomic_load_n(&control->realtime_ns, __ATOMIC_ACQUIRE) : 0;
             const bool finish = empty && stopping;
-            const bool poll = empty && (finish || detector->container_runtime || (raven && tick > last_tick));
+            const bool poll = empty && (finish || detector->container_runtime || (has_detectors() && tick > last_tick));
             const auto before = cursor;
             if (!empty || poll) {
                 {
@@ -637,7 +673,7 @@ struct LiveCapture {
                     static_assert(sizeof(packet) <= sizeof(scap_evt));
                     std::memcpy(&packet, payload, sizeof(packet));
                     if (packet.tag == RZ_PACKET_TAG) {
-                        if (!detector->plugin_inspector || packet.captured_bytes != size - sizeof(packet) ||
+                        if (!zeek || packet.captured_bytes != size - sizeof(packet) ||
                             !packet.captured_bytes || packet.captured_bytes > RZ_SNAPLEN ||
                             packet.captured_bytes > packet.wire_bytes) {
                             ++rejected;
@@ -731,11 +767,12 @@ struct LiveCapture {
             if (falco_record_input(&result, static_cast<const uint8_t*>(data), size, ns, wire) != OE_OK || result)
                 throw std::runtime_error("could not save detector test input");
         };
-        if (raven) {
+        if (has_detectors()) {
             on_syscall = [&](sinsp_evt& evt) {
                 // A busy syscall ring may have no idle poll between TCP timeouts.
                 auto ns = evt.get_ts();
                 if (ns > last_tick && ns - last_tick >= 100000000) queue_tick(ns, false);
+                if (!raven) return;
                 rz::Json row;
                 if (!detector->attempt(Stage::translate, [&] { row = syscalls.translate(evt, collector_pid); })) return;
                 if (row.is_null()) return;
@@ -778,7 +815,7 @@ struct LiveCapture {
             auto& batch = pool[analyzed % pool.size()];
             ordered = &batch.detection;
             auto* data = batch.bytes.data();
-            if (raven && batch.idle && !batch.finish && batch.tick > last_tick) queue_tick(batch.tick, false);
+            if (has_detectors() && batch.idle && !batch.finish && batch.tick > last_tick) queue_tick(batch.tick, false);
             size_t begin = 0;
             for (auto offset : batch.packets) {
                 if (offset > begin) consume(data + begin, offset - begin);
@@ -791,11 +828,11 @@ struct LiveCapture {
             }
             if (batch.used > begin) consume(data + begin, batch.used - begin);
             else if (detector->container_runtime) consume(snapshot.data(), 0);
-            if (raven && batch.finish) queue_tick(batch.tick, true);
+            if (has_detectors() && batch.finish) queue_tick(batch.tick, true);
             {
                 std::lock_guard<std::mutex> lock(mutex);
                 ++analyzed;
-                if (!raven) released = analyzed;
+                if (!has_detectors()) released = analyzed;
                 changed.notify_all();
             }
         }
@@ -833,7 +870,7 @@ struct LiveCapture {
                 } else {
                     const auto& tick = std::get<DetectorTick>(work);
                     auto before = pending.size();
-                    if (!detector->attempt(Stage::raven_advance, [&] {
+                    if (raven && !detector->attempt(Stage::raven_advance, [&] {
                         raven->advance(double(tick.ns) / 1e9, tick.finish);
                     })) {
                         // A tick consumes no event, so the gap ends at the last event already fed.
@@ -858,10 +895,10 @@ struct LiveCapture {
             if (finish) break;
         }
         detector->plugin_output.flush();
-        if (detector->retention.metrics) rz::retention_report({{"phase","flushed"}});
+        if (raven && detector->retention.metrics) rz::retention_report({{"phase","flushed"}});
     }
 
-    unsigned role_mask() const { return raven ? 7u : 3u; }
+    unsigned role_mask() const { return has_detectors() ? 7u : 3u; }
 
     void report() {
         nlohmann::json event_types = nlohmann::json::object();
@@ -874,6 +911,7 @@ struct LiveCapture {
         nlohmann::json errors = nlohmann::json::object();
         for (size_t i = 0; i < stage_names.size(); ++i) errors[stage_names[i]] = detector->errors.counts[i].failures;
         emit(nlohmann::json{{"mode", "live"}, {"errors", errors}, {"records", records}, {"accepted", accepted},
+                            {"detectors", {{"raven", bool(raven)}, {"zeek", bool(zeek)}}},
                             {"packet_records", packet_records}, {"raven_events", raven_events},
                             {"discarded", discarded}, {"format_rejected", rejected}, {"wrapped", wrapped},
                             {"busy_observations", busy}, {"payload_copy_bytes", copied},
@@ -905,7 +943,8 @@ int falco_live_setup(uint8_t* snapshot, size_t bytes, uint64_t consumer, uint64_
         if (live) throw std::runtime_error("live capture already configured");
         if (!bytes || bytes > max_ring_bytes) throw std::runtime_error("invalid snapshot size");
         live = std::make_shared<LiveCapture>(snapshot, bytes, consumer, producer, control, page, capacity, record, inputs);
-        if (live->raven) __atomic_fetch_or(&live->control->flags, ring_detectors, __ATOMIC_RELEASE);
+        if (live->has_detectors())
+            __atomic_fetch_or(&live->control->flags, ring_detectors | (live->zeek ? ring_packets : 0), __ATOMIC_RELEASE);
         detector->live_mode = true;
         return 0;
     } catch (const std::exception& error) {

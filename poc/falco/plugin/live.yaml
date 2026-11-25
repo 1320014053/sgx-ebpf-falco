@@ -17,6 +17,7 @@ plugins:
         libvirt_lxc: {enabled: false}
         bpm: {enabled: false}
   - name: raven_zeek
+    init_config: {raven: true, zeek: true}
 append_output:
   - match: {source: syscall}
     extra_fields: [evt.num, evt.type, thread.tid]

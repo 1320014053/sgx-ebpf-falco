@@ -106,3 +106,100 @@ TSAN 沿用相同输入和 `halt_on_error=1`。从下载到五项检查完成共
 | 5B 及来源对照 | `engine.cmake`、`tests/CMakeLists.txt`、`tests/engine-concurrency.cpp`、`tests/tsan/CMakeLists.txt`、`tests/check-source-order.py`、`compare.py` |
 | 6 | `plugin/raven.cpp`、`plugin/detectors.hpp`、`plugin/graph.hpp`、`tests/replay-detector.cpp` |
 | 文档 | `README.md`、`tests/README.md`、`live/verification.md` |
+
+## RAVEN 与 Zeek 分别启用
+
+2026-11-25。基线 `c661d1a7369814416e6f88f2d63c46d900f81b2d`。初次 `git stash create` 得到 `b4319ed72943e0eade29bfa82680fc9687a71f05`，修复宿主清理后为 `4ab9ea54eec72dc2d625c8068c9c0c09ebab39af`。两次均核对快照与工作树无差异，在客体新目录校验归档 SHA-256 后解包。修复版归档 SHA-256 为 `3c9e8d39ccc2125a8397af4d15a577883f01203dd536d839fe37b781d512fee9`。
+
+QEMU 11.1.0，Ubuntu 22.04.5，`5.15.0-198-generic`，SGX Simulation。原盘仅用作临时 qcow2 的 backing file。以下参数首次即完成引导和 SSH 握手。沙箱内启动时客体 DNS 解析失败，直连也超时；关机后用同一组参数和同一写时复制盘在宿主获准联网的环境重启，依赖下载成功。两次引导均记录过 `failed to get xsave state`，本轮未出现 `Unexpected VP exit code 4`。
+
+```text
+-accel whpx,kernel-irqchip=off -machine q35 -cpu max -smp 2 -m 4096
+-drive file=<临时写时复制盘>,format=qcow2,if=virtio
+-nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:2222-:22
+-display none -serial file:<临时串口日志> -monitor none -no-reboot
+```
+
+按 Falco README 下载固定依赖及 bpftool 7.5.0。用 Clang、Ninja、`--parallel 2` 构建 Falco 用户态、普通插件、正式和故障注入签名 enclave、Modern eBPF 与报文探针、`falco-live`、`falco-ring-test`、`replay-ring` 和 `replay-detector`。修复版使用新的构建目录，复用同一份已准备的依赖。
+
+| 实时配置 | syscall 记录 | RAVEN 输入 | 报文提交 / 消费 | 结果 |
+| --- | ---: | ---: | ---: | --- |
+| 全开，不录制 | 35114 | 259 | 92 / 92 | 工作负载退出前收到 RAVEN 告警和两类 Zeek 扫描告警 |
+| 全开，录制 | 21823 | 193 | 91 / 91 | 普通 Falco、enclave 回放均与现场检测结果一致 |
+| 仅 RAVEN，YAML 省略 `raven` | 20063 | 260 | 0 / 0 | 仅收到预期的 RAVEN 告警 |
+| 仅 Zeek，JSON 字符串省略 `zeek` | 20010 | 0 | 92 / 92 | 收到两类 Zeek 告警 |
+
+四轮均排空，驱动丢失、报文丢失、丢弃、格式拒绝和恢复错误均为 0。`detectors` 与各轮配置一致。五个反例都在采集开始前返回 1；两项录制冲突均清除了新轨迹和录制文件。逐轮原始结果见 [live-detectors-2026-11-25.json](../../../results/falco/raven-zeek-plugin/live-detectors-2026-11-25.json)。
+
+初次快照通过原有矩阵和 17 轮历史回放。另行用已存在的 PCAP 测试全开录制时，宿主返回 1，留下 112032 字节的新轨迹和空 JSONL。文件创建位于清理异常处理之前。宿主现从创建第一个文件起覆盖启动失败，成功启动驱动后才保留输出。修复版录制轮先占用 PCAP，验证原内容逐字节保留、两份新文件均已删除，再释放该路径，用相同三个文件名完成录制和回放。
+
+| 检查 | 结果 |
+| --- | --- |
+| 严格历史 ring | 17/17。仅在客体副本将 Zeek-only 的 syscall 提前返回移到 `queue_tick` 前，并将空闲 tick 条件改为要求 RAVEN。重签后 16/17，仅 `ring/timer-queue-30-syscall-tick/zeek-only` 在 `ordered alerts[0].ts` 失败，实得 `1700000010.0`，归档为 `1700000008.0`。恢复源码、核对字节并重签后再次 17/17 |
+| 严格官方规则采集 | 12519 条驱动记录，零丢失、零恢复错误。现场、普通回放和 enclave 回放的 1 条告警一致 |
+| 严格模拟 ring | 223 条记录、220 条预期告警，读写位置均为 196520。夹具的 1 条 DISCARD、2 条格式拒绝符合预期 |
+| 故障注入与独立检查 | 匹配、格式化、读批、诊断限速、致命预算和 7 项检测处理阶段恢复均通过。混合来源顺序和 BPF ring 单元测试通过。单元测试按 CMake 实际输出路径运行 |
+| 容器与离线回放 | containerd 普通及特权容器合计 8 条告警，现场与回放一致。离线官方规则 25 条启用、2 条告警一致 |
+| 离线插件、历史 detector、TSAN | 插件默认套件 38 项普通态与 enclave 对照通过，使用客体已有的固定上游参考。历史 detector 为 79 项通过、12 项原有差异，退出 1，日志 SHA-256 与上次记录完全相同。TSAN 退出 0，syscall 100 轮、4200 条告警，raven_zeek 15 轮、30 条告警 |
+| DNS | 修复版在两个新目录各跑一次，另从未改动的基线重新构建宿主和签名 enclave 作同环境对照。三次静态采集及双端回放均匹配 7 条告警。刷新阶段三次均退出 1：enclave 在 17 秒后仍匹配旧地址 `127.0.0.1`，未匹配新地址 `127.0.0.2`。修复版两次普通 Falco 均匹配新地址，enclave 两轮驱动丢失均为零。基线存在相同的 enclave 差异 |
+
+以下命令从修复版 `poc/` 执行。`$V` 为本轮验证输出目录。
+
+```bash
+B=build-falco; L=build-falco-live; P=$B/deps/package
+S=$B/falco-enclave.signed; F=$P/etc/falco/falco_rules.yaml
+python3 -B falco/live/check-detectors.py --strict "$P" "$B" "$L" "$V/detectors"
+python3 -B falco/tests/check-history.py ring --strict "$L/replay-ring" "$S" "$F"
+cmake --build "$B" --parallel 2 --target sign-falco  # 变异和恢复后分别执行
+bash falco/live/check.sh --strict "$P" "$B" "$L" "$V/official"
+bash falco/live/check-ring.sh --strict "$P" "$B" "$L" "$V/ring"
+python3 -B falco/tests/check-faults.py "$L" "$B/falco-fault-enclave.signed" "$F"
+python3 -B falco/tests/check-source-order.py "$L/replay-ring" "$S" "$F"
+"$B/tests/bpf-ring-test"
+bash falco/replay.sh "$P" "$B" "$V/offline"
+bash falco/live/check-container.sh "$P" "$B" "$L" "$V/container"
+bash falco/live/check-dns.sh "$P" "$B" "$L" "$V/dns"
+python3 -B falco/plugin/check.py "$P" "$B" "$V/offline" "$REFERENCE" "$V/plugin"
+python3 -B falco/tests/check-history.py detector "$B/bin/replay-detector"
+TSAN_OPTIONS=halt_on_error=1 build-tsan/bin/engine-concurrency build-tsan/input/reference.scap build-tsan/input/raven.jsonl
+```
+
+Kubernetes 补测复用 K3s v1.35.8+k3s1 和 containerd 2.2.1。节点 Ready 后，待 CoreDNS（`10.43.0.10`）实际将 `kubernetes.default.svc.cluster.local` 解析为 `10.43.0.1`，再运行原脚本。前次完成的采集接收 280075 条记录，独立重跑接收 283345 条，后者 ring 读写位置均为 20716008，驱动丢失和格式拒绝均为 0。普通 Falco 与 enclave 现场均通过三组 Pod 元数据断言，仅普通 Pod 访问 API Service 命中官方规则。普通回放与 enclave 回放各匹配 4 条告警（3 条测试规则、1 条官方规则）。
+
+```bash
+K=$(realpath ../k3s)
+export KUBECONFIG=$(realpath ../kubeconfig)
+/bin/busybox nslookup kubernetes.default.svc.cluster.local 10.43.0.10
+bash falco/live/check-kubernetes.sh "$P" "$B" "$L" "$V/kubernetes-confirm" "$K"
+```
+
+| 运行时 | 驱动记录 / enclave 接收 | 现场与回放 |
+| --- | ---: | --- |
+| Docker 29.1.3 | 465392 / 465392 | 通过 |
+| Podman 4.3.1 rootful | 364760 / 364760 | 通过 |
+| Podman 4.3.1 rootless | 313800 / 313800 | 通过 |
+
+三轮均核对已有容器和采集中创建的容器。普通 Falco 与 enclave 现场均匹配两条规则 × 两个容器，普通回放与 enclave 回放各匹配 4 条告警。三轮驱动丢失和格式拒绝均为 0。
+
+客体自带 Podman 3.4.4 的两种模式在修复版和基线均退出 1。普通 Falco 和 enclave 的现场输出均出现插件要求 API 4.0.0、服务端仅提供 3.4.4 的告警，比较器读取 enclave 输出时遇到非 JSON 行。Podman 4.3.1 从 Debian bookworm 包解到本轮临时目录，使用独立的存储和套接字。首次 rootless 服务随用户会话退出，版本查询退出 125；在同一会话启动服务并执行脚本后通过。
+
+```bash
+I="$V/container/fixture-image.tar"
+bash falco/live/check-runtime.sh "$P" "$B" "$L" "$V/docker" "$I" /usr/bin/docker /run/docker.sock
+C="$V/podman-tools/usr/bin/podman"
+bash falco/live/check-runtime.sh "$P" "$B" "$L" "$V/podman4-root" "$I" "$C" /run/falco-podman4.sock
+bash falco/live/check-runtime.sh "$P" "$B" "$L" "$V/podman4-user-confirm" "$I" "$C" /run/user/1000/falco-podman4.sock
+```
+
+MOAT 使用 [Actions 运行 44609488889](https://github.com/1320014053/moat-kernel-build/actions/runs/44609488889) 的产物 `14573461439`。核对归档、包清单和内核镜像 SHA-256 后，按虚拟机说明用 TCG 从同一临时盘引导，`uname -r` 为 `6.1.38-moat-falco2`。修复版 enclave 的 8 MiB ring 接收 45894/45894 条记录，读写位置均为 3049752，驱动丢失、丢弃和格式拒绝均为 0。`openat` 和 `readv` 两条现场告警与普通回放、enclave 回放逐条一致。普通 Falco 独立冒烟命中两种标记访问，退出后确认其 8 MiB ring 已释放。两项检查退出 0，内核 taint 为 0。
+
+```bash
+test "$(uname -r)" = 6.1.38-moat-falco2
+python3 -B falco/live/check-moat.py "$P" "$B" "$L" "$V/moat"
+sudo -n env TMPDIR="$V" python3 -B ../moat-kernel-build/tests/falco-modern-smoke.py \
+  --default-buffer "$(realpath "$P/usr/bin/falco")" "$(realpath "$B/deps/bpftool/bpftool")"
+```
+
+本轮执行了 `falco/live/` 下全部 8 个 `check*` 脚本。检测器开关矩阵在通用内核上执行，MOAT 覆盖标记文件工作负载。两种内核均使用 SGX Simulation，未验证硬件 SGX。
+
+收尾时 K3s 已停止，containerd 的 `k8s.io` 运行任务为 0。客体内三个测试目录均已删除，两次关机的串口末尾均记录 `reboot: Power down`。宿主确认两个 QEMU 进程已退出，2222 端口无监听，已删除临时盘、归档、内核产物和日志。原盘修改时间仍为本地时间 `2026-11-24 23:15:31`。

@@ -5,7 +5,8 @@
 #include <stdexcept>
 
 int main(int argc, char** argv) try {
-    if (argc != 6) return 2;
+    const bool record_events = argc == 6;
+    if (!record_events && (argc != 7 || std::strcmp(argv[6], "--no-record-events") != 0)) return 2;
     auto snapshot = read("snapshot.scap");
     const auto records = read("ring.bin");
     constexpr size_t capacity = 64 * 1024;
@@ -27,13 +28,17 @@ int main(int argc, char** argv) try {
     control.values.flags = ring_stop;
 
     auto enclave = load_enclave(argv[1], "live.yaml", argv + 4, 2, true);
-    falco_events_file = std::fopen("events.jsonl", "wb");
-    if (!falco_events_file) throw std::runtime_error("cannot open translated event log");
+    if (record_events) {
+        falco_events_file = std::fopen("events.jsonl", "wb");
+        if (!falco_events_file) throw std::runtime_error("cannot open translated event log");
+    }
     run_live(enclave.get(), reinterpret_cast<uint8_t*>(snapshot.data()), snapshot.size(),
              reinterpret_cast<uintptr_t>(consumer), reinterpret_cast<uintptr_t>(&producer),
-             reinterpret_cast<uintptr_t>(&control), ring_page_bytes, capacity, false, record_host_events);
-    std::fclose(falco_events_file);
-    falco_events_file = nullptr;
+             reinterpret_cast<uintptr_t>(&control), ring_page_bytes, capacity, false, record_events ? record_host_events : 0);
+    if (falco_events_file) {
+        std::fclose(falco_events_file);
+        falco_events_file = nullptr;
+    }
     return consumer[0] == records.size() ? 0 : 1;
 } catch (const std::exception& error) {
     std::cerr << error.what() << '\n';

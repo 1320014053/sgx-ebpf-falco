@@ -1,4 +1,4 @@
-"""Verify detector output while the producer is still running, with and without test captures."""
+"""Verify live detector selection, alerts before workload exit, and recorded replay."""
 
 import errno
 import getpass
@@ -69,20 +69,49 @@ def check(package, build, live, out, strict=False):
     shutil.copy2(here.parent / "plugin/rules.yaml", out / "raven_zeek_rules.yaml")
     shutil.copy2(package / "etc/falco/falco_rules.yaml", out)
     summary = {"kernel": os.uname().release}
-    for name, record in (("ring-only", False), ("recorded", True)):
+    template = (out / "live.yaml").read_text()
+    both = "{raven: true, zeek: true}"
+    raven_only = "{zeek: false}"
+    zeek_only = """'{"raven":false}'"""
+    entry = "  - name: raven_zeek\n    init_config: "
+    assert template.count(entry + both + "\n") == 1
+    rules = ["falco_rules.yaml", "raven_zeek_rules.yaml"]
+    sudo = [] if os.geteuid() == 0 else ["sudo", "-n"]
+    collector = ["env", "TZ=UTC", "FALCO_HOSTNAME=falco-rz-live", "FALCO_SGX_REPORT=1",
+                 live / "falco-live", build / "falco-enclave.signed", "live.yaml", "4096"]
+
+    def prepare_run(name, settings):
         cwd = out / name
         cwd.mkdir()
-        for path in ("live.yaml", "falco_rules.yaml", "raven_zeek_rules.yaml"):
+        (cwd / "live.yaml").write_text(template.replace(entry + both + "\n", entry + settings + "\n"))
+        for path in rules:
             (cwd / path).symlink_to(out / path)
-        cmd = ([] if os.geteuid() == 0 else ["sudo", "-n"]) + ["env", "TZ=UTC", "FALCO_HOSTNAME=falco-rz-live", "FALCO_SGX_REPORT=1",
-               live / "falco-live", build / "falco-enclave.signed", "live.yaml", "4096",
-               "reference.scap" if record else "-"]
+        return cwd
+
+    for name, settings, raven, zeek in (("ring-only", both, True, True), ("recorded", both, True, True),
+                                       ("raven-only", raven_only, True, False), ("zeek-only", zeek_only, False, True)):
+        cwd = prepare_run(name, settings)
+        expected = set()
+        if raven:
+            expected.add("server_spawns_shell")
+        if zeek:
+            expected.update(("Scan::Port_Scan", "Scan::Address_Scan"))
+        record = name == "recorded"
+        # A stuck drain must not leave the Popen context waiting forever after proc.wait() times out.
+        cmd = [*sudo, "timeout", "--kill-after=10", "240", *collector, "reference.scap" if record else "-"]
         if record:
             cmd.extend(["--record-inputs", "events.jsonl", "packets.pcap"])
         gate = cwd / "release"
-        cmd.extend(["falco_rules.yaml", "raven_zeek_rules.yaml"])
+        cmd.extend(rules)
         fixture = [sys.executable, Path(__file__).resolve(), "--workload", live, gate]
         if record:
+            packets = cwd / "packets.pcap"
+            packets.write_bytes(b"existing PCAP")
+            occupied = subprocess.run([*cmd, "--", "/bin/true"], cwd=cwd, capture_output=True)
+            assert occupied.returncode == 1 and b"could not create the detector test PCAP" in occupied.stderr
+            assert packets.read_bytes() == b"existing PCAP"
+            assert not any((cwd / p).exists() for p in ("reference.scap", "events.jsonl"))
+            packets.unlink()
             cmd.extend(["--", "runuser", "-u", getpass.getuser(), "--", *fixture])
         found = set()
         external = collector_pid = None
@@ -111,10 +140,10 @@ def check(package, build, live, out, strict=False):
                                     found.add(row["note"])
                                 if row.get("note") == "Scan::Address_Scan" and row["src"] == "127.0.0.1":
                                     found.add(row["note"])
-                            if len(found) == 3:
+                            if expected <= found:
                                 break
                         time.sleep(0.1)
-                    if len(found) != 3 or proc.poll() is not None:
+                    if found != expected or proc.poll() is not None:
                         raise AssertionError(f"{name}: before workload release saw {sorted(found)}; see {cwd / 'live.log'}")
                 finally:
                     gate.touch()
@@ -134,12 +163,18 @@ def check(package, build, live, out, strict=False):
             raise AssertionError(f"live errors: {ring['errors']}")
         driver = next(r for r in logs if r.get("mode") == "modern_ebpf")
         assert driver["data_ecalls"] == 5
-        assert ring["raven_events"] > 0 and ring["packet_records"] == driver["packet_submitted"] > 0
+        assert ring["detectors"]["raven"] is raven and ring["detectors"]["zeek"] is zeek
+        assert (ring["raven_events"] > 0 if raven else ring["raven_events"] == 0), f"{name}: RAVEN event count"
+        assert ring["packet_records"] == driver["packet_submitted"]
+        assert (ring["packet_records"] > 0 if zeek else ring["packet_records"] == 0), f"{name}: packet count"
+        raven_alerts, zeek_notices = detector_results(cwd / "alerts.jsonl")
+        assert bool(raven_alerts) == raven and bool(zeek_notices) == zeek, f"{name}: unexpected detector output"
         assert driver["driver_events"] + ring["packet_records"] == ring["accepted"] == ring["records"]
         assert driver["consumer"] == driver["producer"] == ring["consumer"] == ring["producer"]
         assert not any((driver["driver_drops"], driver["packet_drops"], ring["discarded"], ring["format_rejected"]))
         assert all((cwd / p).exists() == record for p in ("events.jsonl", "packets.pcap", "reference.scap"))
         result = {"before_workload_exit": sorted(found), "syscall_records": driver["driver_events"],
+                  "detectors": ring["detectors"], "packet_submitted": driver["packet_submitted"],
                   "raven_events": ring["raven_events"], "packets": ring["packet_records"],
                   "driver_drops": driver["driver_drops"], "packet_drops": driver["packet_drops"],
                   "discarded": ring["discarded"], "format_rejected": ring["format_rejected"],
@@ -177,11 +212,29 @@ def check(package, build, live, out, strict=False):
                 subprocess.run([package / "usr/bin/falco", "-c", "native.yaml", "-o", "engine.kind=modern_ebpf",
                                 "--enable-source", "raven_zeek"], cwd=cwd, stdout=output, stderr=log,
                                env=dict(os.environ, TZ="UTC"), check=True)
-            observed = detector_results(cwd / "alerts.jsonl")
+            observed = raven_alerts, zeek_notices
             assert observed == detector_results(cwd / "replay.jsonl"), "enclave replay differs from live detection"
             assert observed == detector_results(cwd / "native.jsonl"), "native replay differs from live detection"
             result["recorded_replay"] = ["enclave", "native"]
         summary[name] = result
+    for name, settings, recording, keywords in (
+        ("both-disabled", "{raven: false, zeek: false}", [], ("raven_zeek", "load_plugins")),
+        ("unknown-key", "{unknown_detector: true}", [], ("unknown_detector",)),
+        ("non-boolean", '{raven: "false"}', [], ("raven", "bool")),
+        ("record-disabled-zeek", raven_only, ["--record-inputs", "-", "packets.pcap"], ("zeek", "packet")),
+        ("record-disabled-raven", zeek_only, ["--record-inputs", "events.jsonl", "-"], ("raven", "event")),
+    ):
+        cwd = prepare_run(name, settings)
+        cmd = [*sudo, "timeout", "--kill-after=10", "120", *collector, "reference.scap", *recording, *rules]
+        log = cwd / "live.log"
+        with log.open("xb") as output:
+            proc = subprocess.run(cmd, cwd=cwd, stdout=output, stderr=subprocess.STDOUT)
+        lines = log.read_text().lower().splitlines()
+        assert proc.returncode not in (0, 124, 137), f"{name}: expected startup failure; see {log}"
+        assert not any('"capture_ready"' in line for line in lines), f"{name}: capture started; see {log}"
+        assert any(all(word in line for word in keywords) for line in lines), f"{name}: expected {keywords}; see {log}"
+        assert not any((cwd / p).exists() for p in ("reference.scap", *recording[1:]) if p != "-"), f"{name}: rejected run left captures"
+        summary[name] = {"returncode": proc.returncode}
     (out / "comparison.json").write_text(json.dumps(summary, indent=2) + "\n")
     return summary
 
@@ -194,5 +247,5 @@ if __name__ == "__main__":
         if strict:
             del sys.argv[1]
         if len(sys.argv) != 5:
-            sys.exit("usage: check-detectors.py FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY")
+            sys.exit("usage: check-detectors.py [--strict] FALCO_PACKAGE BUILD_DIR LIVE_BUILD_DIR NEW_RUN_DIRECTORY")
         print(json.dumps(check(*(Path(p).resolve() for p in sys.argv[1:]), strict=strict), indent=2))
