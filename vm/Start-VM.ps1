@@ -3,7 +3,10 @@ param(
     [string]$QemuDirectory = 'C:\Program Files\qemu',
     [string]$Python = 'python',
     [int]$SshPort = 2222,
-    [string]$DataRoot = (Split-Path $PSScriptRoot -Parent)
+    [string]$DataRoot = (Split-Path $PSScriptRoot -Parent),
+    [ValidateSet('tcg', 'whpx')][string]$Accelerator = 'tcg',
+    [ValidateRange(1, 2147483647)][int]$Cpus = 2,
+    [ValidateRange(1, 2147483647)][int]$MemoryMB = 4096
 )
 $ErrorActionPreference = 'Stop'
 $workspace = (Resolve-Path -LiteralPath $DataRoot).ProviderPath
@@ -20,8 +23,9 @@ if (Test-Path (Join-Path $runtime 'qemu.pid')) {
         throw "VM process $qemuProcessId is still running. Shut it down before starting another VM."
     }
 }
+$accel = if ($Accelerator -eq 'whpx') { 'whpx,kernel-irqchip=off' } else { 'tcg,thread=multi' }
 $arguments = @(
-    '-accel tcg,thread=multi', '-machine q35', '-cpu max', '-smp 2', '-m 4096',
+    "-accel $accel", '-machine q35', '-cpu max', "-smp $Cpus", "-m $MemoryMB",
     "-drive file=`"$disk`",format=qcow2,if=virtio",
     "-nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:${SshPort}-:22",
     '-display none', "-serial file:`"$(Join-Path $runtime 'serial.log')`"",

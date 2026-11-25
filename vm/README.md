@@ -35,7 +35,7 @@ try {
 ssh -t @connection $guest "cd $guestDir && exec bash"
 ```
 
-此时客体的工作目录是该提交的仓库根目录，可直接执行[项目 README](../README.md) 中的命令。客体采用 TCG、2 个 vCPU 和 4 GiB 内存。`poc` 账号通过安装时生成的 SSH 密钥登录并可执行免密 sudo。结束实验后在客体内运行 `sudo poweroff`。
+此时客体的工作目录是该提交的仓库根目录，可直接执行[项目 README](../README.md) 中的命令。客体默认采用 TCG、2 个 vCPU 和 4 GiB 内存。已启用 Windows Hypervisor Platform 的主机可在启动命令后加 `-Accelerator whpx -Cpus 4 -MemoryMB 5120`；使用 TCG 时也可单独调整 CPU 数和内存。`poc` 账号通过安装时生成的 SSH 密钥登录并可执行免密 sudo。结束实验后在客体内运行 `sudo poweroff`。
 
 ## 用 Actions 内核启动同一客体
 
