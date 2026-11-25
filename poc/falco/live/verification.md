@@ -203,3 +203,41 @@ sudo -n env TMPDIR="$V" python3 -B ../moat-kernel-build/tests/falco-modern-smoke
 本轮执行了 `falco/live/` 下全部 8 个 `check*` 脚本。检测器开关矩阵在通用内核上执行，MOAT 覆盖标记文件工作负载。两种内核均使用 SGX Simulation，未验证硬件 SGX。
 
 收尾时 K3s 已停止，containerd 的 `k8s.io` 运行任务为 0。客体内三个测试目录均已删除，两次关机的串口末尾均记录 `reboot: Power down`。宿主确认两个 QEMU 进程已退出，2222 端口无监听，已删除临时盘、归档、内核产物和日志。原盘修改时间仍为本地时间 `2026-11-24 23:15:31`。
+
+## 按 Falco 规则选择系统调用
+
+2026-11-25。基线 `df41ac2d6f1f263690d93e9c74d0aea7f731fcfa`，在其上测试未提交的工作树，内容与提交 `989c277` 相同。QEMU 使用 `-accel whpx,kernel-irqchip=off`、q35、`-cpu max`、4 vCPU、5120 MiB，直接引导原盘。客体为 Ubuntu 22.04.5、`5.15.0-198-generic`，SGX Simulation，Falco 0.45.2 发行包。
+
+原版 Falco 的最终订阅取自 `-o log_level=debug` 输出的 `syscalls selected in total (final set)`，enclave 的取自 `event_selection` 行。
+
+| 配置 | `all=false` | `all=true` | RAVEN 补订 |
+| --- | ---: | ---: | ---: |
+| 原版官方规则 | 72 | 72 | 0 |
+| SGX 官方规则 | 72 | 72 | 0 |
+| 两个检测器 | 80 | 80 | 8 |
+| 仅 RAVEN | 80 | 80 | 8 |
+| 仅 Zeek | 72 | 72 | 0 |
+
+两组 72 个名称逐项相同，各官方规则配置的 `rules_not_activated` 均为空。RAVEN 补订 `chmod`、`fchmod`、`fchmodat`、`listen`、`pwrite`、`pwritev`、`write`、`writev`。`custom_set: [openat]` 在采集前退出 1。另在客体规则副本追加一条匹配 `write` 的规则作对照：关闭 RAVEN 时，`all=false` 下原版与 SGX 都选 72 个并报告 `write` 未启用；`all=true` 下两者都选 73 个。
+
+同一 `check.sh` 夹具，改动前 enclave 接收 21819 条记录、57 种事件，改动后 485 条、27 种，且全部属于订阅集合。通用 `syscall`、`switch`、`futex`、`page_fault` 和 `poll` 降为 0。两次驱动丢失和恢复错误均为 0，都只产生 1 条 `Run shell untrusted`。
+
+| 检查 | 结果 |
+| --- | --- |
+| 构建与 `raven-syscalls-test` | 通过。增量构建重新生成 EDL 绑定 |
+| `check.sh`、`check-ring.sh`、离线回放 | 通过 |
+| `check-event-set.py` | 通过。8 组 SGX 配置、2 组原版基线和无效配置反例。另以上述 `write` 规则对照运行一次，通过 |
+| `check-detectors.py --strict` | 通过。四种检测器组合、五个启动反例；双检测器录制和仅 RAVEN 两轮各出现全部 10 类 RAVEN 输入标记 |
+| 严格历史 ring、双来源顺序、BPF ring 单元测试 | 17/17，其余通过 |
+| 故障注入 | 八组恢复与预算断言通过。测试后恢复 `FALCO_SGX_FAULT_INJECTION=OFF` 并重建 |
+| 插件套件 | 默认 38 项、structure 23 项、lifecycle 22 项通过，使用客体已有的上游参考输出 |
+| 历史 detector | 79 项通过、12 项原有差异，日志 SHA-256 仍为 `0a197e7744a06698ef89172d3a7f6e249a06a608b4ec827486abbca2e1dbf6e3` |
+| Zeek 状态探针 | 客体无 `unzip`，改用 Python `zipfile` 提取后通过 |
+| 容器、Docker、Kubernetes | 通过。Kubernetes 使用现有 K3s 测试集群 |
+| DNS | 首次失败，修复夹具后两个新目录各通过一次 |
+
+DNS 首次失败的原因：刷新阶段固定等待 17 秒，原版采集器第一次查询 A 记录时已经拿到改写后的地址，enclave 拿到旧地址，此后窗口内没有再查询。`check-dns.sh` 现在先等各自采集器输出首条 A 记录告警，再改写地址，并等解析器日志出现新地址后再继续。
+
+未运行的项目：重新生成上游结果的 behavior-review 和 parity-audit 套件（客体缺固定的 RAVEN checkout 和 Zeek 镜像）、TSAN、硬件 SGX 和性能测试。缩小订阅后 RAVEN 输入与全量订阅一致，目前依据代码分析和十类输入标记，尚无同一轨迹的差分测试。
+
+逐项命令输出和比较文件保存在宿主仓库外的 `tmp/event-selection-verify`，约 600 KiB。收尾时删除了客体测试目录（1.7 GiB），并删除测试从 `falco-poc` 和 `moby` 命名空间导入的固定镜像。K3s 集群原有的 `k8s.io` 镜像保留。客体执行 `sudo -n poweroff`，串口末尾记录 `reboot: Power down`。宿主确认 QEMU 已退出，2222 端口无监听。
